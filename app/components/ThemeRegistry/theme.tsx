@@ -1,33 +1,35 @@
 // components/ThemeRegistry/theme.ts
 
-import { Roboto } from 'next/font/google';
+import { Inter } from 'next/font/google';
+const inter = Inter({ subsets: ['latin'] });
 import { createTheme } from '@mui/material/styles';
-
-const roboto = Roboto({
-  weight: ['300', '400', '500', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-});
 
 const theme = createTheme({
   palette: {
+    mode: 'light',
     primary: {
-        main: '#f2f2f2'
+      main: '#E3F5FF',
+      contrastText: '#333538',
+    },
+    secondary: {
+      main: '#000000',
+    },
+    success: {
+      main: '#76cba9',
+    },
+    info: {
+      main: '#C6C7F8',
     },
   },
   typography: {
-    fontFamily: roboto.style.fontFamily,
+    fontFamily: 'inherit',
+    fontWeightLight: 300,
+    fontWeightRegular: 400,
+    fontWeightMedium: 500,
+    fontWeightBold: 600,
   },
-  components: {
-    MuiAlert: {
-      styleOverrides: {
-        root: ({ ownerState }) => ({
-          ...(ownerState.severity === 'info' && {
-            backgroundColor: '#60a5fa',
-          }),
-        }),
-      },
-    },
+  shape: {
+    borderRadius: 16,
   },
 });
 
