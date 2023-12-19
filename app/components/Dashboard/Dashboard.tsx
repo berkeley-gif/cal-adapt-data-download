@@ -4,41 +4,49 @@ import Image from 'next/image'
 import packageIcon from '@/public/img/icons/package.svg'
 import { useState, useEffect, Dispatch, SetStateAction, useRef } from "react"
 
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import Chip from '@mui/material/Chip'
-import Drawer from '@mui/material/Drawer'
-import CssBaseline from '@mui/material/CssBaseline'
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import List from '@mui/material/List'
-import Typography from '@mui/material/Typography'
-import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
-import InboxIcon from '@mui/icons-material/MoveToInbox'
-import MailIcon from '@mui/icons-material/Mail'
-import Breadcrumbs from '@mui/material/Breadcrumbs'
-import Link from '@mui/material/Link'
-import Autocomplete from '@mui/material/Autocomplete'
-import TextField from '@mui/material/TextField'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
+import Autocomplete from '@mui/material/Autocomplete';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import Chip from '@mui/material/Chip';
 import CloseIcon from '@mui/icons-material/Close';
+import CssBaseline from '@mui/material/CssBaseline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import InputLabel from '@mui/material/InputLabel';
+import Link from '@mui/material/Link';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import MailIcon from '@mui/icons-material/Mail';
+import MenuItem from '@mui/material/MenuItem';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 
 
 import SidePanel from './SidePanel'
 import './../../styles/components/dashboard.scss'
 
 import { stringToArray, arrayToCommaSeparatedString } from "@/app/utils/utilFn"
+import { FormControl } from '@mui/material';
 
-const drawerWidth = 212;
+const DRAWER_WIDTH = 212;
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
 
 export default function Dashboard({ packagesData }) {
 
@@ -87,7 +95,7 @@ export default function Dashboard({ packagesData }) {
     const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', 0)
     const [localPackageSettings, setPackageSettings] = useLocalStorageState('package', {
         dataset: '',
-        model: '',
+        models: '',
         vars: '',
         boundaryType: '',
         boundary: '',
@@ -99,10 +107,78 @@ export default function Dashboard({ packagesData }) {
     })
     const [isPackageStored, setIsPkgStored] = useLocalStorageState<boolean>('isPackageStored', false)
 
+    // configurations for select field dropdown
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                width: 250,
+            },
+        },
+        getContentAnchorEl: null,
+        anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center"
+        },
+        transformOrigin: {
+            vertical: "top",
+            horizontal: "center"
+        },
+        variant: "menu"
+    };
+
+    const modelsList = [
+        'ACCESS-CM2',
+        'CESM2-LENS',
+        'CNRM-ESM2-1',
+        'EC-Earth3',
+        'EC-Earth3-Veg',
+        'FGOALS-g3',
+        'GFDL-ESM4',
+        'HadGEM3-GC31-LL',
+        'INM-CM5-0',
+        'IPSL-CM6A-LR',
+        'KACE-1-0-G',
+        'MIROC6',
+        'MPI-ESM1-2-HR',
+        'MRI-ESM2-0',
+        'TaiESM1'
+    ]
+
+    const [modelsSelected, setModelsSelected] = useState<any>([])
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return
+        }
+        const selectedModelsStr = arrayToCommaSeparatedString(modelsSelected)
+        setPackageSettings({
+            ...localPackageSettings,
+            models: selectedModelsStr
+        })
+    }, [modelsSelected])
+
+    const isAllModelsSelected =
+        modelsList.length > 0 && modelsSelected.length === modelsList.length;
+
+    const handleModelsChange = (event: SelectChangeEvent<typeof modelsSelected>) => {
+        const {
+            target: { value },
+        } = event;
+        if (value[value.length - 1] === "all") {
+            setModelsSelected(modelsSelected.length === modelsList.length ? [] : modelsList);
+            return;
+        }
+        setModelsSelected(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
+
     function handlePackageSave() {
         setPackageSettings({
             dataset: packagesData[selectedPackage].dataset,
-            model: packagesData[selectedPackage].model,
+            models: packagesData[selectedPackage].model,
             vars: packagesData[selectedPackage].vars,
             boundaryType: packagesData[selectedPackage].boundaryType,
             boundary: '',
@@ -117,7 +193,6 @@ export default function Dashboard({ packagesData }) {
         setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
         setIsPkgStored(true)
         toggleDrawer(true)
-
     }
 
     function selectPackageToSave(id: number) {
@@ -157,6 +232,7 @@ export default function Dashboard({ packagesData }) {
     useEffect(() => {
         setAvailableVars(stringToArray(packagesData[0].vars))
         setSelectedVars(stringToArray(localPackageSettings.vars))
+        setModelsSelected(stringToArray(localPackageSettings.models))
     }, [])
 
     return (
@@ -164,7 +240,7 @@ export default function Dashboard({ packagesData }) {
             <CssBaseline />
             <AppBar
                 position="fixed"
-                sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px`, backgroundColor: `#fffff` }}
+                sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, ml: `${DRAWER_WIDTH}px`, backgroundColor: `#fffff` }}
             >
                 <Toolbar sx={{ justifyContent: `space-between` }}>
                     <Breadcrumbs aria-label="breadcrumb">
@@ -183,10 +259,10 @@ export default function Dashboard({ packagesData }) {
             </AppBar>
             <Drawer
                 sx={{
-                    width: drawerWidth,
+                    width: DRAWER_WIDTH,
                     flexShrink: 0,
                     '& .MuiDrawer-paper': {
-                        width: drawerWidth,
+                        width: DRAWER_WIDTH,
                         boxSizing: 'border-box',
                     },
                 }}
@@ -226,7 +302,7 @@ export default function Dashboard({ packagesData }) {
                             </Typography>
                             <ul className="package__settings">
                                 <li><Typography variant="body2">Boundary Type:</Typography> {packagesData[0].boundaryType}</li>
-                                <li><Typography variant="body2">Model:</Typography> {packagesData[0].model}</li>
+                                <li><Typography variant="body2">Models:</Typography> {packagesData[0].models}</li>
                                 <li><Typography variant="body2">Dataset:</Typography> {packagesData[0].dataset}</li>
                                 <li><Typography variant="body2">Range:</Typography> {packagesData[0].rangeStart} - {packagesData[0].rangeEnd}</li>
                                 <li><Typography variant="body2">Data Format:</Typography> {packagesData[0].dataFormat}</li>
@@ -286,7 +362,40 @@ export default function Dashboard({ packagesData }) {
                                 <Typography variant="body2">Dataset</Typography> {localPackageSettings.dataset}
                             </div>
                             <div className="container container--package-setting">
-                                <Typography variant="body2">Model</Typography> {localPackageSettings.model}
+
+                                <Typography variant="body2">Models</Typography>
+                                <FormControl>
+                                    <Select
+                                        multiple
+                                        value={modelsSelected}
+                                        onChange={handleModelsChange}
+                                        renderValue={(selected) => selected.join(', ')}
+                                        MenuProps={MenuProps}
+                                        sx={{ mt: '15px', width: '380px' }}
+                                    >
+                                        <MenuItem
+                                            value="all"
+                                        >
+                                            <ListItemIcon>
+                                                <Checkbox
+                                                    checked={isAllModelsSelected}
+                                                    indeterminate={
+                                                        modelsSelected.length > 0 && modelsSelected.length < modelsList.length
+                                                    }
+                                                />
+                                            </ListItemIcon>
+                                            <ListItemText
+                                                primary="Select All"
+                                            />
+                                        </MenuItem>
+                                        {modelsList.map((model) => (
+                                            <MenuItem key={model} value={model}>
+                                                <Checkbox checked={modelsSelected.indexOf(model) > -1} />
+                                                <ListItemText primary={model} />
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </div>
                             <div className="container container--package-setting">
                                 <Typography variant="body2">Variables</Typography>
