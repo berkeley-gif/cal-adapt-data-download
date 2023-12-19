@@ -36,9 +36,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SidePanel from './SidePanel'
 import './../../styles/components/dashboard.scss'
 
-import { stringToArray } from "@/app/utils/utilFn"
-import { getPropertyValueById } from "@/app/utils/utilFn"
-import { arrayToCommaSeparatedString } from "@/app/utils/utilFn"
+import { stringToArray, arrayToCommaSeparatedString } from "@/app/utils/utilFn"
 
 const drawerWidth = 212;
 
@@ -70,8 +68,9 @@ export default function Dashboard({ packagesData }) {
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
     const [availableVars, setAvailableVars] = useState<any>([])
+    const [tentativePackage, setTentativePackage] = useState<number>(0)
+
     const [selectedVars, setSelectedVars] = useState<any>([])
-    
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
@@ -83,9 +82,9 @@ export default function Dashboard({ packagesData }) {
             vars: selectedVarsStr
         })
     }, [selectedVars])
-    
+
+    // Local state variables
     const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', 0)
-    const [tentativePackage, setTentativePackage] = useState<number>(0)
     const [localPackageSettings, setPackageSettings] = useLocalStorageState('package', {
         dataset: '',
         model: '',
@@ -98,8 +97,9 @@ export default function Dashboard({ packagesData }) {
         rangeEnd: '',
         units: ''
     })
+    const [isPackageStored, setIsPkgStored] = useLocalStorageState<boolean>('isPackageStored', false)
 
-    function handleSave() {
+    function handlePackageSave() {
         setPackageSettings({
             dataset: packagesData[selectedPackage].dataset,
             model: packagesData[selectedPackage].model,
@@ -117,26 +117,40 @@ export default function Dashboard({ packagesData }) {
         setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
     }
 
-    function selectPackage(id: number) {
+    function selectPackageToSave(id: number) {
         setTentativePackage(id)
-        openOverwriteDialog(true)
+
+        if (isPackageStored) {
+            openOverwriteDialog(true)
+        } else {
+            setSelectedPackage(tentativePackage)
+            handlePackageSave()
+            setIsPkgStored(true)
+            toggleDrawer(true)
+        }
     }
 
     function handleOverwriteDialog(overwrite: boolean) {
         if (overwrite) {
+
+            // close dialog
             openOverwriteDialog(false)
+
             setSelectedPackage(tentativePackage)
-            handleSave()
+            handlePackageSave()
+            setIsPkgStored(true)
             toggleDrawer(true)
         } else {
             setTentativePackage(0)
             openOverwriteDialog(false)
+            setIsPkgStored(false)
         }
     }
 
     function handleClear() {
         if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.clear();
+            localStorage.clear()
+            setIsPkgStored(false)
         }
     }
 
@@ -218,10 +232,10 @@ export default function Dashboard({ packagesData }) {
                                 <li><Typography variant="body2">Boundary Type:</Typography> {packagesData[0].boundaryType}</li>
                                 <li><Typography variant="body2">Model:</Typography> {packagesData[0].model}</li>
                                 <li><Typography variant="body2">Dataset:</Typography> {packagesData[0].dataset}</li>
-                                <li><Typography variant="body2">Range:</Typography> {packagesData[0].range}</li>
+                                <li><Typography variant="body2">Range:</Typography> {packagesData[0].rangeStart} - {packagesData[0].rangeEnd}</li>
                                 <li><Typography variant="body2">Data Format:</Typography> {packagesData[0].dataFormat}</li>
                             </ul>
-                            <Button onClick={() => selectPackage(0)} variant="contained">Customize and download</Button>
+                            <Button onClick={() => selectPackageToSave(0)} variant="contained">Customize and download</Button>
                         </div>
                     </div>
                 </div>
