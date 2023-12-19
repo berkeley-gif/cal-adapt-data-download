@@ -1,0 +1,33 @@
+.container {
+    background-color: #F7F9FB;
+    border-radius: 16px; 
+    padding: 30px;
+
+    &--full {
+        width: 100%;
+    }
+
+    &--package {
+        background-color: #EEF3F9;
+        border-radius: 16px;
+        width: 390px;
+        padding: 25px;
+    }
+}
+
+.grid {
+    margin: 16px 0;
+}
+
+.package {
+    &__settings {
+        list-style-type: none;
+        margin: 25px 0;
+
+        li { 
+            p {
+                display: inline-block;
+            }
+        }
+    }
+}

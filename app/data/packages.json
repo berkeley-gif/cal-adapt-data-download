@@ -1,0 +1,28 @@
+[
+  {
+    "id": 0,
+    "name": "County Gridded Data",
+    "dataset": "LOCA2", 
+    "model": "General Use GCM's", 
+    "vars": "tasmax, tasmin, precip",
+    "boundaryType": "County",
+    "frequency": "Monthly",
+    "dataFormat": "NetCDF",
+    "rangeStart": "1950",
+    "rangeEnd": "2100", 
+    "units": "source"
+  },
+  {
+    "id": 1,
+    "name": "Demo Data",
+    "dataset": "LOCA2", 
+    "model": "General Use GCM's", 
+    "vars": "tasmax, tasmin",
+    "boundaryType": "County",
+    "frequency": "Monthly",
+    "dataFormat": "NetCDF",
+    "rangeStart": "1950",
+    "rangeEnd": "2100", 
+    "units": "source"
+  }
+]
