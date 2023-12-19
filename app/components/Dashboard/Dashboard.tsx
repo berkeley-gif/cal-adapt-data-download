@@ -115,6 +115,9 @@ export default function Dashboard({ packagesData }) {
 
         setAvailableVars(stringToArray(packagesData[selectedPackage].vars))
         setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
+        setIsPkgStored(true)
+        toggleDrawer(true)
+
     }
 
     function selectPackageToSave(id: number) {
@@ -125,25 +128,18 @@ export default function Dashboard({ packagesData }) {
         } else {
             setSelectedPackage(tentativePackage)
             handlePackageSave()
-            setIsPkgStored(true)
-            toggleDrawer(true)
         }
     }
 
     function handleOverwriteDialog(overwrite: boolean) {
         if (overwrite) {
-
-            // close dialog
+            // package should be overwritten
             openOverwriteDialog(false)
-
             setSelectedPackage(tentativePackage)
             handlePackageSave()
-            setIsPkgStored(true)
-            toggleDrawer(true)
         } else {
-            setTentativePackage(0)
             openOverwriteDialog(false)
-            setIsPkgStored(false)
+            setTentativePackage(0)
         }
     }
 
@@ -273,63 +269,75 @@ export default function Dashboard({ packagesData }) {
                     <IconButton onClick={() => toggleDrawer(false)}>
                         <CloseIcon />
                     </IconButton>
-                    <IconButton onClick={() => handleClear()}>
-                        <DeleteOutlineIcon />
-                    </IconButton>
 
-                    <Typography variant="h5">
-                        Review Your Data Package
-                    </Typography>
+                    {isPackageStored &&
+                        <IconButton onClick={() => handleClear()}>
+                            <DeleteOutlineIcon />
+                        </IconButton>
+                    }
 
-                    <div className="container container--package-setting">
-                        <Typography variant="body2">Dataset</Typography> {localPackageSettings.dataset}
-                    </div>
-                    <div className="container container--package-setting">
-                        <Typography variant="body2">Model</Typography> {localPackageSettings.model}
-                    </div>
-                    <div className="container container--package-setting">
-                        <Typography variant="body2">Variables</Typography>
-                        <Autocomplete
-                            multiple
-                            value={selectedVars}
-                            onChange={(event: any, newValue: string | null) => {
-                                setSelectedVars(newValue)
-                            }}
-                            id="tags-outlined"
-                            options={availableVars}
-                            filterSelectedOptions
-                            renderOption={(props, option) => {
-                                return (
-                                    <li {...props} key={option}>
-                                        {option}
-                                    </li>
-                                )
-                            }}
-                            renderTags={(tagValue, getTagProps) => {
-                                return tagValue.map((option, index) => (
-                                    <Chip {...getTagProps({ index })} key={option} label={option} />
-                                ))
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    placeholder="Search..."
+                    {isPackageStored &&
+                        <div className="package-contents">
+                            <Typography variant="h5">
+                                Review Your Data Package
+                            </Typography>
 
+                            <div className="container container--package-setting">
+                                <Typography variant="body2">Dataset</Typography> {localPackageSettings.dataset}
+                            </div>
+                            <div className="container container--package-setting">
+                                <Typography variant="body2">Model</Typography> {localPackageSettings.model}
+                            </div>
+                            <div className="container container--package-setting">
+                                <Typography variant="body2">Variables</Typography>
+                                <Autocomplete
+                                    multiple
+                                    value={selectedVars}
+                                    onChange={(event: any, newValue: string | null) => {
+                                        setSelectedVars(newValue)
+                                    }}
+                                    id="tags-outlined"
+                                    options={availableVars}
+                                    filterSelectedOptions
+                                    renderOption={(props, option) => {
+                                        return (
+                                            <li {...props} key={option}>
+                                                {option}
+                                            </li>
+                                        )
+                                    }}
+                                    renderTags={(tagValue, getTagProps) => {
+                                        return tagValue.map((option, index) => (
+                                            <Chip {...getTagProps({ index })} key={option} label={option} />
+                                        ))
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder="Search..."
+
+                                        />
+                                    )}
+                                    sx={{ mt: '15px', width: '380px' }}
                                 />
-                            )}
-                            sx={{ mt: '15px', width: '380px' }}
-                        />
-                    </div>
-                    <div className="container container--package-setting">
-                        <Typography variant="body2">Boundary Type</Typography> {localPackageSettings.boundaryType}
-                    </div>
+                            </div>
+                            <div className="container container--package-setting">
+                                <Typography variant="body2">Boundary Type</Typography> {localPackageSettings.boundaryType}
+                            </div>
 
-                    <div className="container container--package-setting">
-                        <Typography variant="body2">Range</Typography> {localPackageSettings.rangeStart} - {localPackageSettings.rangeEnd}
-                    </div>
-                    <div className="container container--package-setting">
-                        <Typography variant="body2">Data Format</Typography> {localPackageSettings.dataFormat}
-                    </div>
+                            <div className="container container--package-setting">
+                                <Typography variant="body2">Range</Typography> {localPackageSettings.rangeStart} - {localPackageSettings.rangeEnd}
+                            </div>
+                            <div className="container container--package-setting">
+                                <Typography variant="body2">Data Format</Typography> {localPackageSettings.dataFormat}
+                            </div>
+                        </div>
+                    }
+                    {!isPackageStored &&
+                        <Typography variant="h5">
+                            No package available...
+                        </Typography>
+                    }
                 </SidePanel>
             </Box>
         </Box>
