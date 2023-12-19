@@ -95,6 +95,7 @@ export default function Dashboard({ packagesData }) {
     const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', 0)
     const [localPackageSettings, setPackageSettings] = useLocalStorageState('package', {
         dataset: '',
+        scenarios: '',
         models: '',
         vars: '',
         boundaryType: '',
@@ -178,6 +179,7 @@ export default function Dashboard({ packagesData }) {
     function handlePackageSave() {
         setPackageSettings({
             dataset: packagesData[selectedPackage].dataset,
+            scenarios: packagesData[selectedPackage].scenarios,
             models: packagesData[selectedPackage].model,
             vars: packagesData[selectedPackage].vars,
             boundaryType: packagesData[selectedPackage].boundaryType,
@@ -361,8 +363,13 @@ export default function Dashboard({ packagesData }) {
                             <div className="container container--package-setting">
                                 <Typography variant="body2">Dataset</Typography> {localPackageSettings.dataset}
                             </div>
-                            <div className="container container--package-setting">
 
+
+                            <div className="container container--package-setting">
+                                <Typography variant="body2">Scenario(s)</Typography> {localPackageSettings.scenarios}
+                            </div>
+
+                            <div className="container container--package-setting">
                                 <Typography variant="body2">Models</Typography>
                                 <FormControl>
                                     <Select

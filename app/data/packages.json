@@ -2,29 +2,29 @@
   {
     "id": 0,
     "name": "County Gridded Data",
-    "dataset": "LOCA2", 
-    "scenarios": "Historical, 3.7.0",
-    "models": "ACCESS-CM2, CESM2 - LENS, CNRM - ESM2 - 1, EC - Earth3, EC - Earth3 - Veg, FGOALS - g3, GFDL - ESM4, HadGEM3 - GC31 - LL, INM - CM5 - 0, IPSL - CM6A - LR, KACE - 1 - 0 - G, MIROC6, MPI - ESM1 - 2 - HR, MRI - ESM2 - 0, TaiESM1", 
+    "dataset": "LOCA2",
+    "scenarios": "Historical",
+    "models": "ACCESS-CM2, CESM2-LENS, CNRM-ESM2-1, EC-Earth3, EC-Earth3-Veg, FGOALS-g3, GFDL-ESM4, HadGEM3-GC31-LL, INM-CM5-0, IPSL-CM6A-LR, KACE-1-0-G, MIROC6, MPI-ESM1-2-HR, MRI-ESM2-0, TaiESM1",
     "vars": "tasmax, tasmin, precip",
     "boundaryType": "County",
     "frequency": "Monthly",
     "dataFormat": "NetCDF",
     "rangeStart": "1950",
-    "rangeEnd": "2100", 
+    "rangeEnd": "2100",
     "units": "source"
   },
   {
     "id": 1,
     "name": "Demo Data",
-    "dataset": "LOCA2", 
-    "scenarios": "Historical, 3.7.0",
-    "models": "ACCESS-CM2, CESM2 - LENS, CNRM - ESM2 - 1, EC - Earth3, EC - Earth3 - Veg, FGOALS - g3, GFDL - ESM4, HadGEM3 - GC31 - LL, INM - CM5 - 0, IPSL - CM6A - LR, KACE - 1 - 0 - G, MIROC6, MPI - ESM1 - 2 - HR, MRI - ESM2 - 0, TaiESM1", 
+    "dataset": "LOCA2",
+    "scenarios": "Historical",
+    "models": "ACCESS-CM2, CESM2 - LENS, CNRM - ESM2 - 1, EC - Earth3, EC - Earth3 - Veg, FGOALS - g3, GFDL - ESM4, HadGEM3 - GC31 - LL, INM - CM5 - 0, IPSL - CM6A - LR, KACE - 1 - 0 - G, MIROC6, MPI - ESM1 - 2 - HR, MRI - ESM2 - 0, TaiESM1",
     "vars": "tasmax, tasmin",
     "boundaryType": "County",
     "frequency": "Monthly",
     "dataFormat": "NetCDF",
     "rangeStart": "1950",
-    "rangeEnd": "2100", 
+    "rangeEnd": "2100",
     "units": "source"
   }
 ]
