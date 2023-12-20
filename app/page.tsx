@@ -10,9 +10,12 @@ export default async function Home() {
   const file = await fs.readFile(process.cwd() + '/app/data/packages.json', 'utf8');
   const packagesData = JSON.parse(file);
 
+  const fileCounties = await fs.readFile(process.cwd() + '/app/data/counties.json', 'utf8');
+  const countiesData = JSON.parse(fileCounties);
+
   return (
     <div className={styles.container}>
-      <Dashboard packagesData={packagesData} />
+      <Dashboard packagesData={packagesData} countiesData={countiesData} />
     </div>
   );
 }

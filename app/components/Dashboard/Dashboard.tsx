@@ -48,10 +48,47 @@ const DRAWER_WIDTH = 212;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
-export default function Dashboard({ packagesData }) {
-
+export default function Dashboard({ packagesData, countiesData }) {
     type SetValue<T> = Dispatch<SetStateAction<T>>;
 
+    const isFirstRender = useRef(true)
+    const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
+    const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
+    const [availableVars, setAvailableVars] = useState<any>([])
+    const [tentativePackage, setTentativePackage] = useState<number>(0)
+
+    // Code for climate variables / indicators
+    const [selectedVars, setSelectedVars] = useState<any>([])
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return
+        }
+        const selectedVarsStr = arrayToCommaSeparatedString(selectedVars)
+        setPackageSettings({
+            ...localPackageSettings,
+            vars: selectedVarsStr
+        })
+    }, [selectedVars])
+    // End of code for climate variables / indicators
+
+    // Code for counties
+    const [selectedCounties, setSelectedCounties] = useState<any>([])
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return
+        }
+        const selectedCountiesStr = arrayToCommaSeparatedString(selectedCounties)
+        setPackageSettings({
+            ...localPackageSettings,
+            boundaries: selectedCountiesStr
+        })
+    }, [selectedCounties])
+
+    // End of code for climate variables / indicators
+
+    // Variables that are stored in local state
     function useLocalStorageState<T>(
         key: string,
         initialValue: T
@@ -72,26 +109,6 @@ export default function Dashboard({ packagesData }) {
         return [value, setValue];
     }
 
-    const isFirstRender = useRef(true)
-    const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
-    const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
-    const [availableVars, setAvailableVars] = useState<any>([])
-    const [tentativePackage, setTentativePackage] = useState<number>(0)
-
-    const [selectedVars, setSelectedVars] = useState<any>([])
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return
-        }
-        const selectedVarsStr = arrayToCommaSeparatedString(selectedVars)
-        setPackageSettings({
-            ...localPackageSettings,
-            vars: selectedVarsStr
-        })
-    }, [selectedVars])
-
-    // Local state variables
     const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', 0)
     const [localPackageSettings, setPackageSettings] = useLocalStorageState('package', {
         dataset: '',
@@ -99,7 +116,7 @@ export default function Dashboard({ packagesData }) {
         models: '',
         vars: '',
         boundaryType: '',
-        boundary: '',
+        boundaries: '',
         frequency: '',
         dataFormat: '',
         rangeStart: '',
@@ -108,7 +125,7 @@ export default function Dashboard({ packagesData }) {
     })
     const [isPackageStored, setIsPkgStored] = useLocalStorageState<boolean>('isPackageStored', false)
 
-    // configurations for select field dropdown
+    // Configurations for Models Select field dropdown
     const MenuProps = {
         PaperProps: {
             style: {
@@ -162,6 +179,9 @@ export default function Dashboard({ packagesData }) {
     const isAllModelsSelected =
         modelsList.length > 0 && modelsSelected.length === modelsList.length;
 
+    // End of configurations for Models Select field dropdown
+
+
     const handleModelsChange = (event: SelectChangeEvent<typeof modelsSelected>) => {
         const {
             target: { value },
@@ -183,7 +203,7 @@ export default function Dashboard({ packagesData }) {
             models: packagesData[selectedPackage].model,
             vars: packagesData[selectedPackage].vars,
             boundaryType: packagesData[selectedPackage].boundaryType,
-            boundary: '',
+            boundaries: '',
             frequency: packagesData[selectedPackage].frequency,
             dataFormat: packagesData[selectedPackage].dataFormat,
             rangeStart: packagesData[selectedPackage].rangeStart,
@@ -235,6 +255,7 @@ export default function Dashboard({ packagesData }) {
         setAvailableVars(stringToArray(packagesData[0].vars))
         setSelectedVars(stringToArray(localPackageSettings.vars))
         setModelsSelected(stringToArray(localPackageSettings.models))
+        setSelectedCounties(stringToArray(localPackageSettings.boundaries))
     }, [])
 
     return (
@@ -304,10 +325,11 @@ export default function Dashboard({ packagesData }) {
                             </Typography>
                             <ul className="package__settings">
                                 <li><Typography variant="body2">Boundary Type:</Typography> {packagesData[0].boundaryType}</li>
-                                <li><Typography variant="body2">Models:</Typography> {packagesData[0].models}</li>
                                 <li><Typography variant="body2">Dataset:</Typography> {packagesData[0].dataset}</li>
                                 <li><Typography variant="body2">Range:</Typography> {packagesData[0].rangeStart} - {packagesData[0].rangeEnd}</li>
+                                <li><Typography variant="body2">Frequency:</Typography> {packagesData[0].frequency}</li>
                                 <li><Typography variant="body2">Data Format:</Typography> {packagesData[0].dataFormat}</li>
+                                <li><Typography variant="body2">Units:</Typography> {packagesData[0].units}</li>
                             </ul>
                             <Button onClick={() => selectPackageToSave(0)} variant="contained">Customize and download</Button>
                         </div>
@@ -438,7 +460,39 @@ export default function Dashboard({ packagesData }) {
                                 />
                             </div>
                             <div className="container container--package-setting">
-                                <Typography variant="body2">Boundary Type</Typography> {localPackageSettings.boundaryType}
+                                <Typography variant="body2">Spatial Extent</Typography>
+                                <Typography variant="body2">Type</Typography>{localPackageSettings.boundaryType}
+                                <Typography variant="body2">Counties</Typography>
+                                <Autocomplete
+                                    multiple
+                                    value={selectedCounties}
+                                    onChange={(event: any, newValue: string | null) => {
+                                        setSelectedCounties(newValue)
+                                    }}
+                                    id="tags-outlined"
+                                    options={countiesData}
+                                    filterSelectedOptions
+                                    renderOption={(props, option) => {
+                                        return (
+                                            <li {...props} key={option}>
+                                                {option}
+                                            </li>
+                                        )
+                                    }}
+                                    renderTags={(tagValue, getTagProps) => {
+                                        return tagValue.map((option, index) => (
+                                            <Chip {...getTagProps({ index })} key={option} label={option} />
+                                        ))
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder="Search..."
+
+                                        />
+                                    )}
+                                    sx={{ mt: '15px', width: '380px' }}
+                                />
                             </div>
 
                             <div className="container container--package-setting">

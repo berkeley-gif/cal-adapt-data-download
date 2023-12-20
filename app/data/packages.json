@@ -11,7 +11,7 @@
     "dataFormat": "NetCDF",
     "rangeStart": "1950",
     "rangeEnd": "2100",
-    "units": "source"
+    "units": "Source"
   },
   {
     "id": 1,
