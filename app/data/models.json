@@ -1,0 +1,62 @@
+[
+  {
+    "name": "ACCESS-CM2",
+    "genUse": 0
+  },
+  {
+    "name": "CESM2-LENS",
+    "genUse": 0
+  },
+  {
+    "name": "CNRM-ESM2-1",
+    "genUse": 1
+  },
+  {
+    "name": "EC-Earth3",
+    "genUse": 0
+  },
+  {
+    "name": "EC-Earth3-Veg",
+    "genUse": 0
+  },
+  {
+    "name": "FGOALS-g3",
+    "genUse": 0
+  },
+  {
+    "name": "GFDL-ESM4",
+    "genUse": 0
+  },
+  {
+    "name": "HadGEM3-GC31-LL",
+    "genUse": 1
+  },
+  {
+    "name": "INM-CM5-0",
+    "genUse": 0
+  },
+  {
+    "name": "IPSL-CM6A-LR",
+    "genUse": 0
+  },
+  {
+    "name": "KACE-1-0-G",
+    "genUse": 0
+  },
+  {
+    "name": "MIROC6",
+    "genUse": 1
+  },
+  {
+    "name": "MPI-ESM1-2-HR",
+    "genUse": 0
+  },
+  {
+    "name": "MRI-ESM2-0",
+    "genUse": 0
+  },
+  {
+    "name": "TaiESM1",
+    "genUse": 0
+  }
+]

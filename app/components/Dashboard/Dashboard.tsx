@@ -48,7 +48,7 @@ const DRAWER_WIDTH = 212;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
-export default function Dashboard({ packagesData, countiesData }) {
+export default function Dashboard({ packagesData, countiesData, modelsData }) {
     type SetValue<T> = Dispatch<SetStateAction<T>>;
 
     const isFirstRender = useRef(true)
@@ -145,24 +145,9 @@ export default function Dashboard({ packagesData, countiesData }) {
         variant: "menu"
     };
 
-    const modelsList = [
-        'ACCESS-CM2',
-        'CESM2-LENS',
-        'CNRM-ESM2-1',
-        'EC-Earth3',
-        'EC-Earth3-Veg',
-        'FGOALS-g3',
-        'GFDL-ESM4',
-        'HadGEM3-GC31-LL',
-        'INM-CM5-0',
-        'IPSL-CM6A-LR',
-        'KACE-1-0-G',
-        'MIROC6',
-        'MPI-ESM1-2-HR',
-        'MRI-ESM2-0',
-        'TaiESM1'
-    ]
+    const modelsList: string[] = modelsData.map((obj) => obj.name)
 
+    console.log(modelsList)
     const [modelsSelected, setModelsSelected] = useState<any>([])
     useEffect(() => {
         if (isFirstRender.current) {
@@ -254,7 +239,7 @@ export default function Dashboard({ packagesData, countiesData }) {
     useEffect(() => {
         setAvailableVars(stringToArray(packagesData[0].vars))
         setSelectedVars(stringToArray(localPackageSettings.vars))
-        setModelsSelected(stringToArray(localPackageSettings.models))
+        // setModelsSelected(stringToArray(localPackageSettings.models))
         setSelectedCounties(stringToArray(localPackageSettings.boundaries))
     }, [])
 
