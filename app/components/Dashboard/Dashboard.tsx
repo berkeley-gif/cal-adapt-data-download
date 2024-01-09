@@ -248,9 +248,9 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
             <CssBaseline />
             <AppBar
                 position="fixed"
-                sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, ml: `${DRAWER_WIDTH}px`, backgroundColor: `#fffff` }}
+                sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, ml: `${DRAWER_WIDTH}px`, backgroundColor: `#fffff`, boxShadow: `none`, borderBottom: `1px solid #e8e8e8` }}
             >
-                <Toolbar sx={{ justifyContent: `space-between` }}>
+                <Toolbar className="toolbar-main" sx={{ justifyContent: `space-between` }}>
                     <Breadcrumbs aria-label="breadcrumb">
                         <Link underline="hover" color="inherit" href="/">
                             Dashboard
