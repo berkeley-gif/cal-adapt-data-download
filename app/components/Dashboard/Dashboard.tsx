@@ -51,8 +51,20 @@ const ITEM_PADDING_TOP = 8;
 
 export default function Dashboard({ data, packagesData, countiesData, modelsData }) {
     const callAPI = async () => {
+        const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search';
+        const queryParams = new URLSearchParams({
+            limit: '10',
+            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370' AND countyname='San Luis Obispo'",
+            filter_lang: 'cql2-text',
+        });
+
+        const fullUrl = `${apiUrl}?${queryParams.toString()}`;
+
+
+        console.log(fullUrl)
+
         try {
-            const res = await fetch(`https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search?limit=10&filter=collection%3D%27loca2-mon-county%27%20AND%20cmip6%3Aexperiment_id%3D%27ssp370%27%20AND%20countyname%3D%27San%20Luis%20Obispo%27&filter_lang=cql2-text`)
+            const res = await fetch(fullUrl)
             const data = await res.json()
             console.log(data)
         } catch (err) {
@@ -71,7 +83,7 @@ export default function Dashboard({ data, packagesData, countiesData, modelsData
     const [tentativePackage, setTentativePackage] = useState<number>(0)
 
     // Code for climate variables / indicators
-    const varsList: string [] = (data.summaries['cmip6:variable_id']).map((obj) => obj)
+    const varsList: string[] = (data.summaries['cmip6:variable_id']).map((obj) => obj)
     const [selectedVars, setSelectedVars] = useState<any>([])
     useEffect(() => {
         if (isFirstRender.current) {
@@ -88,7 +100,7 @@ export default function Dashboard({ data, packagesData, countiesData, modelsData
 
     // Code for counties
     const countiesList: string[] = (data.summaries['countyname']).map((obj) => obj)
-    
+
     const [selectedCounties, setSelectedCounties] = useState<any>([])
     useEffect(() => {
         if (isFirstRender.current) {
@@ -571,7 +583,9 @@ export default function Dashboard({ data, packagesData, countiesData, modelsData
                                 <Typography variant="body2">Data Format</Typography> {localPackageSettings.dataFormat}
                             </div>
                             <div className="cta">
-                                <Button variant="contained">Download package</Button>
+                                <Button onClick={() => {
+                                    callAPI
+                                }} variant="contained">Download package</Button>
                             </div>
                         </div>
                     }
