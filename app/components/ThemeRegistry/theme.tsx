@@ -71,14 +71,12 @@ const theme = createTheme({
           props: { variant: 'link-purple' },
           style: {
             backgroundColor: '#C7C6F8', // Customize the background color
-            width: '50%'
           },
         },
         {
           props: { variant: 'link-grey' },
           style: {
             backgroundColor: '#E5ECF6', // Customize the background color
-            width: '50%'
           },
         }
       ],
@@ -90,7 +88,7 @@ const theme = createTheme({
         },
         filledInfo: {
           backgroundColor: '#E3F5FF',
-          
+          color: 'inherit',
         },
       },
     },

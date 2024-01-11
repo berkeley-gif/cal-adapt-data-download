@@ -86,8 +86,6 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
     // Code for counties
     const [selectedCounties, setSelectedCounties] = useState<any>([])
     useEffect(() => {
-        callAPI()
-
         if (isFirstRender.current) {
             isFirstRender.current = false;
             return
@@ -248,10 +246,11 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
         setSidePanelOpen(open);
     }
 
+    // useEffect for component
     useEffect(() => {
         setAvailableVars(stringToArray(packagesData[0].vars))
         setSelectedVars(stringToArray(localPackageSettings.vars))
-        // setModelsSelected(stringToArray(localPackageSettings.models))
+        setModelsSelected(stringToArray(localPackageSettings.models))
         setSelectedCounties(stringToArray(localPackageSettings.boundaries))
     }, [])
 
@@ -422,123 +421,148 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
                             </Typography>
 
                             <div className="container container--package-setting">
-                                <Typography variant="body2">Dataset</Typography> {localPackageSettings.dataset}
+                                <p className="option-group">
+                                    <Typography variant="body2">Dataset</Typography> {localPackageSettings.dataset}
+                                </p>
+
                             </div>
 
 
                             <div className="container container--package-setting">
-                                <Typography variant="body2">Scenario(s)</Typography> {localPackageSettings.scenarios}
+                                <p className="option-group">
+                                    <Typography variant="body2">Scenario(s)</Typography> {localPackageSettings.scenarios}
+                                </p>
                             </div>
 
                             <div className="container container--package-setting">
-                                <Typography variant="body2">Models</Typography>
-                                <FormControl>
-                                    <Select
-                                        multiple
-                                        value={modelsSelected}
-                                        onChange={handleModelsChange}
-                                        renderValue={(selected) => selected.join(', ')}
-                                        MenuProps={MenuProps}
-                                        sx={{ mt: '15px', width: '380px' }}
-                                    >
-                                        <MenuItem
-                                            value="all"
+                                <p className="option-group">
+                                    <Typography variant="body2">Models</Typography>
+                                    <FormControl>
+                                        <Select
+                                            multiple
+                                            value={modelsSelected}
+                                            onChange={handleModelsChange}
+                                            renderValue={(selected) => selected.join(', ')}
+                                            MenuProps={MenuProps}
+                                            sx={{ mt: '15px', width: '380px' }}
                                         >
-                                            <ListItemIcon>
-                                                <Checkbox
-                                                    checked={isAllModelsSelected}
-                                                    indeterminate={
-                                                        modelsSelected.length > 0 && modelsSelected.length < modelsList.length
-                                                    }
+                                            <MenuItem
+                                                value="all"
+                                            >
+                                                <ListItemIcon>
+                                                    <Checkbox
+                                                        checked={isAllModelsSelected}
+                                                        indeterminate={
+                                                            modelsSelected.length > 0 && modelsSelected.length < modelsList.length
+                                                        }
+                                                    />
+                                                </ListItemIcon>
+                                                <ListItemText
+                                                    primary="Select All"
                                                 />
-                                            </ListItemIcon>
-                                            <ListItemText
-                                                primary="Select All"
-                                            />
-                                        </MenuItem>
-                                        {modelsList.map((model) => (
-                                            <MenuItem key={model} value={model}>
-                                                <Checkbox checked={modelsSelected.indexOf(model) > -1} />
-                                                <ListItemText primary={model} />
                                             </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                            {modelsList.map((model) => (
+                                                <MenuItem key={model} value={model}>
+                                                    <Checkbox checked={modelsSelected.indexOf(model) > -1} />
+                                                    <ListItemText primary={model} />
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </p>
                             </div>
                             <div className="container container--package-setting">
-                                <Typography variant="body2">Variables</Typography>
-                                <Autocomplete
-                                    multiple
-                                    value={selectedVars}
-                                    onChange={(event: any, newValue: string | null) => {
-                                        setSelectedVars(newValue)
-                                    }}
-                                    id="tags-outlined"
-                                    options={availableVars}
-                                    filterSelectedOptions
-                                    renderOption={(props, option) => {
-                                        return (
-                                            <li {...props} key={option}>
-                                                {option}
-                                            </li>
-                                        )
-                                    }}
-                                    renderTags={(tagValue, getTagProps) => {
-                                        return tagValue.map((option, index) => (
-                                            <Chip {...getTagProps({ index })} key={option} label={option} />
-                                        ))
-                                    }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            placeholder="Search..."
+                                <p className="option-group">
+                                    <Typography variant="body2">Variables</Typography>
+                                    <Autocomplete
+                                        multiple
+                                        value={selectedVars}
+                                        onChange={(event: any, newValue: string | null) => {
+                                            setSelectedVars(newValue)
+                                        }}
+                                        id="tags-outlined"
+                                        options={availableVars}
+                                        filterSelectedOptions
+                                        renderOption={(props, option) => {
+                                            return (
+                                                <li {...props} key={option}>
+                                                    {option}
+                                                </li>
+                                            )
+                                        }}
+                                        renderTags={(tagValue, getTagProps) => {
+                                            return tagValue.map((option, index) => (
+                                                <Chip {...getTagProps({ index })} key={option} label={option} />
+                                            ))
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                placeholder="Search..."
 
-                                        />
-                                    )}
-                                    sx={{ mt: '15px', width: '380px' }}
-                                />
+                                            />
+                                        )}
+                                        sx={{ mt: '15px', width: '380px' }}
+                                    />
+                                </p>
                             </div>
                             <div className="container container--package-setting">
-                                <Typography variant="body2">Spatial Extent</Typography>
-                                <Typography variant="body2">Type</Typography>{localPackageSettings.boundaryType}
-                                <Typography variant="body2">Counties</Typography>
-                                <Autocomplete
-                                    multiple
-                                    value={selectedCounties}
-                                    onChange={(event: any, newValue: string | null) => {
-                                        setSelectedCounties(newValue)
-                                    }}
-                                    id="tags-outlined"
-                                    options={countiesData}
-                                    filterSelectedOptions
-                                    renderOption={(props, option) => {
-                                        return (
-                                            <li {...props} key={option}>
-                                                {option}
-                                            </li>
-                                        )
-                                    }}
-                                    renderTags={(tagValue, getTagProps) => {
-                                        return tagValue.map((option, index) => (
-                                            <Chip {...getTagProps({ index })} key={option} label={option} />
-                                        ))
-                                    }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            placeholder="Search..."
+                                <p className="option-group">
+                                    <Typography variant="body2">Spatial Extent</Typography>
+                                </p>
 
-                                        />
-                                    )}
-                                    sx={{ mt: '15px', width: '380px' }}
-                                />
+                                <p className="option-group">
+                                    <Typography variant="body2">Type</Typography>
+                                    {localPackageSettings.boundaryType}
+                                </p>
+
+                                <p>
+                                    <Typography variant="body2">Counties</Typography>
+
+                                    <Autocomplete
+                                        multiple
+                                        value={selectedCounties}
+                                        onChange={(event: any, newValue: string | null) => {
+                                            setSelectedCounties(newValue)
+                                        }}
+                                        id="tags-outlined"
+                                        options={countiesData}
+                                        filterSelectedOptions
+                                        renderOption={(props, option) => {
+                                            return (
+                                                <li {...props} key={option}>
+                                                    {option}
+                                                </li>
+                                            )
+                                        }}
+                                        renderTags={(tagValue, getTagProps) => {
+                                            return tagValue.map((option, index) => (
+                                                <Chip {...getTagProps({ index })} key={option} label={option} />
+                                            ))
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                placeholder="Search..."
+
+                                            />
+                                        )}
+                                        sx={{ mt: '15px', width: '380px' }}
+                                    />
+                                </p>
+
                             </div>
 
                             <div className="container container--package-setting">
-                                <Typography variant="body2">Range</Typography> {localPackageSettings.rangeStart} - {localPackageSettings.rangeEnd}
+                                <p className="option-group">
+                                    <Typography variant="body2">Range</Typography> {localPackageSettings.rangeStart} - {localPackageSettings.rangeEnd}
+                                </p>
                             </div>
                             <div className="container container--package-setting">
                                 <Typography variant="body2">Data Format</Typography> {localPackageSettings.dataFormat}
+                            </div>
+                            <div className="cta">
+                                <Button variant="contained">Download package</Button>
                             </div>
                         </div>
                     }

@@ -1,53 +1,67 @@
 .container {
-    background-color: #F7F9FB;
-    border-radius: 16px; 
-    padding: 30px;
+  background-color: #f7f9fb;
+  border-radius: 16px;
+  padding: 30px;
 
-    &--full {
-        width: 100%;
-    }
+  &--full {
+    width: 100%;
+  }
 
-    &--package {
-        background-color: #EEF3F9;
-        border-radius: 16px;
-        width: 390px;
-        padding: 25px;
+  &--package {
+    background-color: #eef3f9;
+    border-radius: 16px;
+    width: 390px;
+    padding: 25px;
+  }
+
+  & > p:nth-child(n + 2) {
+    padding-top: 20px;
+  }
+
+  & > p {
+    & > p {
+      padding-bottom: 5px;
     }
+  }
 }
 
 .grid {
-    margin: 16px 0;
+  margin: 16px 0;
 }
 
 .package {
-    &__settings {
-        list-style-type: none;
-        margin: 25px 0;
+  &__settings {
+    list-style-type: none;
+    margin: 25px 0;
 
-        li { 
-            p {
-                display: inline-block;
-            }
-        }
+    li {
+      p {
+        display: inline-block;
+      }
     }
+  }
+}
+
+.package-contents { 
+    padding-top: 20px;
 }
 
 // Drawer Toolbar
 .toolbar-main {
-    background-color: white;
+  background-color: white;
 }
 
-// logo 
+// logo
 .cal-adapt-logo {
-    margin: 16px auto;
+  margin: 16px auto;
 }
 
 .alerts {
-    display: flex;
-    gap: 28px;
-    margin-bottom: 26px;
+  display: flex;
+  gap: 28px;
+  margin-bottom: 26px;
+}
 
-    .cta {
-        margin-top: 15px;
-    }
+.cta {
+  margin-top: 15px;
 }
