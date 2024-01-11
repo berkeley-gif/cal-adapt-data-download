@@ -49,6 +49,16 @@ const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
 export default function Dashboard({ packagesData, countiesData, modelsData }) {
+    const callAPI = async () => {
+        try {
+            const res = await fetch(`https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search?limit=10&filter=collection%3D%27loca2-mon-county%27%20AND%20cmip6%3Aexperiment_id%3D%27ssp370%27%20AND%20countyname%3D%27San%20Luis%20Obispo%27&filter_lang=cql2-text`)
+            const data = await res.json()
+            console.log(data)
+        } catch (err) {
+            console.log(err)
+        }
+    };
+
     type SetValue<T> = Dispatch<SetStateAction<T>>;
 
     const isFirstRender = useRef(true)
@@ -75,6 +85,8 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
     // Code for counties
     const [selectedCounties, setSelectedCounties] = useState<any>([])
     useEffect(() => {
+        callAPI()
+
         if (isFirstRender.current) {
             isFirstRender.current = false;
             return
@@ -147,7 +159,6 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
 
     const modelsList: string[] = modelsData.map((obj) => obj.name)
 
-    console.log(modelsList)
     const [modelsSelected, setModelsSelected] = useState<any>([])
     useEffect(() => {
         if (isFirstRender.current) {

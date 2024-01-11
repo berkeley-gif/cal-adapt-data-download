@@ -18,7 +18,7 @@ export default async function Home() {
 
   return (
     <div className={styles.container}>
-      <Dashboard packagesData={packagesData} countiesData={countiesData} modelsData={modelsData}/>
+      <Dashboard packagesData={packagesData} countiesData={countiesData} modelsData={modelsData} />
     </div>
   );
 }
