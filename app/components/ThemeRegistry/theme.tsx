@@ -64,6 +64,51 @@ const theme = createTheme({
   shape: {
     borderRadius: 16,
   },
+  components: {
+    MuiAlert: {
+      variants: [
+        {
+          props: { variant: 'link-purple' },
+          style: {
+            backgroundColor: '#C7C6F8', // Customize the background color
+            width: '50%'
+          },
+        },
+        {
+          props: { variant: 'link-grey' },
+          style: {
+            backgroundColor: '#E5ECF6', // Customize the background color
+            width: '50%'
+          },
+        }
+      ],
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          color: 'inherit',
+          padding: '25px'
+        },
+        filledInfo: {
+          backgroundColor: '#E3F5FF',
+          
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: ({ ownerState }) => ({
+          ...(ownerState.variant === 'contained' &&
+            ownerState.color === 'primary' && {
+            backgroundColor: '#D3F1F8',
+            color: '#333538',
+            boxShadow: 'none',
+            textTransform: 'capitalize',
+            borderRadius: '8px'
+          }),
+        }),
+      },
+    },
+  }
 });
 
 export default theme;

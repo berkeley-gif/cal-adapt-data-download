@@ -2,8 +2,12 @@
 
 import Image from 'next/image'
 import packageIcon from '@/public/img/icons/package.svg'
+import sidebarBg from '@/public/img/photos/ocean-thumbnail.png'
+import logo from '@/public/img/logos/cal-adapt-data-download.png'
+
 import { useState, useEffect, Dispatch, SetStateAction, useRef } from "react"
 
+import Alert from '@mui/material/Alert';
 import Autocomplete from '@mui/material/Autocomplete';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -21,17 +25,14 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import InputLabel from '@mui/material/InputLabel';
+import StartIcon from '@mui/icons-material/Start';
 import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
 import MenuItem from '@mui/material/MenuItem';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
@@ -255,7 +256,7 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
     }, [])
 
     return (
-        <Box sx={{ display: 'flex', width: '100%' }}>
+        <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <AppBar
                 position="fixed"
@@ -283,18 +284,43 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
                     '& .MuiDrawer-paper': {
                         width: DRAWER_WIDTH,
                         boxSizing: 'border-box',
+                        backgroundImage: `url(${sidebarBg.src})`,
+                        backgroundRepeat: "no-repeat",
+                        backgroundSize: "cover",
+                        border: "none",
                     },
                 }}
                 variant="permanent"
                 anchor="left"
             >
-                <Toolbar />
-                <List>
+                <Toolbar>
+                    <Image
+                        src={logo}
+                        alt="Cal Adapt logo"
+                        className="cal-adapt-logo"
+                    />
+                </Toolbar>
+
+
+                <List sx={{
+                    '& .MuiListItemIcon-root': {
+                        color: '#000',
+                    },
+                    // selected and (selected + hover) states
+                    '&& .Mui-selected, && .Mui-selected:hover': {
+                        bgcolor: 'rgba(247, 249, 251, 0.9)'
+                    },
+                    // hover states
+                    '& .MuiListItemButton-root:hover': {
+                        bgcolor: 'rgba(247, 249, 251, 0.6)',
+                        borderRadius: 'var(--12, 12px)'
+                    },
+                }}>
                     {['Getting Started'].map((text, index) => (
                         <ListItem key={text} disablePadding>
                             <ListItemButton>
                                 <ListItemIcon>
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                    <StartIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={text} />
                             </ListItemButton>
@@ -303,9 +329,26 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
                 </List>
             </Drawer>
             <Box
-
-                sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
+                component="main"
+                sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, pt: "200px" }}
             >
+                <Toolbar />
+
+                <div className="alerts">
+                    <Alert variant="link-purple">Looking for the full LOCA2 scientific data, including 15 GCM’s and 10 climate variables?
+                        <div className="cta">
+                            <Button variant="contained">Click Here for the How-To-Guide</Button>
+                        </div>
+                    </Alert>
+                    <Alert variant="link-grey">The Cal-Adapt data download tool is a beta tool. Feedback or questions are always welcome.
+                        <div className="cta">
+                            <Button variant="contained">Contact Us</Button>
+                        </div>
+                    </Alert>
+                </div>
+
+                <Alert sx={{ mb: "26px" }} variant="filled" severity="info">The size of data packages might be very large. In that case, you will be asked for an email address to notify you when your package is ready for download. </Alert>
+
                 {/** Packages container */}
                 <div className="container container--full">
                     <Typography variant="h5">

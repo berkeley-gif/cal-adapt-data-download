@@ -36,3 +36,18 @@
 .toolbar-main {
     background-color: white;
 }
+
+// logo 
+.cal-adapt-logo {
+    margin: 16px auto;
+}
+
+.alerts {
+    display: flex;
+    gap: 28px;
+    margin-bottom: 26px;
+
+    .cta {
+        margin-top: 15px;
+    }
+}
