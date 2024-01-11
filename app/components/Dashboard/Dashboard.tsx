@@ -49,7 +49,7 @@ const DRAWER_WIDTH = 212;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
-export default function Dashboard({ packagesData, countiesData, modelsData }) {
+export default function Dashboard({ data, packagesData, countiesData, modelsData }) {
     const callAPI = async () => {
         try {
             const res = await fetch(`https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search?limit=10&filter=collection%3D%27loca2-mon-county%27%20AND%20cmip6%3Aexperiment_id%3D%27ssp370%27%20AND%20countyname%3D%27San%20Luis%20Obispo%27&filter_lang=cql2-text`)
@@ -62,6 +62,8 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
 
     type SetValue<T> = Dispatch<SetStateAction<T>>;
 
+    const [collectionsData, setCollectionsData] = useState<object>()
+
     const isFirstRender = useRef(true)
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
@@ -69,6 +71,7 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
     const [tentativePackage, setTentativePackage] = useState<number>(0)
 
     // Code for climate variables / indicators
+    const varsList: string [] = (data.summaries['cmip6:variable_id']).map((obj) => obj)
     const [selectedVars, setSelectedVars] = useState<any>([])
     useEffect(() => {
         if (isFirstRender.current) {
@@ -84,6 +87,8 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
     // End of code for climate variables / indicators
 
     // Code for counties
+    const countiesList: string[] = (data.summaries['countyname']).map((obj) => obj)
+    
     const [selectedCounties, setSelectedCounties] = useState<any>([])
     useEffect(() => {
         if (isFirstRender.current) {
@@ -156,7 +161,8 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
         variant: "menu"
     };
 
-    const modelsList: string[] = modelsData.map((obj) => obj.name)
+    // const modelsList: string[] = modelsData.map((obj) => obj.name)
+    const modelsList: string[] = (data.summaries['cmip6:source_id']).map((obj) => obj)
 
     const [modelsSelected, setModelsSelected] = useState<any>([])
     useEffect(() => {
@@ -195,7 +201,7 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
         setPackageSettings({
             dataset: packagesData[selectedPackage].dataset,
             scenarios: packagesData[selectedPackage].scenarios,
-            models: packagesData[selectedPackage].model,
+            models: packagesData[selectedPackage].models,
             vars: packagesData[selectedPackage].vars,
             boundaryType: packagesData[selectedPackage].boundaryType,
             boundaries: '',
@@ -248,10 +254,13 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
 
     // useEffect for component
     useEffect(() => {
+        callAPI()
+
         setAvailableVars(stringToArray(packagesData[0].vars))
         setSelectedVars(stringToArray(localPackageSettings.vars))
-        setModelsSelected(stringToArray(localPackageSettings.models))
-        setSelectedCounties(stringToArray(localPackageSettings.boundaries))
+        setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
+        setSelectedCounties(localPackageSettings.boundaries ? stringToArray(localPackageSettings.boundaries) : [])
+
     }, [])
 
     return (
@@ -481,7 +490,7 @@ export default function Dashboard({ packagesData, countiesData, modelsData }) {
                                             setSelectedVars(newValue)
                                         }}
                                         id="tags-outlined"
-                                        options={availableVars}
+                                        options={varsList}
                                         filterSelectedOptions
                                         renderOption={(props, option) => {
                                             return (
