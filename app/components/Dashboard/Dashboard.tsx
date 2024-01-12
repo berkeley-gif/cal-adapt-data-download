@@ -24,6 +24,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Drawer from '@mui/material/Drawer';
+import { FormControl } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import StartIcon from '@mui/icons-material/Start';
 import Link from '@mui/material/Link';
@@ -40,17 +41,19 @@ import Typography from '@mui/material/Typography';
 
 
 import SidePanel from './SidePanel'
+import PackageForm from './PackageForm'
 import './../../styles/components/dashboard.scss'
 
 import { stringToArray, arrayToCommaSeparatedString } from "@/app/utils/utilFn"
-import { FormControl } from '@mui/material';
 
 const DRAWER_WIDTH = 212;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
-export default function Dashboard({ data, packagesData, countiesData, modelsData }) {
-    const callAPI = async () => {
+export default function Dashboard({ data, packagesData}) {
+    const [apiResData, setApiResData] = useState<unknown>(null)
+
+    const onFormDataSubmit = async () => {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search';
         const queryParams = new URLSearchParams({
             limit: '10',
@@ -60,21 +63,17 @@ export default function Dashboard({ data, packagesData, countiesData, modelsData
 
         const fullUrl = `${apiUrl}?${queryParams.toString()}`;
 
-
-        console.log(fullUrl)
-
         try {
             const res = await fetch(fullUrl)
             const data = await res.json()
-            console.log(data)
+            setApiResData(data)
+
         } catch (err) {
             console.log(err)
         }
-    };
+    }
 
     type SetValue<T> = Dispatch<SetStateAction<T>>;
-
-    const [collectionsData, setCollectionsData] = useState<object>()
 
     const isFirstRender = useRef(true)
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
@@ -192,9 +191,6 @@ export default function Dashboard({ data, packagesData, countiesData, modelsData
     const isAllModelsSelected =
         modelsList.length > 0 && modelsSelected.length === modelsList.length;
 
-    // End of configurations for Models Select field dropdown
-
-
     const handleModelsChange = (event: SelectChangeEvent<typeof modelsSelected>) => {
         const {
             target: { value },
@@ -208,6 +204,9 @@ export default function Dashboard({ data, packagesData, countiesData, modelsData
             typeof value === 'string' ? value.split(',') : value,
         );
     };
+
+
+    // End of configurations for Models Select field dropdown
 
     function handlePackageSave() {
         setPackageSettings({
@@ -224,8 +223,9 @@ export default function Dashboard({ data, packagesData, countiesData, modelsData
             units: packagesData[selectedPackage].units
         })
 
-        setAvailableVars(stringToArray(packagesData[selectedPackage].vars))
         setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
+        setModelsSelected(stringToArray(packagesData[selectedPackage].models))
+        setSelectedCounties([])
         setIsPkgStored(true)
         toggleDrawer(true)
     }
@@ -266,8 +266,6 @@ export default function Dashboard({ data, packagesData, countiesData, modelsData
 
     // useEffect for component
     useEffect(() => {
-        callAPI()
-
         setAvailableVars(stringToArray(packagesData[0].vars))
         setSelectedVars(stringToArray(localPackageSettings.vars))
         setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
@@ -436,159 +434,9 @@ export default function Dashboard({ data, packagesData, countiesData, modelsData
                     }
 
                     {isPackageStored &&
-                        <div className="package-contents">
-                            <Typography variant="h5">
-                                Review Your Data Package
-                            </Typography>
-
-                            <div className="container container--package-setting">
-                                <p className="option-group">
-                                    <Typography variant="body2">Dataset</Typography> {localPackageSettings.dataset}
-                                </p>
-
-                            </div>
-
-
-                            <div className="container container--package-setting">
-                                <p className="option-group">
-                                    <Typography variant="body2">Scenario(s)</Typography> {localPackageSettings.scenarios}
-                                </p>
-                            </div>
-
-                            <div className="container container--package-setting">
-                                <p className="option-group">
-                                    <Typography variant="body2">Models</Typography>
-                                    <FormControl>
-                                        <Select
-                                            multiple
-                                            value={modelsSelected}
-                                            onChange={handleModelsChange}
-                                            renderValue={(selected) => selected.join(', ')}
-                                            MenuProps={MenuProps}
-                                            sx={{ mt: '15px', width: '380px' }}
-                                        >
-                                            <MenuItem
-                                                value="all"
-                                            >
-                                                <ListItemIcon>
-                                                    <Checkbox
-                                                        checked={isAllModelsSelected}
-                                                        indeterminate={
-                                                            modelsSelected.length > 0 && modelsSelected.length < modelsList.length
-                                                        }
-                                                    />
-                                                </ListItemIcon>
-                                                <ListItemText
-                                                    primary="Select All"
-                                                />
-                                            </MenuItem>
-                                            {modelsList.map((model) => (
-                                                <MenuItem key={model} value={model}>
-                                                    <Checkbox checked={modelsSelected.indexOf(model) > -1} />
-                                                    <ListItemText primary={model} />
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </p>
-                            </div>
-                            <div className="container container--package-setting">
-                                <p className="option-group">
-                                    <Typography variant="body2">Variables</Typography>
-                                    <Autocomplete
-                                        multiple
-                                        value={selectedVars}
-                                        onChange={(event: any, newValue: string | null) => {
-                                            setSelectedVars(newValue)
-                                        }}
-                                        id="tags-outlined"
-                                        options={varsList}
-                                        filterSelectedOptions
-                                        renderOption={(props, option) => {
-                                            return (
-                                                <li {...props} key={option}>
-                                                    {option}
-                                                </li>
-                                            )
-                                        }}
-                                        renderTags={(tagValue, getTagProps) => {
-                                            return tagValue.map((option, index) => (
-                                                <Chip {...getTagProps({ index })} key={option} label={option} />
-                                            ))
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                placeholder="Search..."
-
-                                            />
-                                        )}
-                                        sx={{ mt: '15px', width: '380px' }}
-                                    />
-                                </p>
-                            </div>
-                            <div className="container container--package-setting">
-                                <p className="option-group">
-                                    <Typography variant="body2">Spatial Extent</Typography>
-                                </p>
-
-                                <p className="option-group">
-                                    <Typography variant="body2">Type</Typography>
-                                    {localPackageSettings.boundaryType}
-                                </p>
-
-                                <p>
-                                    <Typography variant="body2">Counties</Typography>
-
-                                    <Autocomplete
-                                        multiple
-                                        value={selectedCounties}
-                                        onChange={(event: any, newValue: string | null) => {
-                                            setSelectedCounties(newValue)
-                                        }}
-                                        id="tags-outlined"
-                                        options={countiesData}
-                                        filterSelectedOptions
-                                        renderOption={(props, option) => {
-                                            return (
-                                                <li {...props} key={option}>
-                                                    {option}
-                                                </li>
-                                            )
-                                        }}
-                                        renderTags={(tagValue, getTagProps) => {
-                                            return tagValue.map((option, index) => (
-                                                <Chip {...getTagProps({ index })} key={option} label={option} />
-                                            ))
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                placeholder="Search..."
-
-                                            />
-                                        )}
-                                        sx={{ mt: '15px', width: '380px' }}
-                                    />
-                                </p>
-
-                            </div>
-
-                            <div className="container container--package-setting">
-                                <p className="option-group">
-                                    <Typography variant="body2">Range</Typography> {localPackageSettings.rangeStart} - {localPackageSettings.rangeEnd}
-                                </p>
-                            </div>
-                            <div className="container container--package-setting">
-                                <Typography variant="body2">Data Format</Typography> {localPackageSettings.dataFormat}
-                            </div>
-                            <div className="cta">
-                                <Button onClick={() => {
-                                    callAPI
-                                }} variant="contained">Download package</Button>
-                            </div>
-                        </div>
+                        <PackageForm apiResData={apiResData} localPackageSettings={localPackageSettings} setPackageSettings={setPackageSettings} modelsSelected={modelsSelected} setModelsSelected={setModelsSelected} modelsList={modelsList} selectedVars={selectedVars} setSelectedVars={setSelectedVars} varsList={varsList} selectedCounties={selectedCounties} setSelectedCounties={setSelectedCounties} countiesList={countiesList} onFormDataSubmit={onFormDataSubmit} handleClear={handleClear}></PackageForm>
                     }
+
                     {!isPackageStored &&
                         <Typography variant="h5">
                             No package available...
