@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, SetStateAction } from 'react'
 
 import Autocomplete from '@mui/material/Autocomplete'
 import Checkbox from '@mui/material/Checkbox'
 import Chip from '@mui/material/Chip'
+import IconButton from '@mui/material/IconButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
@@ -17,6 +18,15 @@ import { stringToArray, arrayToCommaSeparatedString } from "@/app/utils/utilFn"
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
+type varUrl = {
+    name: string,
+    href: string
+}
+
+type modelVarUrls = {
+    model: string,
+    vars: varUrl[]
+}
 interface ChildFormProps {
     modelsList: string[],
     modelsSelected: string[],
@@ -24,13 +34,16 @@ interface ChildFormProps {
     selectedVars: string[],
     countiesList: string[],
     selectedCounties: string[],
+    sidebarState: string,
     localPackageSettings: any,
     apiResData: unknown,
+    dataResponse: modelVarUrls[]
+    setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
     setSelectedVars: (selectedVars: unknown) => void,
     setModelsSelected: (selectedModels: unknown) => void,
     setSelectedCounties: (selectedCounties: unknown) => void,
-    onFormDataSubmit: () => void,
+    onFormDataSubmit: () => unknown,
     handleClear: () => void
 }
 
@@ -54,11 +67,28 @@ const MenuProps = {
     variant: "menu"
 };
 
-const PackageForm: React.FC<ChildFormProps> = ({ apiResData, localPackageSettings, setPackageSettings, modelsSelected, setModelsSelected, modelsList, selectedVars, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, handleClear }) => {
-    const [isSuccess, setIsSuccess] = useState(false);
+const handleDownload = (url: string) => {
+    // Replace 'your-file-url' with the actual URL of the file you want to download
+    const fileUrl = url;
+
+    // Create an invisible anchor element
+    const link = document.createElement('a');
+    link.href = fileUrl;
+
+    // Set the download attribute to specify the filename
+    link.download = 'downloaded-file.txt';
+
+    // Append the anchor to the body and trigger a click event
+    document.body.appendChild(link);
+    link.click();
+
+    // Remove the anchor from the body
+    document.body.removeChild(link);
+}
+
+const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse, handleClear }) => {
     const [isError, setIsError] = useState(false);
     const isFirstRender = useRef(true)
-
 
     // Models handling code
     useEffect(() => {
@@ -109,30 +139,54 @@ const PackageForm: React.FC<ChildFormProps> = ({ apiResData, localPackageSetting
 
     const handleSubmit = () => {
         // validate form data
+        let apires: any
 
         if (typeof onFormDataSubmit === 'function') {
             onFormDataSubmit()
-
-
-            console.log(apiResData)
-
         }
 
-        setIsSuccess(true);
-        setIsError(false);
+        setSidebarState('download')
+        setIsError(false)
     }
 
     const handleReset = () => {
         handleClear()
-        setIsSuccess(false)
+        setSidebarState('settings')
         setIsError(false)
-    };
+    }
 
     return (
         <div className="package-form">
-            {isSuccess && (
+            {(sidebarState === 'download') && (
                 <div>
-                    <Typography variant="h4">Form submitted successfully!</Typography>
+                    <Typography variant="h5">Download your data</Typography>
+                    {(dataResponse.length > 0) ? (
+                        <div>
+                            {dataResponse.map((item) => (
+                                <div className="container container--package-setting">
+                                    <Typography variant="h5">Model</Typography>
+                                    {item.model}
+                                    <p className="option-group">
+                                        <Typography variant="h5">Vars</Typography>
+                                        {(item.vars.length > 0) && (
+                                            item.vars.map((variable) => (
+                                                <div>
+                                                    <p className="option-group">
+                                                        {variable.name}
+                                                    </p>
+                                                    <p className="option-group">
+                                                        <Button variant="contained" color="primary" onClick={() => { handleDownload(variable.href) }}>
+                                                            Download File
+                                                        </Button>
+                                                    </p>
+                                                </div>
+                                            ))
+                                        )}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : 'Loading...'}
                 </div>
             )}
             {isError && (
@@ -140,7 +194,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ apiResData, localPackageSetting
                     <Typography variant="h4">Error submiting form</Typography>
                 </div>
             )}
-            {!isSuccess && !isError && (
+            {sidebarState === 'settings' && (
                 <form onSubmit={handleSubmit} noValidate>
                     <div className="package-contents">
                         <Typography variant="h5">

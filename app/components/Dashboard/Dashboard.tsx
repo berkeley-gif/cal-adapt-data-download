@@ -24,7 +24,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Drawer from '@mui/material/Drawer';
-import { FormControl } from '@mui/material';
+import { FabPropsVariantOverrides, FormControl } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import StartIcon from '@mui/icons-material/Start';
 import Link from '@mui/material/Link';
@@ -38,6 +38,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
 
 
 import SidePanel from './SidePanel'
@@ -50,14 +51,37 @@ const DRAWER_WIDTH = 212;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
-export default function Dashboard({ data, packagesData}) {
-    const [apiResData, setApiResData] = useState<unknown>(null)
+type varUrl = {
+    name: string,
+    href: string
+}
+
+type modelVarUrls = {
+    model: string,
+    vars: varUrl[]
+}
+
+function createOrStatement(parameterName: string, values: string[]): string {
+    if (values.length === 0) {
+        throw new Error('Values array must not be empty');
+    }
+
+    const orStatements = values.map(value => `${parameterName}='${value}'`);
+    const fullOrStatement = orStatements.join(' or ');
+
+    return `(${fullOrStatement})`;
+}
+
+export default function Dashboard({ data, packagesData }) {
+    const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])
 
     const onFormDataSubmit = async () => {
+        const countyQueryStr = createOrStatement('countyname', stringToArray(localPackageSettings.boundaries))
+        let assetUrls = {}
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search';
         const queryParams = new URLSearchParams({
             limit: '10',
-            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370' AND countyname='San Luis Obispo'",
+            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370' AND " + countyQueryStr,
             filter_lang: 'cql2-text',
         });
 
@@ -66,8 +90,35 @@ export default function Dashboard({ data, packagesData}) {
         try {
             const res = await fetch(fullUrl)
             const data = await res.json()
-            setApiResData(data)
 
+            console.log(data)
+
+            const apiResponseData: modelVarUrls[] = []
+
+            for (const modelIdx in data.features) {
+                const assets = data.features[modelIdx].assets
+
+                const varsInModel: modelVarUrls = {
+                    model: '',
+                    vars: []
+                }
+
+                for (const asset in assets) {
+                    const varInVars: varUrl = {
+                        name: '',
+                        href: ''
+                    }
+
+                    varInVars.name = asset
+                    varInVars.href = assets[asset].href
+                    varsInModel.vars.push(varInVars)
+                }
+
+                varsInModel.model = data.features[modelIdx].id
+                apiResponseData.push(varsInModel)
+            }
+
+            setDataResponse(apiResponseData)
         } catch (err) {
             console.log(err)
         }
@@ -80,6 +131,8 @@ export default function Dashboard({ data, packagesData}) {
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
     const [availableVars, setAvailableVars] = useState<any>([])
     const [tentativePackage, setTentativePackage] = useState<number>(0)
+    const [sidebarState, setSidebarState] = useState<string>('')
+    const [isError, setIsError] = useState(false);
 
     // Code for climate variables / indicators
     const varsList: string[] = (data.summaries['cmip6:variable_id']).map((obj) => obj)
@@ -270,7 +323,8 @@ export default function Dashboard({ data, packagesData}) {
         setSelectedVars(stringToArray(localPackageSettings.vars))
         setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
         setSelectedCounties(localPackageSettings.boundaries ? stringToArray(localPackageSettings.boundaries) : [])
-
+        setSidebarState('settings')
+        console.log('sidebarstate ' + sidebarState)
     }, [])
 
     return (
@@ -331,7 +385,7 @@ export default function Dashboard({ data, packagesData}) {
                     // hover states
                     '& .MuiListItemButton-root:hover': {
                         bgcolor: 'rgba(247, 249, 251, 0.6)',
-                        borderRadius: 'var(--12, 12px)'
+                        borderRadius: '12px'
                     },
                 }}>
                     {['Getting Started'].map((text, index) => (
@@ -433,8 +487,15 @@ export default function Dashboard({ data, packagesData}) {
                         </IconButton>
                     }
 
+                    {sidebarState == 'download' &&
+                        <IconButton onClick={() => (setSidebarState('settings'))}>
+                            <UndoOutlinedIcon />
+                        </IconButton>
+                    }
+
+
                     {isPackageStored &&
-                        <PackageForm apiResData={apiResData} localPackageSettings={localPackageSettings} setPackageSettings={setPackageSettings} modelsSelected={modelsSelected} setModelsSelected={setModelsSelected} modelsList={modelsList} selectedVars={selectedVars} setSelectedVars={setSelectedVars} varsList={varsList} selectedCounties={selectedCounties} setSelectedCounties={setSelectedCounties} countiesList={countiesList} onFormDataSubmit={onFormDataSubmit} handleClear={handleClear}></PackageForm>
+                        <PackageForm localPackageSettings={localPackageSettings} sidebarState={sidebarState} setSidebarState={setSidebarState} setPackageSettings={setPackageSettings} modelsSelected={modelsSelected} setModelsSelected={setModelsSelected} modelsList={modelsList} selectedVars={selectedVars} setSelectedVars={setSelectedVars} varsList={varsList} selectedCounties={selectedCounties} setSelectedCounties={setSelectedCounties} countiesList={countiesList} onFormDataSubmit={onFormDataSubmit} dataResponse={dataResponse} handleClear={handleClear}></PackageForm>
                     }
 
                     {!isPackageStored &&
