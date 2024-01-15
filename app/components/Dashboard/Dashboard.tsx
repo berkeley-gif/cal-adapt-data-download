@@ -61,6 +61,11 @@ type modelVarUrls = {
     vars: varUrl[]
 }
 
+interface apiParamStrs {
+    countyQueryStr: string,
+    modelQueryStr: string
+}
+
 function createOrStatement(parameterName: string, values: string[]): string {
     if (values.length === 0) {
         throw new Error('Values array must not be empty');
@@ -75,52 +80,72 @@ function createOrStatement(parameterName: string, values: string[]): string {
 export default function Dashboard({ data, packagesData }) {
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])
 
+    const [apiParams, setApiParams] = useState<apiParamStrs>({
+        countyQueryStr: '',
+        modelQueryStr: ''
+    })
+    const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return
+        }
+        // Check if API parameters have changed
+        setApiParamsChanged(true)
+        setDataResponse([]) // Clear previous data
+
+    }, [apiParams]);
+
+
     const onFormDataSubmit = async () => {
-        const countyQueryStr = createOrStatement('countyname', stringToArray(localPackageSettings.boundaries))
-        let assetUrls = {}
+
+
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search';
         const queryParams = new URLSearchParams({
             limit: '10',
-            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370' AND " + countyQueryStr,
+            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370' AND " + apiParams?.countyQueryStr + " AND " + apiParams?.modelQueryStr,
             filter_lang: 'cql2-text',
         });
 
         const fullUrl = `${apiUrl}?${queryParams.toString()}`;
+        if (apiParamsChanged) {
+            try {
 
-        try {
-            const res = await fetch(fullUrl)
-            const data = await res.json()
+                const res = await fetch(fullUrl)
+                const data = await res.json()
 
-            console.log(data)
+                console.log(data)
 
-            const apiResponseData: modelVarUrls[] = []
+                const apiResponseData: modelVarUrls[] = []
 
-            for (const modelIdx in data.features) {
-                const assets = data.features[modelIdx].assets
+                for (const modelIdx in data.features) {
+                    const assets = data.features[modelIdx].assets
 
-                const varsInModel: modelVarUrls = {
-                    model: '',
-                    vars: []
-                }
-
-                for (const asset in assets) {
-                    const varInVars: varUrl = {
-                        name: '',
-                        href: ''
+                    const varsInModel: modelVarUrls = {
+                        model: '',
+                        vars: []
                     }
 
-                    varInVars.name = asset
-                    varInVars.href = assets[asset].href
-                    varsInModel.vars.push(varInVars)
+                    for (const asset in assets) {
+                        const varInVars: varUrl = {
+                            name: '',
+                            href: ''
+                        }
+
+                        varInVars.name = asset
+                        varInVars.href = assets[asset].href
+                        varsInModel.vars.push(varInVars)
+                    }
+
+                    varsInModel.model = data.features[modelIdx].id
+                    apiResponseData.push(varsInModel)
                 }
 
-                varsInModel.model = data.features[modelIdx].id
-                apiResponseData.push(varsInModel)
+                setDataResponse(apiResponseData)
+            } catch (err) {
+                console.log(err)
             }
-
-            setDataResponse(apiResponseData)
-        } catch (err) {
-            console.log(err)
+            setApiParamsChanged(false)
         }
     }
 
@@ -133,6 +158,10 @@ export default function Dashboard({ data, packagesData }) {
     const [tentativePackage, setTentativePackage] = useState<number>(0)
     const [sidebarState, setSidebarState] = useState<string>('')
     const [isError, setIsError] = useState(false);
+
+    function resetStateToSettings(): void {
+        setSidebarState('settings')
+    }
 
     // Code for climate variables / indicators
     const varsList: string[] = (data.summaries['cmip6:variable_id']).map((obj) => obj)
@@ -159,11 +188,22 @@ export default function Dashboard({ data, packagesData }) {
             isFirstRender.current = false;
             return
         }
-        const selectedCountiesStr = arrayToCommaSeparatedString(selectedCounties)
-        setPackageSettings({
-            ...localPackageSettings,
-            boundaries: selectedCountiesStr
-        })
+
+        if (selectedCounties.length > 0) {
+            const updatedApiParam: apiParamStrs = {
+                ...apiParams,
+                countyQueryStr: createOrStatement('countyname', selectedCounties)
+            }
+
+            setApiParams(updatedApiParam)
+
+
+            const selectedCountiesStr = arrayToCommaSeparatedString(selectedCounties)
+            setPackageSettings({
+                ...localPackageSettings,
+                boundaries: selectedCountiesStr
+            })
+        }
     }, [selectedCounties])
 
     // End of code for climate variables / indicators
@@ -225,7 +265,6 @@ export default function Dashboard({ data, packagesData }) {
         variant: "menu"
     };
 
-    // const modelsList: string[] = modelsData.map((obj) => obj.name)
     const modelsList: string[] = (data.summaries['cmip6:source_id']).map((obj) => obj)
 
     const [modelsSelected, setModelsSelected] = useState<any>([])
@@ -234,29 +273,24 @@ export default function Dashboard({ data, packagesData }) {
             isFirstRender.current = false;
             return
         }
-        const selectedModelsStr = arrayToCommaSeparatedString(modelsSelected)
-        setPackageSettings({
-            ...localPackageSettings,
-            models: selectedModelsStr
-        })
-    }, [modelsSelected])
 
-    const isAllModelsSelected =
-        modelsList.length > 0 && modelsSelected.length === modelsList.length;
+        if (modelsSelected.length > 0) {
+            const updatedApiParam: apiParamStrs = {
+                ...apiParams,
+                modelQueryStr: createOrStatement('cmip6:source_id', modelsSelected)
+            }
 
-    const handleModelsChange = (event: SelectChangeEvent<typeof modelsSelected>) => {
-        const {
-            target: { value },
-        } = event;
-        if (value[value.length - 1] === "all") {
-            setModelsSelected(modelsSelected.length === modelsList.length ? [] : modelsList);
-            return;
+            setApiParams(updatedApiParam)
+
+
+            const selectedModelsStr = arrayToCommaSeparatedString(modelsSelected)
+
+            setPackageSettings({
+                ...localPackageSettings,
+                models: selectedModelsStr
+            })
         }
-        setModelsSelected(
-            // On autofill we get a stringified value.
-            typeof value === 'string' ? value.split(',') : value,
-        );
-    };
+    }, [modelsSelected])
 
 
     // End of configurations for Models Select field dropdown
@@ -324,7 +358,6 @@ export default function Dashboard({ data, packagesData }) {
         setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
         setSelectedCounties(localPackageSettings.boundaries ? stringToArray(localPackageSettings.boundaries) : [])
         setSidebarState('settings')
-        console.log('sidebarstate ' + sidebarState)
     }, [])
 
     return (
@@ -488,7 +521,7 @@ export default function Dashboard({ data, packagesData }) {
                     }
 
                     {sidebarState == 'download' &&
-                        <IconButton onClick={() => (setSidebarState('settings'))}>
+                        <IconButton onClick={() => (resetStateToSettings())}>
                             <UndoOutlinedIcon />
                         </IconButton>
                     }
