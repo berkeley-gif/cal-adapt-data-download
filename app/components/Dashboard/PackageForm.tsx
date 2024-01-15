@@ -4,16 +4,14 @@ import React, { useState, useEffect, useRef, SetStateAction } from 'react'
 import Autocomplete from '@mui/material/Autocomplete'
 import Checkbox from '@mui/material/Checkbox'
 import Chip from '@mui/material/Chip'
-import IconButton from '@mui/material/IconButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import Select from '@mui/material/Select'
 import { FormControl, Button } from '@mui/material'
 
-import { stringToArray, arrayToCommaSeparatedString } from "@/app/utils/utilFn"
+import { arrayToCommaSeparatedString, handleDownload } from "@/app/utils/functions"
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -38,13 +36,13 @@ interface ChildFormProps {
     localPackageSettings: any,
     apiResData: unknown,
     dataResponse: modelVarUrls[]
+    isAllModelsSelected: any,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
     setSelectedVars: (selectedVars: unknown) => void,
     setModelsSelected: (selectedModels: unknown) => void,
     setSelectedCounties: (selectedCounties: unknown) => void,
     onFormDataSubmit: () => unknown,
-    handleClear: () => void
 }
 
 // Configurations for Models Select field dropdown
@@ -67,62 +65,84 @@ const MenuProps = {
     variant: "menu"
 };
 
-const handleDownload = (url: string) => {
-    // Replace 'your-file-url' with the actual URL of the file you want to download
-    const fileUrl = url;
-
-    // Create an invisible anchor element
-    const link = document.createElement('a');
-    link.href = fileUrl;
-
-    // Set the download attribute to specify the filename
-    link.download = 'downloaded-file.txt';
-
-    // Append the anchor to the body and trigger a click event
-    document.body.appendChild(link);
-    link.click();
-
-    // Remove the anchor from the body
-    document.body.removeChild(link);
+interface FormFieldErrorStates {
+    models: boolean;
+    vars: boolean;
+    counties: boolean;
 }
 
-const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse, handleClear }) => {
-    const [isError, setIsError] = useState(false);
-    const isFirstRender = useRef(true)
+const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse }) => {
 
-    // Models handling code
+    const [formState, setFormState] = useState<FormFieldErrorStates>({
+        models: false,
+        vars: false,
+        counties: false
+    })
+
+    const isFormInvalid = useRef(false)
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
             return
         }
-        const selectedModelsStr = arrayToCommaSeparatedString(modelsSelected)
-        setPackageSettings({
-            ...localPackageSettings,
-            models: selectedModelsStr
-        })
-    }, [modelsSelected])
 
-    const handleModelsChange = (event: SelectChangeEvent<typeof modelsSelected>) => {
-        const {
-            target: { value },
-        } = event;
-        if (value[value.length - 1] === "all") {
-            setModelsSelected(modelsSelected.length === modelsList.length ? [] : modelsList);
-            return;
+        console.log('isforminvalid state change to: ' + isFormInvalid.current)
+    }, [isFormInvalid])
+
+    const [isError, setIsError] = useState(false);
+    const isFirstRender = useRef(true)
+
+    // MODELS
+    
+    modelsList.length > 0 && modelsSelected.length === modelsList.length
+
+    const handleModelsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        console.log('isallmodelsselected: ' + isAllModelsSelected.current)
+        const selectedValues = event.target.value as string[];
+        console.log('selected values')
+        console.log(selectedValues)
+
+        // Check if "Select All" option is selected
+        if (selectedValues.includes('all')) {
+            if (isAllModelsSelected.current) {
+                // Deselect all options if "Select All" was previously selected
+                console.log('deselect all')
+                setModelsSelected([])
+                console.log(modelsSelected)
+            } else {
+                console.log('select all')
+                // Select all options if "Select All" is selected
+                setModelsSelected(modelsList);
+            }
+            // Toggle the selectAll state
+            isAllModelsSelected.current = !isAllModelsSelected.current
+        } else {
+            // Remove "Select All" from selected options
+            setModelsSelected(selectedValues.filter(value => value !== 'all'))
+            // Ensure selectAll state is false when individual options are selected/deselected
+            isAllModelsSelected.current = false
         }
-        setModelsSelected(
-            // On autofill we get a stringified value.
-            typeof value === 'string' ? value.split(',') : value,
-        );
-    };
+    }
+    /* 
+        const handleModelsChange = (event: SelectChangeEvent<typeof modelsSelected>) => {
+            console.log('handlemodelschange')
+            const {
+                target: { value },
+            } = event;
+            console.log(value)
+            if (value[value.length - 1] === "all") {
+                setModelsSelected(modelsSelected.length === modelsList.length ? [] : modelsList)
+                console.log(modelsSelected)
+                return
+            }
+            setModelsSelected(
+                // On autofill we get a stringified value.
+                typeof value === 'string' ? value.split(',') : value,
+            );
+        } */
 
-    const isAllModelsSelected =
-        modelsList.length > 0 && modelsSelected.length === modelsList.length;
-    // end of Models handling code
+    // COUNTIES 
 
-
-    // Counties handling code
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
@@ -135,24 +155,46 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackag
         })
     }, [selectedCounties])
 
-    // end of counties handling code 
 
-    const handleSubmit = () => {
-        // validate form data
-        let apires: any
+    function validateFormData() {
+        let newFormState = formState
 
-        if (typeof onFormDataSubmit === 'function') {
-            onFormDataSubmit()
+        if (modelsSelected.length == 0) {
+            newFormState.models = true
+            isFormInvalid.current = true
         }
 
-        setSidebarState('download')
-        setIsError(false)
+        if (selectedVars.length == 0) {
+            newFormState.vars = true
+            isFormInvalid.current = true
+        }
+
+        if (selectedCounties.length == 0) {
+            newFormState.counties = true
+            isFormInvalid.current = true
+        }
+
+        setFormState(newFormState)
+        console.log('formstate')
+        console.log(formState)
     }
 
-    const handleReset = () => {
-        handleClear()
-        setSidebarState('settings')
-        setIsError(false)
+    const handleSubmit = () => {
+
+        validateFormData()
+
+        // validate form data
+        if (!isFormInvalid) {
+            if (typeof onFormDataSubmit === 'function') {
+                onFormDataSubmit()
+            }
+
+            isFormInvalid.current = false
+            setSidebarState('download')
+            setIsError(false)
+        } else {
+            setIsError(true)
+        }
     }
 
     return (
@@ -191,7 +233,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackag
             )}
             {isError && (
                 <div>
-                    <Typography variant="h4">Error submiting form</Typography>
+                    <Typography variant="h4">Error calling the API</Typography>
                 </div>
             )}
             {sidebarState === 'settings' && (
@@ -218,37 +260,28 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackag
                         <div className="container container--package-setting">
                             <p className="option-group">
                                 <Typography variant="body2">Models</Typography>
-                                <FormControl>
+                                <FormControl error={formState.models}>
                                     <Select
                                         multiple
-                                        value={modelsSelected}
+                                        value={isAllModelsSelected.current ? ['all'] : modelsSelected}
                                         onChange={handleModelsChange}
-                                        renderValue={(selected) => selected.join(', ')}
+                                        renderValue={(selected) => (isAllModelsSelected.current ? 'All Available' : (selected as string[]).join(', '))}
                                         MenuProps={MenuProps}
                                         sx={{ mt: '15px', width: '380px' }}
+
                                     >
-                                        <MenuItem
-                                            value="all"
-                                        >
-                                            <ListItemIcon>
-                                                <Checkbox
-                                                    checked={isAllModelsSelected}
-                                                    indeterminate={
-                                                        modelsSelected.length > 0 && modelsSelected.length < modelsList.length
-                                                    }
-                                                />
-                                            </ListItemIcon>
-                                            <ListItemText
-                                                primary="Select All"
-                                            />
+                                        <MenuItem value="all">
+                                            <Checkbox checked={isAllModelsSelected.current} />
+                                            Select All
                                         </MenuItem>
                                         {modelsList.map((model) => (
                                             <MenuItem key={model} value={model}>
-                                                <Checkbox checked={modelsSelected.indexOf(model) > -1} />
+                                                <Checkbox checked={modelsSelected.includes(model)} />
                                                 <ListItemText primary={model} />
                                             </MenuItem>
                                         ))}
                                     </Select>
+                                    {formState.models && <div>One or more models need to be selected in order to continue</div>}
                                 </FormControl>
                             </p>
                         </div>
@@ -281,10 +314,12 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackag
                                         <TextField
                                             {...params}
                                             placeholder="Search..."
-
+                                            error={formState.vars}
+                                            helperText={'One or more variables need to be selected in order to continue'}
                                         />
                                     )}
                                     sx={{ mt: '15px', width: '380px' }}
+
                                 />
                             </p>
                         </div>
@@ -327,10 +362,12 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackag
                                         <TextField
                                             {...params}
                                             placeholder="Search..."
-
+                                            error={formState.counties}
+                                            helperText={'One or more counties need to be selected in order to continue'}
                                         />
                                     )}
                                     sx={{ mt: '15px', width: '380px' }}
+
                                 />
                             </p>
 

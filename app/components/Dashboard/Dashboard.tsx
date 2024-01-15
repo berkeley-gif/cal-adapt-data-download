@@ -45,7 +45,7 @@ import SidePanel from './SidePanel'
 import PackageForm from './PackageForm'
 import './../../styles/components/dashboard.scss'
 
-import { stringToArray, arrayToCommaSeparatedString } from "@/app/utils/utilFn"
+import { stringToArray, arrayToCommaSeparatedString } from "@/app/utils/functions"
 
 const DRAWER_WIDTH = 212;
 const ITEM_HEIGHT = 48;
@@ -98,8 +98,6 @@ export default function Dashboard({ data, packagesData }) {
 
 
     const onFormDataSubmit = async () => {
-
-
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search';
         const queryParams = new URLSearchParams({
             limit: '10',
@@ -113,8 +111,6 @@ export default function Dashboard({ data, packagesData }) {
 
                 const res = await fetch(fullUrl)
                 const data = await res.json()
-
-                console.log(data)
 
                 const apiResponseData: modelVarUrls[] = []
 
@@ -163,23 +159,28 @@ export default function Dashboard({ data, packagesData }) {
         setSidebarState('settings')
     }
 
-    // Code for climate variables / indicators
+    // VARIABLES
+
     const varsList: string[] = (data.summaries['cmip6:variable_id']).map((obj) => obj)
+
     const [selectedVars, setSelectedVars] = useState<any>([])
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
             return
         }
-        const selectedVarsStr = arrayToCommaSeparatedString(selectedVars)
-        setPackageSettings({
-            ...localPackageSettings,
-            vars: selectedVarsStr
-        })
+
+        if (selectedVars.length > 0) {
+            const selectedVarsStr = arrayToCommaSeparatedString(selectedVars)
+            setPackageSettings({
+                ...localPackageSettings,
+                vars: selectedVarsStr
+            })
+        }
     }, [selectedVars])
     // End of code for climate variables / indicators
 
-    // Code for counties
+    // COUNTIES
     const countiesList: string[] = (data.summaries['countyname']).map((obj) => obj)
 
     const [selectedCounties, setSelectedCounties] = useState<any>([])
@@ -267,8 +268,9 @@ export default function Dashboard({ data, packagesData }) {
 
     const modelsList: string[] = (data.summaries['cmip6:source_id']).map((obj) => obj)
 
-    const [modelsSelected, setModelsSelected] = useState<any>([])
+    const [modelsSelected, setModelsSelected] = useState<string[]>([])
     useEffect(() => {
+        let selectedModelsStr: string = ''
         if (isFirstRender.current) {
             isFirstRender.current = false;
             return
@@ -282,16 +284,16 @@ export default function Dashboard({ data, packagesData }) {
 
             setApiParams(updatedApiParam)
 
-
-            const selectedModelsStr = arrayToCommaSeparatedString(modelsSelected)
-
-            setPackageSettings({
-                ...localPackageSettings,
-                models: selectedModelsStr
-            })
+            selectedModelsStr = arrayToCommaSeparatedString(modelsSelected)
         }
+
+        setPackageSettings({
+            ...localPackageSettings,
+            models: selectedModelsStr
+        })
     }, [modelsSelected])
 
+    const isAllModelsSelected = useRef(false)
 
     // End of configurations for Models Select field dropdown
 
@@ -340,7 +342,7 @@ export default function Dashboard({ data, packagesData }) {
         }
     }
 
-    function handleClear() {
+    function handleLocalPackageClear() {
         if (typeof window !== 'undefined' && window.localStorage) {
             localStorage.clear()
             setIsPkgStored(false)
@@ -353,11 +355,14 @@ export default function Dashboard({ data, packagesData }) {
 
     // useEffect for component
     useEffect(() => {
-        setAvailableVars(stringToArray(packagesData[0].vars))
-        setSelectedVars(stringToArray(localPackageSettings.vars))
+        console.log(localPackageSettings)
+        setSelectedVars(localPackageSettings.vars.length > 0 ? stringToArray(localPackageSettings.vars) : [])
         setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
-        setSelectedCounties(localPackageSettings.boundaries ? stringToArray(localPackageSettings.boundaries) : [])
+        setSelectedCounties(localPackageSettings.boundaries.length > 0 ? stringToArray(localPackageSettings.boundaries) : [])
         setSidebarState('settings')
+        console.log('initial models status')
+        console.log('modelsselected.length: ' + modelsSelected.length)
+        isAllModelsSelected.current = (modelsSelected.length == modelsList.length)
     }, [])
 
     return (
@@ -515,7 +520,7 @@ export default function Dashboard({ data, packagesData }) {
                     </IconButton>
 
                     {isPackageStored &&
-                        <IconButton onClick={() => handleClear()}>
+                        <IconButton onClick={() => handleLocalPackageClear()}>
                             <DeleteOutlineIcon />
                         </IconButton>
                     }
@@ -528,7 +533,7 @@ export default function Dashboard({ data, packagesData }) {
 
 
                     {isPackageStored &&
-                        <PackageForm localPackageSettings={localPackageSettings} sidebarState={sidebarState} setSidebarState={setSidebarState} setPackageSettings={setPackageSettings} modelsSelected={modelsSelected} setModelsSelected={setModelsSelected} modelsList={modelsList} selectedVars={selectedVars} setSelectedVars={setSelectedVars} varsList={varsList} selectedCounties={selectedCounties} setSelectedCounties={setSelectedCounties} countiesList={countiesList} onFormDataSubmit={onFormDataSubmit} dataResponse={dataResponse} handleClear={handleClear}></PackageForm>
+                        <PackageForm localPackageSettings={localPackageSettings} sidebarState={sidebarState} setSidebarState={setSidebarState} setPackageSettings={setPackageSettings} modelsSelected={modelsSelected} setModelsSelected={setModelsSelected} isAllModelsSelected={isAllModelsSelected} modelsList={modelsList} selectedVars={selectedVars} setSelectedVars={setSelectedVars} varsList={varsList} selectedCounties={selectedCounties} setSelectedCounties={setSelectedCounties} countiesList={countiesList} onFormDataSubmit={onFormDataSubmit} dataResponse={dataResponse} handleLocalPackageClear={handleLocalPackageClear}></PackageForm>
                     }
 
                     {!isPackageStored &&
