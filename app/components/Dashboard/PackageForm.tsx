@@ -10,6 +10,9 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { FormControl, Button } from '@mui/material'
+import DownloadIcon from '@mui/icons-material/Download'
+import IconButton from '@mui/material/IconButton'
+import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
 
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
@@ -65,6 +68,7 @@ interface ChildFormProps {
     localPackageSettings: any,
     dataResponse: modelVarUrls[]
     isAllModelsSelected: any,
+    isPackageStored: boolean,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
     setSelectedVars: (selectedVars: string[]) => void,
@@ -73,7 +77,7 @@ interface ChildFormProps {
     onFormDataSubmit: () => unknown,
 }
 
-const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse }) => {
+const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse }) => {
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         models: false,
         vars: false,
@@ -210,6 +214,12 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                     </div>
                                 </div>
                             ))}
+                            
+                            {isPackageStored && sidebarState == 'download' &&
+                                <IconButton onClick={() => (setSidebarState('settings'))}>
+                                    <UndoOutlinedIcon />
+                                </IconButton>
+                            }
                         </div>
                     ) : 'Loading...'}
                 </div>
@@ -323,7 +333,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                 <Autocomplete
                                     multiple
                                     value={selectedCounties}
-                                    onChange={(event: any, newValue: string []) => {
+                                    onChange={(event: any, newValue: string[]) => {
                                         setSelectedCounties(newValue)
                                     }}
                                     id="tags-outlined"

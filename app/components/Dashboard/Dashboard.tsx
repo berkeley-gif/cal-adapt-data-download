@@ -324,6 +324,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         setSelectedCounties(localPackageSettings.boundaries.length > 0 ? stringToArray(localPackageSettings.boundaries) : [])
         setSidebarState('settings')
 
+
         isAllModelsSelected.current = (modelsSelected.length == modelsList.length)
     }, [])
 
@@ -402,7 +403,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
             </Drawer>
             <Box
                 component="main"
-                sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, pt: "200px" }}
+                sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, mt: "64px", pt: "200px" }}
             >
                 <Toolbar />
 
@@ -431,8 +432,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                     </Typography>
                     <div className="packages-grid">
                         {packagesData.map((pkg: any) => (
-                            <div className="package container container--package">
-                                <Typography className="package__name" variant="h6" key={pkg.id}>
+                            <div className="package container container--package" key={pkg.id}>
+                                <Typography className="package__name" variant="h6" >
                                     {pkg.name}
                                 </Typography>
                                 <ul className="package__settings">
@@ -517,6 +518,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                             countiesList={countiesList}
                             onFormDataSubmit={onFormDataSubmit}
                             dataResponse={dataResponse}
+                            isPackageStored={isPackageStored}
                         ></PackageForm>
                     }
 

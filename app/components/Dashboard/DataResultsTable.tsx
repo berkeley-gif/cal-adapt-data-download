@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import { Button } from '@mui/material'
+import DownloadIcon from '@mui/icons-material/Download'
 
 import { searchObject, handleDownload } from '@/app/utils/functions'
 
@@ -18,12 +19,12 @@ interface DataResultsProps {
 
 const DataResultsTable: React.FC<DataResultsProps> = ({ varsResData, selectedVars }) => {
     return (
-        <TableContainer sx={{mt: '15px'}} component={Paper}>
+        <TableContainer sx={{mt: '15px', p: '20px', backgroundColor: '#f7f9fb', borderRadius: '7px', boxShadow: 'none'}} component={Paper}>
             <Table aria-label="Data Results table">
                 <TableHead>
                     <TableRow>
                         <TableCell>Name</TableCell>
-                        <TableCell align="right">Download</TableCell>
+                        <TableCell align="center">Download</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -39,6 +40,7 @@ const DataResultsTable: React.FC<DataResultsProps> = ({ varsResData, selectedVar
                             </TableCell>
                             <TableCell align="right">
                                 <Button variant="contained" color="primary" onClick={() => { handleDownload(variable.href) }}>
+                                    <DownloadIcon />
                                     Download File
                                 </Button>
                             </TableCell>
