@@ -219,7 +219,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                     {(dataResponse.length > 0) ? (
                         <div>
                             {dataResponse.map((item) => (
-                                <div className="container container--package-setting">
+                                <div className="container container--package-setting" key={item.model}>
                                     <Typography variant="h5">Model</Typography>
                                     {item.model}
                                     <div className="option-group">

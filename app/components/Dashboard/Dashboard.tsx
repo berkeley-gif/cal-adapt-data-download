@@ -60,8 +60,12 @@ type apiParamStrs = {
     modelQueryStr: string
 }
 
+interface DashboardProps {
+    data: any,
+    packagesData: any
+}
 
-export default function Dashboard({ data, packagesData }) {
+export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])
 
     // API PARAMS
@@ -149,7 +153,7 @@ export default function Dashboard({ data, packagesData }) {
 
     // VARIABLES
 
-    const varsList: string[] = (data.summaries['cmip6:variable_id']).map((obj) => obj)
+    const varsList: string[] = (data.summaries['cmip6:variable_id']).map((obj: {}) => obj)
 
     const [selectedVars, setSelectedVars] = useState<any>([])
     useDidMountEffect(() => {
@@ -165,7 +169,7 @@ export default function Dashboard({ data, packagesData }) {
 
     // COUNTIES
 
-    const countiesList: string[] = (data.summaries['countyname']).map((obj) => obj)
+    const countiesList: string[] = (data.summaries['countyname']).map((obj: {}) => obj)
 
     const [selectedCounties, setSelectedCounties] = useState<string[]>([])
     useDidMountEffect(() => {
@@ -229,7 +233,7 @@ export default function Dashboard({ data, packagesData }) {
         variant: "menu"
     };
 
-    const modelsList: string[] = (data.summaries['cmip6:source_id']).map((obj) => obj)
+    const modelsList: string[] = (data.summaries['cmip6:source_id']).map((obj: {}) => obj)
 
     const [modelsSelected, setModelsSelected] = useState<string[]>([])
 
@@ -459,7 +463,7 @@ export default function Dashboard({ data, packagesData }) {
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            If you proceed, the current package data that is saved will be overwritten by the package that you're selecting
+                            If you proceed, the current package data that is saved will be overwritten by the package that you are selecting
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
