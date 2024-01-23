@@ -96,9 +96,12 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
         counties: false
     })
 
-    const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false)
+    let isFormInvalid: boolean = false
+    
     useEffect(() => {
-        setIsFormInvalid(searchObject(formErrorState, true))
+        isFormInvalid = searchObject(formErrorState, true)
+
+        console.log('form is invalid: ' + isFormInvalid)
 
     }, [formErrorState])
 
@@ -108,7 +111,6 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
 
     const handleModelsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const selectedValues = event.target.value as string[];
-
 
         // Check if "Select All" option is selected
         // HERE FOR ERROR WITH DESELECTING ?
@@ -188,6 +190,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
         }
 
         setFormErrorState(newFormState)
+        isFormInvalid = searchObject(formErrorState, true)
     }
 
     const handleSubmit = () => {
@@ -200,7 +203,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
 
             onFormDataSubmit()
 
-            setIsFormInvalid(false)
+            isFormInvalid = false
             setSidebarState('download')
             setIsError(false)
         } else {
@@ -219,23 +222,23 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                 <div className="container container--package-setting">
                                     <Typography variant="h5">Model</Typography>
                                     {item.model}
-                                    <p className="option-group">
+                                    <div className="option-group">
                                         <Typography variant="h5">Vars</Typography>
                                         {(item.vars.length > 0) && (
                                             item.vars.map((variable) => (
                                                 <div>
-                                                    <p className="option-group">
+                                                    <div className="option-group">
                                                         {variable.name}
-                                                    </p>
-                                                    <p className="option-group">
+                                                    </div>
+                                                    <div className="option-group">
                                                         <Button variant="contained" color="primary" onClick={() => { handleDownload(variable.href) }}>
                                                             Download File
                                                         </Button>
-                                                    </p>
+                                                    </div>
                                                 </div>
                                             ))
                                         )}
-                                    </p>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -255,21 +258,21 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                         </Typography>
 
                         <div className="container container--package-setting">
-                            <p className="option-group">
+                            <div className="option-group">
                                 <Typography variant="body2">Dataset</Typography> {localPackageSettings.dataset}
-                            </p>
+                            </div>
 
                         </div>
 
 
                         <div className="container container--package-setting">
-                            <p className="option-group">
+                            <div className="option-group">
                                 <Typography variant="body2">Scenario(s)</Typography> {localPackageSettings.scenarios}
-                            </p>
+                            </div>
                         </div>
 
                         <div className="container container--package-setting">
-                            <p className="option-group">
+                            <div className="option-group">
                                 <Typography variant="body2">Models</Typography>
                                 <FormControl error={formErrorState.models}>
                                     <Select
@@ -294,11 +297,11 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                     </Select>
                                     {formErrorState.models && <div>One or more models need to be selected in order to continue</div>}
                                 </FormControl>
-                            </p>
+                            </div>
                         </div>
 
                         <div className="container container--package-setting">
-                            <p className="option-group">
+                            <div className="option-group">
                                 <Typography variant="body2">Variables</Typography>
                                 <Autocomplete
                                     multiple
@@ -326,26 +329,26 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                             {...params}
                                             placeholder="Search..."
                                             error={formErrorState.vars}
-                                            helperText={'One or more variables need to be selected in order to continue'}
+                                            helperText={formErrorState.vars ? 'One or more variables need to be selected in order to continue' : ''}
                                         />
                                     )}
                                     sx={{ mt: '15px', width: '380px' }}
 
                                 />
-                            </p>
+                            </div>
                         </div>
 
                         <div className="container container--package-setting">
-                            <p className="option-group">
+                            <div className="option-group">
                                 <Typography variant="body2">Spatial Extent</Typography>
-                            </p>
+                            </div>
 
-                            <p className="option-group">
+                            <div className="option-group">
                                 <Typography variant="body2">Type</Typography>
                                 {localPackageSettings.boundaryType}
-                            </p>
+                            </div>
 
-                            <p>
+                            <div>
                                 <Typography variant="body2">Counties</Typography>
 
                                 <Autocomplete
@@ -374,20 +377,20 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                             {...params}
                                             placeholder="Search..."
                                             error={formErrorState.counties}
-                                            helperText={'One or more counties need to be selected in order to continue'}
+                                            helperText={formErrorState.counties ? 'One or more counties need to be selected in order to continue' : ''}
                                         />
                                     )}
                                     sx={{ mt: '15px', width: '380px' }}
 
                                 />
-                            </p>
+                            </div>
 
                         </div>
 
                         <div className="container container--package-setting">
-                            <p className="option-group">
+                            <div className="option-group">
                                 <Typography variant="body2">Range</Typography> {localPackageSettings.rangeStart} - {localPackageSettings.rangeEnd}
-                            </p>
+                            </div>
                         </div>
 
                         <div className="container container--package-setting">

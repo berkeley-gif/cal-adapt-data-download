@@ -239,7 +239,7 @@ export default function Dashboard({ data, packagesData }) {
 
         if (modelsSelected.length > 0) {
             const updatedApiParam: apiParamStrs = {
-                countyQueryStr: createOrStatement('countyname', selectedCounties.length > 0 ? selectedCounties : []),
+                countyQueryStr: selectedCounties.length > 0 ? createOrStatement('countyname', selectedCounties) : '',
                 modelQueryStr: createOrStatement('cmip6:source_id', modelsSelected)
             }
 
