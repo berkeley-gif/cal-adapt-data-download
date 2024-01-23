@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Autocomplete from '@mui/material/Autocomplete'
 import Checkbox from '@mui/material/Checkbox'
@@ -12,6 +12,7 @@ import Select from '@mui/material/Select'
 import { FormControl, Button } from '@mui/material'
 
 import { arrayToCommaSeparatedString, handleDownload } from "@/app/utils/functions"
+import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -39,9 +40,9 @@ interface ChildFormProps {
     isAllModelsSelected: any,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
-    setSelectedVars: (selectedVars: string []) => void,
-    setModelsSelected: (selectedModels: string []) => void,
-    setSelectedCounties: (selectedCounties: string []) => void,
+    setSelectedVars: (selectedVars: string[]) => void,
+    setModelsSelected: (selectedModels: string[]) => void,
+    setSelectedCounties: (selectedCounties: string[]) => void,
     onFormDataSubmit: () => unknown,
 }
 
@@ -88,30 +89,22 @@ function searchObject(obj: FormFieldErrorStates, targetValue: any): boolean {
     return false;
 }
 
-const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse}) => {
-    const [formState, setFormState] = useState<FormFieldErrorStates>({
+const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse }) => {
+    const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         models: false,
         vars: false,
         counties: false
     })
 
-    const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false) 
+    const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false)
     useEffect(() => {
-/*         if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return
-        }
- */
-        setIsFormInvalid(searchObject(formState, true))
+        setIsFormInvalid(searchObject(formErrorState, true))
 
-        console.log('isforminvalid state change to: ' + isFormInvalid)
-    }, [formState])
+    }, [formErrorState])
 
     const [isError, setIsError] = useState(false);
 
     // MODELS
-
-    // modelsList.length > 0 && modelsSelected.length === modelsList.length
 
     const handleModelsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const selectedValues = event.target.value as string[];
@@ -140,9 +133,41 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
         }
     }
 
+    // MODELS
+    useDidMountEffect(() => {
+        if (modelsSelected.length > 0) {
+            let newFormState = formErrorState
+
+            newFormState.models = false
+            setFormErrorState(newFormState)
+        }
+
+    }, [modelsSelected])
+
+    // VARIABLES 
+    useDidMountEffect(() => {
+        if (selectedVars.length > 0) {
+            let newFormState = formErrorState
+
+            newFormState.vars = false
+            setFormErrorState(newFormState)
+        }
+
+    }, [selectedVars])
+
     // COUNTIES
+    useDidMountEffect(() => {
+        if (selectedCounties.length > 0) {
+            let newFormState = formErrorState
+
+            newFormState.counties = false
+            setFormErrorState(newFormState)
+        }
+
+    }, [selectedCounties])
+
     function validateFormData() {
-        let newFormState = formState
+        let newFormState = formErrorState
 
         if (modelsSelected.length == 0) {
             newFormState.models = true
@@ -162,7 +187,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
             newFormState.counties = false
         }
 
-        setFormState(newFormState)
+        setFormErrorState(newFormState)
     }
 
     const handleSubmit = () => {
@@ -246,7 +271,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                         <div className="container container--package-setting">
                             <p className="option-group">
                                 <Typography variant="body2">Models</Typography>
-                                <FormControl error={formState.models}>
+                                <FormControl error={formErrorState.models}>
                                     <Select
                                         multiple
                                         value={isAllModelsSelected.current ? ['all'] : modelsSelected}
@@ -267,7 +292,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                             </MenuItem>
                                         ))}
                                     </Select>
-                                    {formState.models && <div>One or more models need to be selected in order to continue</div>}
+                                    {formErrorState.models && <div>One or more models need to be selected in order to continue</div>}
                                 </FormControl>
                             </p>
                         </div>
@@ -300,7 +325,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                         <TextField
                                             {...params}
                                             placeholder="Search..."
-                                            error={formState.vars}
+                                            error={formErrorState.vars}
                                             helperText={'One or more variables need to be selected in order to continue'}
                                         />
                                     )}
@@ -348,7 +373,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                         <TextField
                                             {...params}
                                             placeholder="Search..."
-                                            error={formState.counties}
+                                            error={formErrorState.counties}
                                             helperText={'One or more counties need to be selected in order to continue'}
                                         />
                                     )}

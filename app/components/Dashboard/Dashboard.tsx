@@ -39,7 +39,7 @@ import PackageForm from './PackageForm'
 import './../../styles/components/dashboard.scss'
 
 import { createOrStatement, stringToArray, arrayToCommaSeparatedString } from "@/app/utils/functions"
-import { useDidMountEffect, useLocalStorageState, useNotFirstRender } from "@/app/utils/hooks"
+import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
 
 const DRAWER_WIDTH = 212;
 const ITEM_HEIGHT = 48;
@@ -63,8 +63,6 @@ type apiParamStrs = {
 
 export default function Dashboard({ data, packagesData }) {
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])
-    //const isFirstRender = useRef(true)
-
 
     // API PARAMS
 
