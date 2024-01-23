@@ -10,7 +10,6 @@
   &--package {
     background-color: #eef3f9;
     border-radius: 16px;
-    width: 33%;
     padding: 25px;
   }
 
@@ -31,7 +30,7 @@
   justify-content: flex-start;
   gap: 30px;
   & > .package {
-    width: 1/3;
+    width: 50%;
   }
 }
 
@@ -48,8 +47,8 @@
   }
 }
 
-.package-contents { 
-    padding-top: 20px;
+.package-contents {
+  padding-top: 20px;
 }
 
 // Drawer Toolbar

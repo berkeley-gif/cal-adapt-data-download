@@ -436,14 +436,17 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                     {pkg.name}
                                 </Typography>
                                 <ul className="package__settings">
-                                    <li><Typography variant="body2">Boundary Type:</Typography> {pkg.boundaryType}</li>
                                     <li><Typography variant="body2">Dataset:</Typography> {pkg.dataset}</li>
+                                    <li><Typography variant="body2">Scenarios:</Typography> {pkg.scenarios}</li>
+                                    <li><Typography variant="body2">Models:</Typography> {pkg.models}</li>
+                                    <li><Typography variant="body2">Vars:</Typography> {pkg.vars}</li>
+                                    <li><Typography variant="body2">Boundary Type:</Typography> {pkg.boundaryType}</li>
                                     <li><Typography variant="body2">Range:</Typography> {pkg.rangeStart} - {pkg.rangeEnd}</li>
                                     <li><Typography variant="body2">Frequency:</Typography> {pkg.frequency}</li>
                                     <li><Typography variant="body2">Data Format:</Typography> {pkg.dataFormat}</li>
                                     <li><Typography variant="body2">Units:</Typography> {pkg.units}</li>
                                 </ul>
-                                <Button onClick={() => selectPackageToSave(idx)} variant="contained">Customize and download</Button>
+                                <Button disabled={pkg.disabled} onClick={() => selectPackageToSave(idx)} variant="contained">Customize and download</Button>
                             </div>
                         ))}
 

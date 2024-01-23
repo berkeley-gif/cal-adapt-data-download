@@ -16,7 +16,7 @@
   },
   {
     "id": 1,
-    "name": "Statewide Climate Data",
+    "name": "Statewide Climate Data (Coming soon...)",
     "dataset": "LOCA2",
     "scenarios": "Historical",
     "models": "EC-Earth3, FGOALS-g3, CNRM-ESM2-1",
