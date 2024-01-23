@@ -180,10 +180,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
 
         validateFormData()
 
-        // validate form data
         if (!isFormInvalid) {
-            console.log('form is valid')
-
             onFormDataSubmit()
 
             isFormInvalid = false

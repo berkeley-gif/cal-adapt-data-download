@@ -20,20 +20,12 @@ async function getData() {
 export default async function Home() {
   const data = await getData()
 
-  console.log(data)
-
   const filePackages = await fs.readFile(process.cwd() + '/app/data/packages.json', 'utf8')
   const packagesData = JSON.parse(filePackages)
 
-  const fileCounties = await fs.readFile(process.cwd() + '/app/data/counties.json', 'utf8')
-  const countiesData = JSON.parse(fileCounties)
-
-  const fileModels = await fs.readFile(process.cwd() + '/app/data/models.json', 'utf8');
-  const modelsData = JSON.parse(fileModels);
-
   return (
     <div className={styles.container}>
-      <Dashboard data={data} packagesData={packagesData} countiesData={countiesData} modelsData={modelsData} />
+      <Dashboard data={data} packagesData={packagesData}  />
     </div>
   );
 }

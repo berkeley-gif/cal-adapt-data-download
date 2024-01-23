@@ -70,8 +70,6 @@ type apiParamStrs = {
 interface DashboardProps {
     data: any,
     packagesData: any,
-    countiesData: any, 
-    modelsData: any, 
 }
 
 export default function Dashboard({ data, packagesData }: DashboardProps) {
@@ -431,21 +429,24 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                     <Typography variant="body1">
                         Select a data package preset from the options listed below
                     </Typography>
-                    <div className="grid">
-                        <div className="package container container--package">
-                            <Typography className="package__name" variant="h6">
-                                {packagesData[0].name}
-                            </Typography>
-                            <ul className="package__settings">
-                                <li><Typography variant="body2">Boundary Type:</Typography> {packagesData[0].boundaryType}</li>
-                                <li><Typography variant="body2">Dataset:</Typography> {packagesData[0].dataset}</li>
-                                <li><Typography variant="body2">Range:</Typography> {packagesData[0].rangeStart} - {packagesData[0].rangeEnd}</li>
-                                <li><Typography variant="body2">Frequency:</Typography> {packagesData[0].frequency}</li>
-                                <li><Typography variant="body2">Data Format:</Typography> {packagesData[0].dataFormat}</li>
-                                <li><Typography variant="body2">Units:</Typography> {packagesData[0].units}</li>
-                            </ul>
-                            <Button onClick={() => selectPackageToSave(0)} variant="contained">Customize and download</Button>
-                        </div>
+                    <div className="packages-grid">
+                        {packagesData.map((pkg: any, idx: number) => (
+                            <div className="package container container--package">
+                                <Typography className="package__name" variant="h6">
+                                    {pkg.name}
+                                </Typography>
+                                <ul className="package__settings">
+                                    <li><Typography variant="body2">Boundary Type:</Typography> {pkg.boundaryType}</li>
+                                    <li><Typography variant="body2">Dataset:</Typography> {pkg.dataset}</li>
+                                    <li><Typography variant="body2">Range:</Typography> {pkg.rangeStart} - {pkg.rangeEnd}</li>
+                                    <li><Typography variant="body2">Frequency:</Typography> {pkg.frequency}</li>
+                                    <li><Typography variant="body2">Data Format:</Typography> {pkg.dataFormat}</li>
+                                    <li><Typography variant="body2">Units:</Typography> {pkg.units}</li>
+                                </ul>
+                                <Button onClick={() => selectPackageToSave(idx)} variant="contained">Customize and download</Button>
+                            </div>
+                        ))}
+
                     </div>
                 </div>
 
