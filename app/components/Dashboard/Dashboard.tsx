@@ -430,9 +430,9 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                         Select a data package preset from the options listed below
                     </Typography>
                     <div className="packages-grid">
-                        {packagesData.map((pkg: any, idx: number) => (
+                        {packagesData.map((pkg: any) => (
                             <div className="package container container--package">
-                                <Typography className="package__name" variant="h6">
+                                <Typography className="package__name" variant="h6" key={pkg.id}>
                                     {pkg.name}
                                 </Typography>
                                 <ul className="package__settings">
@@ -446,7 +446,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                     <li><Typography variant="body2">Data Format:</Typography> {pkg.dataFormat}</li>
                                     <li><Typography variant="body2">Units:</Typography> {pkg.units}</li>
                                 </ul>
-                                <Button disabled={pkg.disabled} onClick={() => selectPackageToSave(idx)} variant="contained">Customize and download</Button>
+                                <Button disabled={pkg.disabled} onClick={() => selectPackageToSave(pkg.id)} variant="contained">Customize and download</Button>
                             </div>
                         ))}
 
