@@ -11,8 +11,9 @@ import Typography from '@mui/material/Typography'
 import Select from '@mui/material/Select'
 import { FormControl, Button } from '@mui/material'
 
-import { arrayToCommaSeparatedString, handleDownload } from "@/app/utils/functions"
+import { handleDownload } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
+import DataResultsTable from './DataResultsTable'
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -72,7 +73,7 @@ interface FormFieldErrorStates {
     counties: boolean;
 }
 
-function searchObject(obj: FormFieldErrorStates, targetValue: any): boolean {
+function searchObject(obj: any, targetValue: any): boolean {
     for (const key in obj) {
         if (obj[key] === targetValue) {
             return true;
@@ -97,7 +98,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
     })
 
     let isFormInvalid: boolean = false
-    
+
     useEffect(() => {
         isFormInvalid = searchObject(formErrorState, true)
 
@@ -214,7 +215,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
     return (
         <div className="package-form">
             {(sidebarState === 'download') && (
-                <div>
+                <div className="package-contents">
                     <Typography variant="h5">Download your data</Typography>
                     {(dataResponse.length > 0) ? (
                         <div>
@@ -225,18 +226,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                     <div className="option-group">
                                         <Typography variant="h5">Vars</Typography>
                                         {(item.vars.length > 0) && (
-                                            item.vars.map((variable) => (
-                                                <div>
-                                                    <div className="option-group">
-                                                        {variable.name}
-                                                    </div>
-                                                    <div className="option-group">
-                                                        <Button variant="contained" color="primary" onClick={() => { handleDownload(variable.href) }}>
-                                                            Download File
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            ))
+                                            <DataResultsTable varsResData={item.vars} selectedVars={selectedVars}></DataResultsTable>
                                         )}
                                     </div>
                                 </div>

@@ -51,3 +51,20 @@ export function createOrStatement(parameterName: string, values: string[]): stri
 
     return `(${fullOrStatement})`;
 }
+
+export function searchObject(obj: any, targetValue: any): boolean {
+    for (const key in obj) {
+        if (obj[key] === targetValue) {
+            return true;
+        }
+
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+            // Recursively search nested objects
+            if (searchObject(obj[key], targetValue)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}

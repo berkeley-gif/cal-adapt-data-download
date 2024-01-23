@@ -96,7 +96,7 @@ export default function Dashboard({ data, packagesData }) {
         console.log(apiParams)
         const queryParams = new URLSearchParams({
             limit: '10',
-            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370'" + ( apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '' ) + ( apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : '' ),
+            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370'" + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
             filter_lang: 'cql2-text',
         })
 
@@ -133,6 +133,7 @@ export default function Dashboard({ data, packagesData }) {
                 }
 
                 setDataResponse(apiResponseData)
+
                 console.log('apiresponse')
                 console.log(apiResponseData)
             } catch (err) {
@@ -307,6 +308,7 @@ export default function Dashboard({ data, packagesData }) {
         if (typeof window !== 'undefined' && window.localStorage) {
             localStorage.clear()
             setIsPkgStored(false)
+            setSidebarState('settings')
         }
     }
 
@@ -485,7 +487,7 @@ export default function Dashboard({ data, packagesData }) {
                         </IconButton>
                     }
 
-                    {sidebarState == 'download' &&
+                    {isPackageStored && sidebarState == 'download' &&
                         <IconButton onClick={() => (resetStateToSettings())}>
                             <UndoOutlinedIcon />
                         </IconButton>
@@ -497,12 +499,15 @@ export default function Dashboard({ data, packagesData }) {
                     }
 
                     {!isPackageStored &&
-                        <Typography variant="h5">
-                            No package available...
-                        </Typography>
+                        <div className='package-contents'>
+                            <Typography variant="h6">
+                                No package has been selected. Head back to the dashboard and select a data package preset.
+                            </Typography>
+                        </div>
                     }
+
                 </SidePanel>
             </Box>
-        </Box>
+        </Box >
     )
 }
