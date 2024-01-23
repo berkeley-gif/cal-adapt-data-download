@@ -40,3 +40,14 @@ export function handleDownload(url: string): void {
     // Remove the anchor from the body
     document.body.removeChild(link);
 }
+
+export function createOrStatement(parameterName: string, values: string[]): string {
+    if (values.length === 0) {
+        throw new Error('Values array must not be empty');
+    }
+
+    const orStatements = values.map(value => `${parameterName}='${value}'`);
+    const fullOrStatement = orStatements.join(' or ');
+
+    return `(${fullOrStatement})`;
+}

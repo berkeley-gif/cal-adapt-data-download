@@ -5,7 +5,7 @@ import packageIcon from '@/public/img/icons/package.svg'
 import sidebarBg from '@/public/img/photos/ocean-thumbnail.png'
 import logo from '@/public/img/logos/cal-adapt-data-download.png'
 
-import { useState, useEffect, Dispatch, SetStateAction, useRef } from "react"
+import React, { useState, useEffect, useRef } from 'react'
 
 import Alert from '@mui/material/Alert';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -13,8 +13,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import Chip from '@mui/material/Chip';
 import CloseIcon from '@mui/icons-material/Close';
 import CssBaseline from '@mui/material/CssBaseline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -24,7 +22,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Drawer from '@mui/material/Drawer';
-import { FabPropsVariantOverrides, FormControl } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import StartIcon from '@mui/icons-material/Start';
 import Link from '@mui/material/Link';
@@ -33,19 +30,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
-
 
 import SidePanel from './SidePanel'
 import PackageForm from './PackageForm'
 import './../../styles/components/dashboard.scss'
 
-import { stringToArray, arrayToCommaSeparatedString } from "@/app/utils/functions"
+import { createOrStatement, stringToArray, arrayToCommaSeparatedString } from "@/app/utils/functions"
+import { useDidMountEffect, useLocalStorageState, useNotFirstRender } from "@/app/utils/hooks"
 
 const DRAWER_WIDTH = 212;
 const ITEM_HEIGHT = 48;
@@ -61,49 +55,52 @@ type modelVarUrls = {
     vars: varUrl[]
 }
 
-interface apiParamStrs {
+type apiParamStrs = {
     countyQueryStr: string,
     modelQueryStr: string
 }
 
-function createOrStatement(parameterName: string, values: string[]): string {
-    if (values.length === 0) {
-        throw new Error('Values array must not be empty');
-    }
-
-    const orStatements = values.map(value => `${parameterName}='${value}'`);
-    const fullOrStatement = orStatements.join(' or ');
-
-    return `(${fullOrStatement})`;
-}
 
 export default function Dashboard({ data, packagesData }) {
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])
+    //const isFirstRender = useRef(true)
+
+
+    // API PARAMS
 
     const [apiParams, setApiParams] = useState<apiParamStrs>({
         countyQueryStr: '',
         modelQueryStr: ''
     })
     const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
+    useDidMountEffect(() => {
+        //useEffect(() => {
+
+        /*         if (isFirstRender.current) {
+            isFirstRender.current = false
             return
-        }
+        } */
         // Check if API parameters have changed
         setApiParamsChanged(true)
         setDataResponse([]) // Clear previous data
 
     }, [apiParams]);
 
+    const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
+    const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
+    const [tentativePackage, setTentativePackage] = useState<number>(0)
+    const [sidebarState, setSidebarState] = useState<string>('')
+    const [isError, setIsError] = useState(false);
+    const [areVarsInitialized, setVarsInitialized] = useState<boolean>(false)
 
     const onFormDataSubmit = async () => {
-        const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search';
+        const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
+        console.log(apiParams)
         const queryParams = new URLSearchParams({
             limit: '10',
-            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370' AND " + apiParams?.countyQueryStr + " AND " + apiParams?.modelQueryStr,
+            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370'" + ( apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '' ) + ( apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : '' ),
             filter_lang: 'cql2-text',
-        });
+        })
 
         const fullUrl = `${apiUrl}?${queryParams.toString()}`;
         if (apiParamsChanged) {
@@ -138,22 +135,14 @@ export default function Dashboard({ data, packagesData }) {
                 }
 
                 setDataResponse(apiResponseData)
+                console.log('apiresponse')
+                console.log(apiResponseData)
             } catch (err) {
                 console.log(err)
             }
             setApiParamsChanged(false)
         }
     }
-
-    type SetValue<T> = Dispatch<SetStateAction<T>>;
-
-    const isFirstRender = useRef(true)
-    const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
-    const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
-    const [availableVars, setAvailableVars] = useState<any>([])
-    const [tentativePackage, setTentativePackage] = useState<number>(0)
-    const [sidebarState, setSidebarState] = useState<string>('')
-    const [isError, setIsError] = useState(false);
 
     function resetStateToSettings(): void {
         setSidebarState('settings')
@@ -164,31 +153,26 @@ export default function Dashboard({ data, packagesData }) {
     const varsList: string[] = (data.summaries['cmip6:variable_id']).map((obj) => obj)
 
     const [selectedVars, setSelectedVars] = useState<any>([])
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return
-        }
+    useDidMountEffect(() => {
+        const selectedVarsStr = arrayToCommaSeparatedString(selectedVars)
 
-        if (selectedVars.length > 0) {
-            const selectedVarsStr = arrayToCommaSeparatedString(selectedVars)
-            setPackageSettings({
-                ...localPackageSettings,
-                vars: selectedVarsStr
-            })
-        }
+        setPackageSettings({
+            ...localPackageSettings,
+            vars: selectedVarsStr
+        })
+
     }, [selectedVars])
-    // End of code for climate variables / indicators
+
 
     // COUNTIES
+
     const countiesList: string[] = (data.summaries['countyname']).map((obj) => obj)
 
-    const [selectedCounties, setSelectedCounties] = useState<any>([])
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return
-        }
+    const [selectedCounties, setSelectedCounties] = useState<string[]>([])
+    useDidMountEffect(() => {
+        let selectedCountiesStr: string = ''
+
+        console.log('running use effect for counties change')
 
         if (selectedCounties.length > 0) {
             const updatedApiParam: apiParamStrs = {
@@ -198,37 +182,17 @@ export default function Dashboard({ data, packagesData }) {
 
             setApiParams(updatedApiParam)
 
-
-            const selectedCountiesStr = arrayToCommaSeparatedString(selectedCounties)
-            setPackageSettings({
-                ...localPackageSettings,
-                boundaries: selectedCountiesStr
-            })
+            selectedCountiesStr = arrayToCommaSeparatedString(selectedCounties)
         }
+
+        setPackageSettings({
+            ...localPackageSettings,
+            boundaries: selectedCountiesStr
+        })
     }, [selectedCounties])
 
-    // End of code for climate variables / indicators
 
-    // Variables that are stored in local state
-    function useLocalStorageState<T>(
-        key: string,
-        initialValue: T
-    ): [T, SetValue<T>] {
 
-        // Get initial value from local storage or use the provided initial value
-        const storedValue = typeof window !== 'undefined' ? localStorage.getItem(key) : null
-        const initial = storedValue ? JSON.parse(storedValue) : initialValue
-
-        // Set up state to manage the value
-        const [value, setValue] = useState<T>(initial);
-
-        // Update local storage when the state changes
-        useEffect(() => {
-            localStorage.setItem(key, JSON.stringify(value));
-        }, [key, value]);
-
-        return [value, setValue];
-    }
 
     const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', 0)
     const [localPackageSettings, setPackageSettings] = useLocalStorageState('package', {
@@ -269,16 +233,15 @@ export default function Dashboard({ data, packagesData }) {
     const modelsList: string[] = (data.summaries['cmip6:source_id']).map((obj) => obj)
 
     const [modelsSelected, setModelsSelected] = useState<string[]>([])
-    useEffect(() => {
+
+    useDidMountEffect(() => {
         let selectedModelsStr: string = ''
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return
-        }
+
+        console.log('running use effect for models change')
 
         if (modelsSelected.length > 0) {
             const updatedApiParam: apiParamStrs = {
-                ...apiParams,
+                countyQueryStr: createOrStatement('countyname', selectedCounties.length > 0 ? selectedCounties : []),
                 modelQueryStr: createOrStatement('cmip6:source_id', modelsSelected)
             }
 
@@ -353,15 +316,14 @@ export default function Dashboard({ data, packagesData }) {
         setSidePanelOpen(open);
     }
 
-    // useEffect for component
+
     useEffect(() => {
-        console.log(localPackageSettings)
+
         setSelectedVars(localPackageSettings.vars.length > 0 ? stringToArray(localPackageSettings.vars) : [])
         setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
         setSelectedCounties(localPackageSettings.boundaries.length > 0 ? stringToArray(localPackageSettings.boundaries) : [])
         setSidebarState('settings')
-        console.log('initial models status')
-        console.log('modelsselected.length: ' + modelsSelected.length)
+
         isAllModelsSelected.current = (modelsSelected.length == modelsList.length)
     }, [])
 
@@ -544,5 +506,5 @@ export default function Dashboard({ data, packagesData }) {
                 </SidePanel>
             </Box>
         </Box>
-    );
+    )
 }

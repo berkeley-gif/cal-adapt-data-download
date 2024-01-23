@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, SetStateAction } from 'react'
+import React, { useState, useEffect} from 'react'
 
 import Autocomplete from '@mui/material/Autocomplete'
 import Checkbox from '@mui/material/Checkbox'
@@ -39,9 +39,9 @@ interface ChildFormProps {
     isAllModelsSelected: any,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
-    setSelectedVars: (selectedVars: unknown) => void,
-    setModelsSelected: (selectedModels: unknown) => void,
-    setSelectedCounties: (selectedCounties: unknown) => void,
+    setSelectedVars: (selectedVars: string []) => void,
+    setModelsSelected: (selectedModels: string []) => void,
+    setSelectedCounties: (selectedCounties: string []) => void,
     onFormDataSubmit: () => unknown,
 }
 
@@ -71,38 +71,54 @@ interface FormFieldErrorStates {
     counties: boolean;
 }
 
-const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse }) => {
+function searchObject(obj: FormFieldErrorStates, targetValue: any): boolean {
+    for (const key in obj) {
+        if (obj[key] === targetValue) {
+            return true;
+        }
 
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+            // Recursively search nested objects
+            if (searchObject(obj[key], targetValue)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse}) => {
     const [formState, setFormState] = useState<FormFieldErrorStates>({
         models: false,
         vars: false,
         counties: false
     })
 
-    const isFormInvalid = useRef(false)
+    const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false) 
     useEffect(() => {
-        if (isFirstRender.current) {
+/*         if (isFirstRender.current) {
             isFirstRender.current = false;
             return
         }
+ */
+        setIsFormInvalid(searchObject(formState, true))
 
-        console.log('isforminvalid state change to: ' + isFormInvalid.current)
-    }, [isFormInvalid])
+        console.log('isforminvalid state change to: ' + isFormInvalid)
+    }, [formState])
 
     const [isError, setIsError] = useState(false);
-    const isFirstRender = useRef(true)
 
     // MODELS
-    
-    modelsList.length > 0 && modelsSelected.length === modelsList.length
+
+    // modelsList.length > 0 && modelsSelected.length === modelsList.length
 
     const handleModelsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        console.log('isallmodelsselected: ' + isAllModelsSelected.current)
         const selectedValues = event.target.value as string[];
-        console.log('selected values')
-        console.log(selectedValues)
+
 
         // Check if "Select All" option is selected
+        // HERE FOR ERROR WITH DESELECTING ?
         if (selectedValues.includes('all')) {
             if (isAllModelsSelected.current) {
                 // Deselect all options if "Select All" was previously selected
@@ -123,60 +139,30 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackag
             isAllModelsSelected.current = false
         }
     }
-    /* 
-        const handleModelsChange = (event: SelectChangeEvent<typeof modelsSelected>) => {
-            console.log('handlemodelschange')
-            const {
-                target: { value },
-            } = event;
-            console.log(value)
-            if (value[value.length - 1] === "all") {
-                setModelsSelected(modelsSelected.length === modelsList.length ? [] : modelsList)
-                console.log(modelsSelected)
-                return
-            }
-            setModelsSelected(
-                // On autofill we get a stringified value.
-                typeof value === 'string' ? value.split(',') : value,
-            );
-        } */
 
-    // COUNTIES 
-
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return
-        }
-        const selectedCountiesStr = arrayToCommaSeparatedString(selectedCounties)
-        setPackageSettings({
-            ...localPackageSettings,
-            boundaries: selectedCountiesStr
-        })
-    }, [selectedCounties])
-
-
+    // COUNTIES
     function validateFormData() {
         let newFormState = formState
 
         if (modelsSelected.length == 0) {
             newFormState.models = true
-            isFormInvalid.current = true
+        } else {
+            newFormState.models = false
         }
 
         if (selectedVars.length == 0) {
             newFormState.vars = true
-            isFormInvalid.current = true
+        } else {
+            newFormState.vars = false
         }
 
         if (selectedCounties.length == 0) {
             newFormState.counties = true
-            isFormInvalid.current = true
+        } else {
+            newFormState.counties = false
         }
 
         setFormState(newFormState)
-        console.log('formstate')
-        console.log(formState)
     }
 
     const handleSubmit = () => {
@@ -185,11 +171,11 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, setPackag
 
         // validate form data
         if (!isFormInvalid) {
-            if (typeof onFormDataSubmit === 'function') {
-                onFormDataSubmit()
-            }
+            console.log('form is valid')
 
-            isFormInvalid.current = false
+            onFormDataSubmit()
+
+            setIsFormInvalid(false)
             setSidebarState('download')
             setIsError(false)
         } else {
