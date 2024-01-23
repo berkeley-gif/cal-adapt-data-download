@@ -7,7 +7,14 @@ import logo from '@/public/img/logos/cal-adapt-data-download.png'
 
 import React, { useState, useEffect, useRef } from 'react'
 
-import Alert from '@mui/material/Alert';
+import Alert from '@mui/material/Alert'
+declare module '@mui/material/Alert' {
+    interface AlertPropsVariantOverrides {
+        purple: true;
+        grey: true;
+    }
+}
+
 import Autocomplete from '@mui/material/Autocomplete';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -62,7 +69,9 @@ type apiParamStrs = {
 
 interface DashboardProps {
     data: any,
-    packagesData: any
+    packagesData: any,
+    countiesData: any, 
+    modelsData: any, 
 }
 
 export default function Dashboard({ data, packagesData }: DashboardProps) {
@@ -76,13 +85,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     })
     const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
     useDidMountEffect(() => {
-        //useEffect(() => {
 
-        /*         if (isFirstRender.current) {
-            isFirstRender.current = false
-            return
-        } */
-        // Check if API parameters have changed
         setApiParamsChanged(true)
         setDataResponse([]) // Clear previous data
 
@@ -92,8 +95,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
     const [tentativePackage, setTentativePackage] = useState<number>(0)
     const [sidebarState, setSidebarState] = useState<string>('')
-    const [isError, setIsError] = useState(false);
-    const [areVarsInitialized, setVarsInitialized] = useState<boolean>(false)
 
     const onFormDataSubmit = async () => {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
@@ -194,11 +195,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         })
     }, [selectedCounties])
 
-
-
-
     const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', 0)
-    const [localPackageSettings, setPackageSettings] = useLocalStorageState('package', {
+    const [localPackageSettings, setPackageSettings] = useLocalStorageState<any>('package', {
         dataset: '',
         scenarios: '',
         models: '',
@@ -411,12 +409,12 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                 <Toolbar />
 
                 <div className="alerts">
-                    <Alert variant="link-purple" severity="info">Looking for the full LOCA2 scientific data, including 15 GCM’s and 10 climate variables?
+                    <Alert variant="purple" severity="info">Looking for the full LOCA2 scientific data, including 15 GCM’s and 10 climate variables?
                         <div className="cta">
                             <Button variant="contained">Click Here for the How-To-Guide</Button>
                         </div>
                     </Alert>
-                    <Alert variant="link-grey" severity="info">The Cal-Adapt data download tool is a beta tool. Feedback or questions are always welcome.
+                    <Alert variant="grey" severity="info">The Cal-Adapt data download tool is a beta tool. Feedback or questions are always welcome.
                         <div className="cta">
                             <Button variant="contained">Contact Us</Button>
                         </div>
@@ -499,7 +497,23 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
 
                     {isPackageStored &&
-                        <PackageForm localPackageSettings={localPackageSettings} sidebarState={sidebarState} setSidebarState={setSidebarState} setPackageSettings={setPackageSettings} modelsSelected={modelsSelected} setModelsSelected={setModelsSelected} isAllModelsSelected={isAllModelsSelected} modelsList={modelsList} selectedVars={selectedVars} setSelectedVars={setSelectedVars} varsList={varsList} selectedCounties={selectedCounties} setSelectedCounties={setSelectedCounties} countiesList={countiesList} onFormDataSubmit={onFormDataSubmit} dataResponse={dataResponse} handleLocalPackageClear={handleLocalPackageClear}></PackageForm>
+                        <PackageForm
+                            localPackageSettings={localPackageSettings}
+                            sidebarState={sidebarState}
+                            setSidebarState={setSidebarState}
+                            setPackageSettings={setPackageSettings}
+                            modelsSelected={modelsSelected}
+                            setModelsSelected={setModelsSelected}
+                            isAllModelsSelected={isAllModelsSelected}
+                            modelsList={modelsList} selectedVars={selectedVars}
+                            setSelectedVars={setSelectedVars}
+                            varsList={varsList}
+                            selectedCounties={selectedCounties}
+                            setSelectedCounties={setSelectedCounties}
+                            countiesList={countiesList}
+                            onFormDataSubmit={onFormDataSubmit}
+                            dataResponse={dataResponse}
+                        ></PackageForm>
                     }
 
                     {!isPackageStored &&

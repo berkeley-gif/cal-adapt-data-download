@@ -21,9 +21,6 @@ const theme = createTheme({
     },
     info: {
       main: '#C6C7F8',
-    },
-    greybg: {
-      main: "#F7F9FB"
     }
   },
   typography: {
@@ -68,13 +65,13 @@ const theme = createTheme({
     MuiAlert: {
       variants: [
         {
-          props: { variant: 'link-purple' },
+          props: { variant: 'purple' },
           style: {
             backgroundColor: '#C7C6F8', // Customize the background color
           },
         },
         {
-          props: { variant: 'link-grey' },
+          props: { variant: 'grey' },
           style: {
             backgroundColor: '#E5ECF6', // Customize the background color
           },
@@ -109,4 +106,5 @@ const theme = createTheme({
   }
 });
 
-export default theme;
+export default theme
+

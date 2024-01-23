@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, ChangeEvent, ChangeEventHandler } from 'react'
 
 import Autocomplete from '@mui/material/Autocomplete'
 import Checkbox from '@mui/material/Checkbox'
@@ -8,10 +8,11 @@ import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import Select from '@mui/material/Select'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { FormControl, Button } from '@mui/material'
 
-import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
+import { searchObject } from "@/app/utils/functions"
+import { useDidMountEffect } from "@/app/utils/hooks"
 import DataResultsTable from './DataResultsTable'
 
 const ITEM_HEIGHT = 48;
@@ -26,28 +27,9 @@ type modelVarUrls = {
     model: string,
     vars: varUrl[]
 }
-interface ChildFormProps {
-    modelsList: string[],
-    modelsSelected: string[],
-    varsList: string[],
-    selectedVars: string[],
-    countiesList: string[],
-    selectedCounties: string[],
-    sidebarState: string,
-    localPackageSettings: any,
-    apiResData: unknown,
-    dataResponse: modelVarUrls[]
-    isAllModelsSelected: any,
-    setSidebarState: ((state: string) => void),
-    setPackageSettings: (localPackageSettings: string[]) => void,
-    setSelectedVars: (selectedVars: string[]) => void,
-    setModelsSelected: (selectedModels: string[]) => void,
-    setSelectedCounties: (selectedCounties: string[]) => void,
-    onFormDataSubmit: () => unknown,
-}
 
 // Configurations for Models Select field dropdown
-const MenuProps = {
+const MenuProps: any = {
     PaperProps: {
         style: {
             maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
@@ -72,21 +54,23 @@ interface FormFieldErrorStates {
     counties: boolean;
 }
 
-function searchObject(obj: any, targetValue: any): boolean {
-    for (const key in obj) {
-        if (obj[key] === targetValue) {
-            return true;
-        }
-
-        if (typeof obj[key] === 'object' && obj[key] !== null) {
-            // Recursively search nested objects
-            if (searchObject(obj[key], targetValue)) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+interface ChildFormProps {
+    modelsList: string[],
+    modelsSelected: string[],
+    varsList: string[],
+    selectedVars: string[],
+    countiesList: string[],
+    selectedCounties: string[],
+    sidebarState: string,
+    localPackageSettings: any,
+    dataResponse: modelVarUrls[]
+    isAllModelsSelected: any,
+    setSidebarState: ((state: string) => void),
+    setPackageSettings: (localPackageSettings: string[]) => void,
+    setSelectedVars: (selectedVars: string[]) => void,
+    setModelsSelected: (selectedModels: string[]) => void,
+    setSelectedCounties: (selectedCounties: string[]) => void,
+    onFormDataSubmit: () => unknown,
 }
 
 const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse }) => {
@@ -109,7 +93,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
 
     // MODELS
 
-    const handleModelsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const handleModelsChange = (event: SelectChangeEvent<string[]>) => {
         const selectedValues = event.target.value as string[];
 
         // Check if "Select All" option is selected
@@ -135,7 +119,6 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
         }
     }
 
-    // MODELS
     useDidMountEffect(() => {
         if (modelsSelected.length > 0) {
             let newFormState = formErrorState
@@ -295,7 +278,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                 <Autocomplete
                                     multiple
                                     value={selectedVars}
-                                    onChange={(event: any, newValue: string | null) => {
+                                    onChange={(event: any, newValue: string[]) => {
                                         setSelectedVars(newValue)
                                     }}
                                     id="tags-outlined"
@@ -343,7 +326,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                 <Autocomplete
                                     multiple
                                     value={selectedCounties}
-                                    onChange={(event: any, newValue: string | null) => {
+                                    onChange={(event: any, newValue: string []) => {
                                         setSelectedCounties(newValue)
                                     }}
                                     id="tags-outlined"
