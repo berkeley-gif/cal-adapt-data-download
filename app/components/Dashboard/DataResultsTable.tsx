@@ -9,7 +9,7 @@ import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import { Button } from '@mui/material'
 
-import { searchObject } from '@/app/utils/functions'
+import { searchObject, handleDownload } from '@/app/utils/functions'
 
 interface DataResultsProps {
     varsResData: any[],
@@ -18,7 +18,7 @@ interface DataResultsProps {
 
 const DataResultsTable: React.FC<DataResultsProps> = ({ varsResData, selectedVars }) => {
     return (
-        <TableContainer component={Paper}>
+        <TableContainer sx={{mt: '15px'}} component={Paper}>
             <Table aria-label="Data Results table">
                 <TableHead>
                     <TableRow>

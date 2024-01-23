@@ -407,12 +407,12 @@ export default function Dashboard({ data, packagesData }) {
                 <Toolbar />
 
                 <div className="alerts">
-                    <Alert variant="link-purple">Looking for the full LOCA2 scientific data, including 15 GCM’s and 10 climate variables?
+                    <Alert variant="link-purple" severity="info">Looking for the full LOCA2 scientific data, including 15 GCM’s and 10 climate variables?
                         <div className="cta">
                             <Button variant="contained">Click Here for the How-To-Guide</Button>
                         </div>
                     </Alert>
-                    <Alert variant="link-grey">The Cal-Adapt data download tool is a beta tool. Feedback or questions are always welcome.
+                    <Alert variant="link-grey" severity="info">The Cal-Adapt data download tool is a beta tool. Feedback or questions are always welcome.
                         <div className="cta">
                             <Button variant="contained">Contact Us</Button>
                         </div>

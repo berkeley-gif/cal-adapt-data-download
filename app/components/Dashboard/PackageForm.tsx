@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography'
 import Select from '@mui/material/Select'
 import { FormControl, Button } from '@mui/material'
 
-import { handleDownload } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
 import DataResultsTable from './DataResultsTable'
 
@@ -224,7 +223,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ localPackageSettings, modelsSel
                                     <Typography variant="h5">Model</Typography>
                                     {item.model}
                                     <div className="option-group">
-                                        <Typography variant="h5">Vars</Typography>
+                                        <Typography variant="h5">Variables</Typography>
                                         {(item.vars.length > 0) && (
                                             <DataResultsTable varsResData={item.vars} selectedVars={selectedVars}></DataResultsTable>
                                         )}
