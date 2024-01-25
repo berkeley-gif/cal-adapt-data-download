@@ -94,16 +94,15 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
-    const [tentativePackage, setTentativePackage] = useState<number>(-1)
+    const [tentativePackage, setTentativePackage] = useState<number>(0)
     const [sidebarState, setSidebarState] = useState<string>('')
 
     const onFormDataSubmit = async () => {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
 
         const queryParams = new URLSearchParams({
-            limit: '10',
+            limit: '50',
             filter: "collection='loca2-mon-county'" + (apiParams?.scenariosQueryStr ? " AND " + apiParams?.scenariosQueryStr : '') + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
-            // filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370'" + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
             filter_lang: 'cql2-text',
         })
 
@@ -198,7 +197,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         })
     }, [selectedCounties])
 
-    const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', -1)
+    const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', 0)
     const [localPackageSettings, setPackageSettings] = useLocalStorageState<any>('package', {
         id: -1,
         dataset: '',
@@ -290,6 +289,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
         setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
         setModelsSelected(stringToArray(packagesData[selectedPackage].models))
+        setSelectedScenarios(stringToArray(packagesData[selectedPackage].scenarios))
         setSelectedCounties([])
         setIsPkgStored(true)
         toggleDrawer(true)
@@ -315,7 +315,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
             handlePackageSave()
         } else {
             openOverwriteDialog(false)
-            setTentativePackage(-1)
+            setTentativePackage(0)
         }
     }
 
