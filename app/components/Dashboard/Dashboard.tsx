@@ -66,6 +66,7 @@ type modelVarUrls = {
 
 type apiParamStrs = {
     countyQueryStr: string,
+    scenariosQueryStr: string,
     modelQueryStr: string
 }
 
@@ -81,6 +82,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const [apiParams, setApiParams] = useState<apiParamStrs>({
         countyQueryStr: '',
+        scenariosQueryStr: '',
         modelQueryStr: ''
     })
     const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
@@ -98,21 +100,25 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const onFormDataSubmit = async () => {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
-        console.log(apiParams)
+
         const queryParams = new URLSearchParams({
             limit: '10',
-            filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370'" + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
+            filter: "collection='loca2-mon-county'" + (apiParams?.scenariosQueryStr ? " AND " + apiParams?.scenariosQueryStr : '') + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
+            // filter: "collection='loca2-mon-county' AND cmip6:experiment_id='ssp370'" + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
             filter_lang: 'cql2-text',
         })
 
         const fullUrl = `${apiUrl}?${queryParams.toString()}`;
+
+        console.log(apiParams.scenariosQueryStr)
         if (apiParamsChanged) {
             try {
-
                 const res = await fetch(fullUrl)
                 const data = await res.json()
 
                 const apiResponseData: modelVarUrls[] = []
+
+                console.log(apiResponseData)
 
                 for (const modelIdx in data.features) {
                     const assets = data.features[modelIdx].assets
@@ -176,8 +182,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     useDidMountEffect(() => {
         let selectedCountiesStr: string = ''
 
-        console.log('running use effect for counties change')
-
         if (selectedCounties.length > 0) {
             const updatedApiParam: apiParamStrs = {
                 ...apiParams,
@@ -212,25 +216,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     })
     const [isPackageStored, setIsPkgStored] = useLocalStorageState<boolean>('isPackageStored', false)
 
-    // Configurations for Models Select field dropdown
-    const MenuProps = {
-        PaperProps: {
-            style: {
-                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-                width: 250,
-            },
-        },
-        getContentAnchorEl: null,
-        anchorOrigin: {
-            vertical: "bottom",
-            horizontal: "center"
-        },
-        transformOrigin: {
-            vertical: "top",
-            horizontal: "center"
-        },
-        variant: "menu"
-    };
+    // MODELS
 
     const modelsList: string[] = (data.summaries['cmip6:source_id']).map((obj: {}) => obj)
 
@@ -239,11 +225,10 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     useDidMountEffect(() => {
         let selectedModelsStr: string = ''
 
-        console.log('running use effect for models change')
-
         if (modelsSelected.length > 0) {
             const updatedApiParam: apiParamStrs = {
                 countyQueryStr: selectedCounties.length > 0 ? createOrStatement('countyname', selectedCounties) : '',
+                scenariosQueryStr: selectedScenarios.length > 0 ? createOrStatement('cmip6:experiment_id', selectedScenarios) : '',
                 modelQueryStr: createOrStatement('cmip6:source_id', modelsSelected)
             }
 
@@ -260,7 +245,31 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const isAllModelsSelected = useRef(false)
 
-    // End of configurations for Models Select field dropdown
+    // SCENARIOS
+    const scenariosList: string[] = (data.summaries['cmip6:experiment_id']).map((obj: {}) => obj)
+
+    const [selectedScenarios, setSelectedScenarios] = useState<string[]>([])
+    useDidMountEffect(() => {
+        let selectedScenariosStr: string = ''
+
+        if (selectedScenarios.length > 0) {
+            const updatedApiParam: apiParamStrs = {
+                ...apiParams,
+                scenariosQueryStr: createOrStatement('cmip6:experiment_id', selectedScenarios)
+            }
+
+            setApiParams(updatedApiParam)
+
+            console.log(apiParams.scenariosQueryStr)
+
+            selectedScenariosStr = arrayToCommaSeparatedString(selectedScenarios)
+        }
+
+        setPackageSettings({
+            ...localPackageSettings,
+            scenarios: selectedScenariosStr
+        })
+    }, [selectedScenarios])
 
     function handlePackageSave() {
 
@@ -301,7 +310,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     function handleOverwriteDialog(overwrite: boolean) {
         if (overwrite) {
-            // package should be overwritten
             openOverwriteDialog(false)
             setSidebarState('settings')
             setSelectedPackage(tentativePackage)
@@ -326,12 +334,13 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
 
     useEffect(() => {
-
         setSelectedVars(localPackageSettings.vars.length > 0 ? stringToArray(localPackageSettings.vars) : [])
         setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
+        setSelectedScenarios(localPackageSettings.scenarios.length > 0 ? stringToArray(localPackageSettings.scenarios) : [])
         setSelectedCounties(localPackageSettings.boundaries.length > 0 ? stringToArray(localPackageSettings.boundaries) : [])
         setSidebarState('settings')
 
+        console.log(scenariosList)
 
         isAllModelsSelected.current = (modelsSelected.length == modelsList.length)
     }, [])
@@ -576,9 +585,13 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                             selectedCounties={selectedCounties}
                             setSelectedCounties={setSelectedCounties}
                             countiesList={countiesList}
+                            selectedScenarios={selectedScenarios}
+                            setSelectedScenarios={setSelectedScenarios}
+                            scenariosList={scenariosList}
                             onFormDataSubmit={onFormDataSubmit}
                             dataResponse={dataResponse}
                             isPackageStored={isPackageStored}
+                            handleLocalPackageClear={handleLocalPackageClear}
                         ></PackageForm>
                     }
 

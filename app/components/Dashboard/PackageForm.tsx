@@ -58,6 +58,7 @@ interface FormFieldErrorStates {
     models: boolean;
     vars: boolean;
     counties: boolean;
+    scenarios: boolean;
 }
 
 interface ChildFormProps {
@@ -67,6 +68,8 @@ interface ChildFormProps {
     selectedVars: string[],
     countiesList: string[],
     selectedCounties: string[],
+    selectedScenarios: string[],
+    scenariosList: string[],
     sidebarState: string,
     localPackageSettings: any,
     dataResponse: modelVarUrls[]
@@ -77,22 +80,23 @@ interface ChildFormProps {
     setSelectedVars: (selectedVars: string[]) => void,
     setModelsSelected: (selectedModels: string[]) => void,
     setSelectedCounties: (selectedCounties: string[]) => void,
+    setSelectedScenarios: (selectedScenarios: string[]) => void,
+    handleLocalPackageClear: () => void,
     onFormDataSubmit: () => unknown,
 }
 
-const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, onFormDataSubmit, dataResponse }) => {
+const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, selectedScenarios, setSelectedScenarios, scenariosList, onFormDataSubmit, dataResponse, handleLocalPackageClear }) => {
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         models: false,
         vars: false,
-        counties: false
+        counties: false,
+        scenarios: false
     })
 
     let isFormInvalid: boolean = false
 
     useEffect(() => {
         isFormInvalid = searchObject(formErrorState, true)
-
-        console.log('form is invalid: ' + isFormInvalid)
 
     }, [formErrorState])
 
@@ -156,6 +160,17 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
     }, [selectedCounties])
 
+    // SCENARIOS
+    useDidMountEffect(() => {
+        if (selectedScenarios.length > 0) {
+            let newFormState = formErrorState
+
+            newFormState.scenarios = false
+            setFormErrorState(newFormState)
+        }
+
+    }, [selectedScenarios])
+
     function validateFormData() {
         let newFormState = formErrorState
 
@@ -175,6 +190,12 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
             newFormState.counties = true
         } else {
             newFormState.counties = false
+        }
+
+        if (selectedScenarios.length == 0) {
+            newFormState.scenarios = true
+        } else {
+            newFormState.scenarios = false
         }
 
         setFormErrorState(newFormState)
@@ -269,14 +290,54 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
                         <div className="container container--package-setting">
                             <div className="option-group">
-                                <Typography className="option-group__title" variant="body2">Scenario(s)</Typography>
+                                {/* <Typography className="option-group__title" variant="body2">Scenario(s)</Typography>
                                 <Tooltip
                                     TransitionComponent={Fade}
                                     TransitionProps={{ timeout: 600 }}
                                     title="Informational text about scenarios"
                                     placement="right-end"
                                 ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
-                                <p>{localPackageSettings.scenarios}</p>
+                                <p>{localPackageSettings.scenarios}</p>*/}
+
+                                <Typography className="option-group__title" variant="body2">Scenarios</Typography>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Informational text about scenarios"
+                                    placement="right-end"
+                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                <Autocomplete
+                                    multiple
+                                    value={selectedScenarios}
+                                    onChange={(event: any, newValue: string[]) => {
+                                        setSelectedScenarios(newValue)
+                                    }}
+                                    id="scenarios"
+                                    options={scenariosList}
+                                    filterSelectedOptions
+                                    renderOption={(props, option) => {
+                                        return (
+                                            <li {...props} key={option}>
+                                                {option}
+                                            </li>
+                                        )
+                                    }}
+                                    renderTags={(tagValue, getTagProps) => {
+                                        return tagValue.map((option, index) => (
+                                            <Chip {...getTagProps({ index })} key={option} label={option} />
+                                        ))
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder="Search..."
+                                            error={formErrorState.scenarios}
+                                            helperText={formErrorState.scenarios ? 'One or more scenarios need to be selected in order to continue' : ''}
+                                        />
+                                    )}
+                                    sx={{ mt: '15px', width: '380px' }}
+
+                                />
                             </div>
                         </div>
 
@@ -330,7 +391,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
                                     onChange={(event: any, newValue: string[]) => {
                                         setSelectedVars(newValue)
                                     }}
-                                    id="tags-outlined"
+                                    id="variables"
                                     options={varsList}
                                     filterSelectedOptions
                                     renderOption={(props, option) => {
@@ -384,7 +445,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
                                     onChange={(event: any, newValue: string[]) => {
                                         setSelectedCounties(newValue)
                                     }}
-                                    id="tags-outlined"
+                                    id="counties"
                                     options={countiesList}
                                     filterSelectedOptions
                                     renderOption={(props, option) => {
