@@ -4,15 +4,17 @@ import React, { useState, useEffect, ChangeEvent, ChangeEventHandler } from 'rea
 import Autocomplete from '@mui/material/Autocomplete'
 import Checkbox from '@mui/material/Checkbox'
 import Chip from '@mui/material/Chip'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { FormControl, Button } from '@mui/material'
-import DownloadIcon from '@mui/icons-material/Download'
 import IconButton from '@mui/material/IconButton'
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
+import Tooltip from '@mui/material/Tooltip'
+import Fade from '@mui/material/Fade'
 
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
@@ -212,11 +214,28 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
                                     </div>
                                 </div>
                             ))}
-                            
+
                             {isPackageStored && sidebarState == 'download' &&
-                                <IconButton onClick={() => (setSidebarState('settings'))}>
-                                    <UndoOutlinedIcon />
-                                </IconButton>
+                                <div className="bottom-actions">
+                                    <Tooltip
+                                        TransitionComponent={Fade}
+                                        TransitionProps={{ timeout: 600 }}
+                                        title="Delete stored data package"
+                                    >
+                                        <IconButton onClick={() => handleLocalPackageClear()}>
+                                            <DeleteOutlineIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip
+                                        TransitionComponent={Fade}
+                                        TransitionProps={{ timeout: 600 }}
+                                        title="Review your package settings"
+                                    >
+                                        <IconButton onClick={() => (setSidebarState('settings'))}>
+                                            <UndoOutlinedIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </div>
                             }
                         </div>
                     ) : 'Loading...'}
@@ -372,7 +391,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
                         <div className="cta">
                             <Button onClick={() => {
                                 handleSubmit()
-                            }} variant="contained">Download package</Button>
+                            }} variant="contained">Download your data</Button>
                         </div>
                     </div>
                 </form>

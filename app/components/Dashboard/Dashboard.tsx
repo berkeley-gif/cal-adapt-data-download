@@ -15,7 +15,6 @@ declare module '@mui/material/Alert' {
     }
 }
 
-import Autocomplete from '@mui/material/Autocomplete';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -40,6 +39,8 @@ import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
+import Tooltip from '@mui/material/Tooltip';
+import Fade from '@mui/material/Fade';
 
 import SidePanel from './SidePanel'
 import PackageForm from './PackageForm'
@@ -274,7 +275,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
             dataFormat: packagesData[selectedPackage].dataFormat,
             rangeStart: packagesData[selectedPackage].rangeStart,
             rangeEnd: packagesData[selectedPackage].rangeEnd,
-            units: packagesData[selectedPackage].units
+            units: packagesData[selectedPackage].units,
+            disabled: packagesData[selectedPackage].disabled
         })
 
         setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
@@ -347,12 +349,18 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                         </Link>
                         <Typography color="text.primary">Getting Started</Typography>
                     </Breadcrumbs>
-                    <IconButton onClick={() => toggleDrawer(true)}>
-                        <Image
-                            src={packageIcon}
-                            alt="Package icon that you can click on to see your current data package"
-                        />
-                    </IconButton>
+                    <Tooltip
+                        TransitionComponent={Fade}
+                        TransitionProps={{ timeout: 600 }}
+                        title={sidebarState == 'settings' ? "Review your selected package" : "Download your data"}
+                    >
+                        <IconButton onClick={() => toggleDrawer(true)}>
+                            <Image
+                                src={packageIcon}
+                                alt="Package icon that you can click on to see your current data package"
+                            />
+                        </IconButton>
+                    </Tooltip>
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -452,7 +460,28 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                     <li><Typography variant="body2">Data Format:</Typography> {pkg.dataFormat}</li>
                                     <li><Typography variant="body2">Units:</Typography> {pkg.units}</li>
                                 </ul>
-                                <Button disabled={pkg.disabled} onClick={() => selectPackageToSave(pkg.id)} variant="contained">Customize and download</Button>
+                                {pkg.disabled && (
+                                    <Tooltip
+                                        TransitionComponent={Fade}
+                                        TransitionProps={{ timeout: 600 }}
+                                        title="This data package preset is not available"
+                                    >
+                                        <span>
+                                            <Button disabled={pkg.disabled} variant="contained" >Customize and download</Button>
+                                        </span>
+                                    </Tooltip>
+                                )}
+                                {!pkg.disabled && (
+                                    <Tooltip
+                                        TransitionComponent={Fade}
+                                        TransitionProps={{ timeout: 600 }}
+                                        title="Continue with this data package preset"
+                                    >
+                                        <span>
+                                            <Button onClick={() => selectPackageToSave(pkg.id)} variant="contained">Customize and download</Button>
+                                        </span>
+                                    </Tooltip>
+                                )}
                             </div>
                         ))}
 
@@ -489,20 +518,38 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                     open={isSidePanelOpen}
                     onClose={() => toggleDrawer(false)}
                 >
-                    <IconButton onClick={() => toggleDrawer(false)}>
-                        <CloseIcon />
-                    </IconButton>
+                    <Tooltip
+                        TransitionComponent={Fade}
+                        TransitionProps={{ timeout: 600 }}
+                        title="Close the sidebar"
+                    >
+                        <IconButton onClick={() => toggleDrawer(false)}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Tooltip>
 
                     {isPackageStored &&
-                        <IconButton onClick={() => handleLocalPackageClear()}>
-                            <DeleteOutlineIcon />
-                        </IconButton>
+                        <Tooltip
+                            TransitionComponent={Fade}
+                            TransitionProps={{ timeout: 600 }}
+                            title="Delete stored data package"
+                        >
+                            <IconButton onClick={() => handleLocalPackageClear()}>
+                                <DeleteOutlineIcon />
+                            </IconButton>
+                        </Tooltip>
                     }
 
                     {isPackageStored && sidebarState == 'download' &&
-                        <IconButton onClick={() => (resetStateToSettings())}>
-                            <UndoOutlinedIcon />
-                        </IconButton>
+                        <Tooltip
+                            TransitionComponent={Fade}
+                            TransitionProps={{ timeout: 600 }}
+                            title="Review your package settings"
+                        >
+                            <IconButton onClick={() => (resetStateToSettings())}>
+                                <UndoOutlinedIcon />
+                            </IconButton>
+                        </Tooltip>
                     }
 
 
