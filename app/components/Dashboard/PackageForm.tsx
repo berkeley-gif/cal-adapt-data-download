@@ -15,6 +15,7 @@ import IconButton from '@mui/material/IconButton'
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
 import Tooltip from '@mui/material/Tooltip'
 import Fade from '@mui/material/Fade'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
@@ -250,7 +251,17 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
                         <div className="container container--package-setting">
                             <div className="option-group">
-                                <Typography variant="body2">Dataset</Typography> {localPackageSettings.dataset}
+                                <Typography className="option-group__title" variant="body2">Dataset</Typography>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Informational text about datasets"
+                                    placement="right-end"
+                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+
+                                <p>{localPackageSettings.dataset}</p>
+
+
                             </div>
 
                         </div>
@@ -258,13 +269,26 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
                         <div className="container container--package-setting">
                             <div className="option-group">
-                                <Typography variant="body2">Scenario(s)</Typography> {localPackageSettings.scenarios}
+                                <Typography className="option-group__title" variant="body2">Scenario(s)</Typography>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Informational text about scenarios"
+                                    placement="right-end"
+                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                <p>{localPackageSettings.scenarios}</p>
                             </div>
                         </div>
 
                         <div className="container container--package-setting">
                             <div className="option-group">
-                                <Typography variant="body2">Models</Typography>
+                                <Typography className="option-group__title" variant="body2">Models</Typography>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Informational text about models"
+                                    placement="right-end"
+                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
                                 <FormControl error={formErrorState.models}>
                                     <Select
                                         multiple
@@ -293,7 +317,13 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
                         <div className="container container--package-setting">
                             <div className="option-group">
-                                <Typography variant="body2">Variables</Typography>
+                                <Typography className="option-group__title" variant="body2">Variables</Typography>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Informational text about variables"
+                                    placement="right-end"
+                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
                                 <Autocomplete
                                     multiple
                                     value={selectedVars}
@@ -331,7 +361,13 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
                         <div className="container container--package-setting">
                             <div className="option-group">
-                                <Typography variant="body2">Spatial Extent</Typography>
+                                <Typography className="option-group__title" variant="body2">Spatial Extent</Typography>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Informational text about spatial extent"
+                                    placement="right-end"
+                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
                             </div>
 
                             <div className="option-group">
@@ -380,12 +416,28 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
                         <div className="container container--package-setting">
                             <div className="option-group">
-                                <Typography variant="body2">Range</Typography> {localPackageSettings.rangeStart} - {localPackageSettings.rangeEnd}
+                                <Typography className="option-group__title" variant="body2">Range</Typography>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Informational text about range"
+                                    placement="right-end"
+                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                <p>{localPackageSettings.rangeStart} - {localPackageSettings.rangeEnd}</p>
                             </div>
                         </div>
 
                         <div className="container container--package-setting">
-                            <Typography variant="body2">Data Format</Typography> {localPackageSettings.dataFormat}
+                            <div className="option-group">
+                                <Typography className="option-group__title" variant="body2">Data Format</Typography>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Informational text about data format"
+                                    placement="right-end"
+                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                <p>{localPackageSettings.dataFormat}</p>
+                            </div>
                         </div>
 
                         <div className="cta">

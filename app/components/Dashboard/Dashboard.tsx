@@ -42,6 +42,7 @@ import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import Fade from '@mui/material/Fade';
 
+
 import SidePanel from './SidePanel'
 import PackageForm from './PackageForm'
 import './../../styles/components/dashboard.scss'
@@ -428,7 +429,14 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                     </Alert>
                     <Alert variant="grey" severity="info">The Cal-Adapt data download tool is a beta tool. Feedback or questions are always welcome.
                         <div className="cta">
-                            <Button variant="contained" href="mailto:support@cal-adapt.org">Contact Us</Button>
+                            <Tooltip
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 600 }}
+                                title="Email support@cal-adapt.org"
+                                placement="right-end"
+                            >
+                                <Button variant="contained" href="mailto:support@cal-adapt.org">Contact Us</Button>
+                            </Tooltip>
                         </div>
                     </Alert>
                 </div>

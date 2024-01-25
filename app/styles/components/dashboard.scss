@@ -74,3 +74,17 @@
 .bottom-actions {
   padding-top: 30px;
 }
+
+.option-group {
+  &__title {
+    display: inline-block;
+  }
+
+  svg { 
+    width: 15px;
+    color: #57AEF3;
+    margin-left: 5px;
+    height: 15px;
+    margin-bottom: -2px;
+  }
+}
