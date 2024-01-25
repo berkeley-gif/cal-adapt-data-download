@@ -222,7 +222,6 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
         } else {
             setIsError(true)
-            console.log('form is invalid')
         }
     }
 

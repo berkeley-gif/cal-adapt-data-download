@@ -108,15 +108,12 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
         const fullUrl = `${apiUrl}?${queryParams.toString()}`;
 
-        console.log(apiParams.scenariosQueryStr)
         if (apiParamsChanged) {
             try {
                 const res = await fetch(fullUrl)
                 const data = await res.json()
 
                 const apiResponseData: modelVarUrls[] = []
-
-                console.log(apiResponseData)
 
                 for (const modelIdx in data.features) {
                     const assets = data.features[modelIdx].assets
@@ -142,9 +139,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                 }
 
                 setDataResponse(apiResponseData)
-
-                console.log('apiresponse')
-                console.log(apiResponseData)
             } catch (err) {
                 console.log(err)
             }
@@ -258,8 +252,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
             setApiParams(updatedApiParam)
 
-            console.log(apiParams.scenariosQueryStr)
-
             selectedScenariosStr = arrayToCommaSeparatedString(selectedScenarios)
         }
 
@@ -338,8 +330,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         setSelectedScenarios(localPackageSettings.scenarios.length > 0 ? stringToArray(localPackageSettings.scenarios) : [])
         setSelectedCounties(localPackageSettings.boundaries.length > 0 ? stringToArray(localPackageSettings.boundaries) : [])
         setSidebarState('settings')
-
-        console.log(scenariosList)
 
         isAllModelsSelected.current = (modelsSelected.length == modelsList.length)
     }, [])
