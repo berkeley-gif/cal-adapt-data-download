@@ -91,7 +91,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
-    const [tentativePackage, setTentativePackage] = useState<number>(0)
+    const [tentativePackage, setTentativePackage] = useState<number>(-1)
     const [sidebarState, setSidebarState] = useState<string>('')
 
     const onFormDataSubmit = async () => {
@@ -193,8 +193,9 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         })
     }, [selectedCounties])
 
-    const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', 0)
+    const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', -1)
     const [localPackageSettings, setPackageSettings] = useLocalStorageState<any>('package', {
+        id: -1,
         dataset: '',
         scenarios: '',
         models: '',
@@ -260,7 +261,9 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     // End of configurations for Models Select field dropdown
 
     function handlePackageSave() {
+
         setPackageSettings({
+            id: packagesData[selectedPackage].id,
             dataset: packagesData[selectedPackage].dataset,
             scenarios: packagesData[selectedPackage].scenarios,
             models: packagesData[selectedPackage].models,
@@ -287,6 +290,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         if (isPackageStored) {
             openOverwriteDialog(true)
         } else {
+            setSidebarState('settings')
             setSelectedPackage(tentativePackage)
             handlePackageSave()
         }
@@ -296,11 +300,12 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         if (overwrite) {
             // package should be overwritten
             openOverwriteDialog(false)
+            setSidebarState('settings')
             setSelectedPackage(tentativePackage)
             handlePackageSave()
         } else {
             openOverwriteDialog(false)
-            setTentativePackage(0)
+            setTentativePackage(-1)
         }
     }
 
@@ -408,19 +413,19 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                 <Toolbar />
 
                 <div className="alerts">
-                    <Alert variant="purple" severity="info">Looking for the full LOCA2 scientific data, including 15 GCM’s and 10 climate variables?
+                    <Alert variant="purple" severity="info">Looking for the full LOCA2 scientific data at daily resolution for the entire state of California?
                         <div className="cta">
                             <Button variant="contained">Click Here for the How-To-Guide</Button>
                         </div>
                     </Alert>
                     <Alert variant="grey" severity="info">The Cal-Adapt data download tool is a beta tool. Feedback or questions are always welcome.
                         <div className="cta">
-                            <Button variant="contained">Contact Us</Button>
+                            <Button variant="contained" href="mailto:support@cal-adapt.org">Contact Us</Button>
                         </div>
                     </Alert>
                 </div>
 
-                <Alert sx={{ mb: "26px" }} variant="filled" severity="info">The size of data packages might be very large. In that case, you will be asked for an email address to notify you when your package is ready for download. </Alert>
+                <Alert sx={{ mb: "26px" }} variant="filled" severity="info">The size of data packages might be very large. In that case, you may be asked for an email address to notify you when your package is ready for download. </Alert>
 
                 {/** Packages container */}
                 <div className="container container--full">
@@ -470,8 +475,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => handleOverwriteDialog(false)}>Cancel</Button>
-                        <Button onClick={() => handleOverwriteDialog(true)} autoFocus>
+                        <Button variant="contained" onClick={() => handleOverwriteDialog(false)}>Cancel</Button>
+                        <Button variant="contained" onClick={() => handleOverwriteDialog(true)} autoFocus>
                             Confirm
                         </Button>
                     </DialogActions>

@@ -103,6 +103,14 @@ const theme = createTheme({
         }),
       },
     },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          padding: '15px',
+          borderRadius: '3px'
+        },
+      },
+    },
   }
 });
 

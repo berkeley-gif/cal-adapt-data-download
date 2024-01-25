@@ -93,8 +93,6 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
     }, [formErrorState])
 
-    const [isError, setIsError] = useState(false);
-
     // MODELS
 
     const handleModelsChange = (event: SelectChangeEvent<string[]>) => {
@@ -189,9 +187,9 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
             isFormInvalid = false
             setSidebarState('download')
-            setIsError(false)
+
         } else {
-            setIsError(true)
+            console.log('form is invalid')
         }
     }
 
@@ -222,11 +220,6 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
                             }
                         </div>
                     ) : 'Loading...'}
-                </div>
-            )}
-            {isError && (
-                <div>
-                    <Typography variant="h4">Error calling the API</Typography>
                 </div>
             )}
             {sidebarState === 'settings' && (
