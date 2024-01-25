@@ -20,6 +20,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
 import DataResultsTable from './DataResultsTable'
+import { variablesLookupTable, lookupValue } from '@/app/utils/lookupTables'
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -290,15 +291,6 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
                         <div className="container container--package-setting">
                             <div className="option-group">
-                                {/* <Typography className="option-group__title" variant="body2">Scenario(s)</Typography>
-                                <Tooltip
-                                    TransitionComponent={Fade}
-                                    TransitionProps={{ timeout: 600 }}
-                                    title="Informational text about scenarios"
-                                    placement="right-end"
-                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
-                                <p>{localPackageSettings.scenarios}</p>*/}
-
                                 <Typography className="option-group__title" variant="body2">Scenarios</Typography>
                                 <Tooltip
                                     TransitionComponent={Fade}
@@ -397,13 +389,14 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
                                     renderOption={(props, option) => {
                                         return (
                                             <li {...props} key={option}>
-                                                {option}
+                                                {/*option*/}
+                                                {lookupValue(option, variablesLookupTable)}
                                             </li>
                                         )
                                     }}
                                     renderTags={(tagValue, getTagProps) => {
                                         return tagValue.map((option, index) => (
-                                            <Chip {...getTagProps({ index })} key={option} label={option} />
+                                            <Chip {...getTagProps({ index })} key={option} label={lookupValue(option, variablesLookupTable)} />
                                         ))
                                     }}
                                     renderInput={(params) => (

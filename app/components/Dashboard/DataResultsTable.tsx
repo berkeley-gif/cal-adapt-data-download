@@ -11,6 +11,7 @@ import { Button } from '@mui/material'
 import DownloadIcon from '@mui/icons-material/Download'
 
 import { searchObject, handleDownload } from '@/app/utils/functions'
+import { variablesLookupTable, lookupValue } from '@/app/utils/lookupTables'
 
 interface DataResultsProps {
     varsResData: any[],
@@ -19,7 +20,7 @@ interface DataResultsProps {
 
 const DataResultsTable: React.FC<DataResultsProps> = ({ varsResData, selectedVars }) => {
     return (
-        <TableContainer sx={{mt: '15px', p: '20px', backgroundColor: '#f7f9fb', borderRadius: '7px', boxShadow: 'none'}} component={Paper}>
+        <TableContainer sx={{ mt: '15px', p: '20px', backgroundColor: '#f7f9fb', borderRadius: '7px', boxShadow: 'none' }} component={Paper}>
             <Table aria-label="Data Results table">
                 <TableHead>
                     <TableRow>
@@ -36,12 +37,12 @@ const DataResultsTable: React.FC<DataResultsProps> = ({ varsResData, selectedVar
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
                             <TableCell component="th" scope="row">
-                                {variable.name}
+                                {lookupValue(variable.name, variablesLookupTable)}
                             </TableCell>
                             <TableCell align="right">
                                 <Button variant="contained" color="primary" onClick={() => { handleDownload(variable.href) }}>
                                     <DownloadIcon />
-                                    Download File
+                                    Download
                                 </Button>
                             </TableCell>
                         </TableRow>

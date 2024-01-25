@@ -50,9 +50,8 @@ import './../../styles/components/dashboard.scss'
 import { createOrStatement, stringToArray, arrayToCommaSeparatedString } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
 
-const DRAWER_WIDTH = 212;
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
+
+const DRAWER_WIDTH = 212
 
 type varUrl = {
     name: string,
