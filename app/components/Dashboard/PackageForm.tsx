@@ -94,10 +94,16 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
         scenarios: false
     })
 
+    const [isError, setIsError] = useState(false)
+
     let isFormInvalid: boolean = false
 
     useEffect(() => {
         isFormInvalid = searchObject(formErrorState, true)
+
+        if (isFormInvalid) {
+            setIsError(true)
+        }
 
     }, [formErrorState])
 
@@ -212,8 +218,10 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
             isFormInvalid = false
             setSidebarState('download')
+            setIsError(false)
 
         } else {
+            setIsError(true)
             console.log('form is invalid')
         }
     }
