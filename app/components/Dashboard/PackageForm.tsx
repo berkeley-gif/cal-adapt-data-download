@@ -94,15 +94,15 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
         scenarios: false
     })
 
-    const [isError, setIsError] = useState(false)
-
+    //const [isError, setIsError] = useState(false)
+    let isError: boolean = false
     let isFormInvalid: boolean = false
 
     useEffect(() => {
         isFormInvalid = searchObject(formErrorState, true)
 
         if (isFormInvalid) {
-            setIsError(true)
+            isError = true
         }
 
     }, [formErrorState])
@@ -135,6 +135,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
         }
     }
 
+    // MODELS
     useDidMountEffect(() => {
         if (modelsSelected.length > 0) {
             let newFormState = formErrorState
@@ -218,10 +219,10 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
 
             isFormInvalid = false
             setSidebarState('download')
-            setIsError(false)
+            isError = false
 
         } else {
-            setIsError(true)
+            isError = true
         }
     }
 

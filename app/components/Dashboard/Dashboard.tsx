@@ -78,7 +78,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])
 
     // API PARAMS
-
     const [apiParams, setApiParams] = useState<apiParamStrs>({
         countyQueryStr: '',
         scenariosQueryStr: '',
@@ -94,7 +93,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
-    const [tentativePackage, setTentativePackage] = useState<number>(0)
+    const [tentativePackage, setTentativePackage] = useState<number>(-1)
     const [sidebarState, setSidebarState] = useState<string>('')
 
     const onFormDataSubmit = async () => {
@@ -191,7 +190,35 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         })
     }, [selectedCounties])
 
-    const [selectedPackage, setSelectedPackage] = useLocalStorageState<number>('selectedPackage', 0)
+    const [savingPackage, setSavingPackage] = useState<boolean>(false)
+    const [selectedPackage, setSelectedPackage] = useState<number>(-1)
+    useDidMountEffect(() => {
+        if (savingPackage && selectedPackage >= 0) {
+            setPackageSettings({
+                id: packagesData[selectedPackage].id,
+                dataset: packagesData[selectedPackage].dataset,
+                scenarios: packagesData[selectedPackage].scenarios,
+                models: packagesData[selectedPackage].models,
+                vars: packagesData[selectedPackage].vars,
+                boundaryType: packagesData[selectedPackage].boundaryType,
+                boundaries: '',
+                frequency: packagesData[selectedPackage].frequency,
+                dataFormat: packagesData[selectedPackage].dataFormat,
+                rangeStart: packagesData[selectedPackage].rangeStart,
+                rangeEnd: packagesData[selectedPackage].rangeEnd,
+                units: packagesData[selectedPackage].units,
+                disabled: packagesData[selectedPackage].disabled
+            })
+
+            setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
+            setModelsSelected(stringToArray(packagesData[selectedPackage].models))
+            setSelectedScenarios(stringToArray(packagesData[selectedPackage].scenarios))
+            setSelectedCounties([])
+            setIsPkgStored(true)
+            setSavingPackage(false)
+        }
+    }, [selectedPackage])
+
     const [localPackageSettings, setPackageSettings] = useLocalStorageState<any>('package', {
         id: -1,
         dataset: '',
@@ -261,32 +288,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         })
     }, [selectedScenarios])
 
-    function handlePackageSave() {
-
-        setPackageSettings({
-            id: packagesData[selectedPackage].id,
-            dataset: packagesData[selectedPackage].dataset,
-            scenarios: packagesData[selectedPackage].scenarios,
-            models: packagesData[selectedPackage].models,
-            vars: packagesData[selectedPackage].vars,
-            boundaryType: packagesData[selectedPackage].boundaryType,
-            boundaries: '',
-            frequency: packagesData[selectedPackage].frequency,
-            dataFormat: packagesData[selectedPackage].dataFormat,
-            rangeStart: packagesData[selectedPackage].rangeStart,
-            rangeEnd: packagesData[selectedPackage].rangeEnd,
-            units: packagesData[selectedPackage].units,
-            disabled: packagesData[selectedPackage].disabled
-        })
-
-        setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
-        setModelsSelected(stringToArray(packagesData[selectedPackage].models))
-        setSelectedScenarios(stringToArray(packagesData[selectedPackage].scenarios))
-        setSelectedCounties([])
-        setIsPkgStored(true)
-        toggleDrawer(true)
-    }
-
     function selectPackageToSave(id: number) {
         setTentativePackage(id)
 
@@ -294,8 +295,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
             openOverwriteDialog(true)
         } else {
             setSidebarState('settings')
-            setSelectedPackage(tentativePackage)
-            handlePackageSave()
+            setSavingPackage(true)
+            setSelectedPackage(id)
         }
     }
 
@@ -303,11 +304,12 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         if (overwrite) {
             openOverwriteDialog(false)
             setSidebarState('settings')
+
+            setSavingPackage(true)
             setSelectedPackage(tentativePackage)
-            handlePackageSave()
         } else {
             openOverwriteDialog(false)
-            setTentativePackage(0)
+            setTentativePackage(-1)
         }
     }
 
@@ -325,6 +327,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
 
     useEffect(() => {
+        setSelectedPackage(parseInt(localPackageSettings.id) >= 0 ? parseInt(localPackageSettings.id) : -1)
         setSelectedVars(localPackageSettings.vars.length > 0 ? stringToArray(localPackageSettings.vars) : [])
         setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
         setSelectedScenarios(localPackageSettings.scenarios.length > 0 ? stringToArray(localPackageSettings.scenarios) : [])
@@ -484,7 +487,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                         title="Continue with this data package preset"
                                     >
                                         <span>
-                                            <Button onClick={() => selectPackageToSave(pkg.id)} variant="contained">Customize and download</Button>
+                                            <Button onClick={() => selectPackageToSave(parseInt(pkg.id))} variant="contained">Customize and download</Button>
                                         </span>
                                     </Tooltip>
                                 )}
