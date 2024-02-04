@@ -190,34 +190,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         })
     }, [selectedCounties])
 
-    const [savingPackage, setSavingPackage] = useState<boolean>(false)
     const [selectedPackage, setSelectedPackage] = useState<number>(-1)
-    useDidMountEffect(() => {
-        if (savingPackage && selectedPackage >= 0) {
-            setPackageSettings({
-                id: packagesData[selectedPackage].id,
-                dataset: packagesData[selectedPackage].dataset,
-                scenarios: packagesData[selectedPackage].scenarios,
-                models: packagesData[selectedPackage].models,
-                vars: packagesData[selectedPackage].vars,
-                boundaryType: packagesData[selectedPackage].boundaryType,
-                boundaries: '',
-                frequency: packagesData[selectedPackage].frequency,
-                dataFormat: packagesData[selectedPackage].dataFormat,
-                rangeStart: packagesData[selectedPackage].rangeStart,
-                rangeEnd: packagesData[selectedPackage].rangeEnd,
-                units: packagesData[selectedPackage].units,
-                disabled: packagesData[selectedPackage].disabled
-            })
-
-            setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
-            setModelsSelected(stringToArray(packagesData[selectedPackage].models))
-            setSelectedScenarios(stringToArray(packagesData[selectedPackage].scenarios))
-            setSelectedCounties([])
-            setIsPkgStored(true)
-            setSavingPackage(false)
-        }
-    }, [selectedPackage])
 
     const [localPackageSettings, setPackageSettings] = useLocalStorageState<any>('package', {
         id: -1,
@@ -294,22 +267,48 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         if (isPackageStored) {
             openOverwriteDialog(true)
         } else {
-            setSidebarState('settings')
-            setSavingPackage(true)
             setSelectedPackage(id)
+            savePackageToLocal()
         }
     }
 
     function handleOverwriteDialog(overwrite: boolean) {
         if (overwrite) {
             openOverwriteDialog(false)
-            setSidebarState('settings')
-
-            setSavingPackage(true)
             setSelectedPackage(tentativePackage)
+            savePackageToLocal()
         } else {
             openOverwriteDialog(false)
             setTentativePackage(-1)
+        }
+    }
+
+    function savePackageToLocal() {
+        if (tentativePackage >= 0) {
+            console.log('selectedpackage about to be saved...')
+            setPackageSettings({
+                id: packagesData[tentativePackage].id,
+                dataset: packagesData[tentativePackage].dataset,
+                scenarios: packagesData[tentativePackage].scenarios,
+                models: packagesData[tentativePackage].models,
+                vars: packagesData[tentativePackage].vars,
+                boundaryType: packagesData[tentativePackage].boundaryType,
+                boundaries: '',
+                frequency: packagesData[tentativePackage].frequency,
+                dataFormat: packagesData[tentativePackage].dataFormat,
+                rangeStart: packagesData[tentativePackage].rangeStart,
+                rangeEnd: packagesData[tentativePackage].rangeEnd,
+                units: packagesData[tentativePackage].units,
+                disabled: packagesData[tentativePackage].disabled
+            })
+
+            setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
+            setModelsSelected(stringToArray(packagesData[selectedPackage].models))
+            setSelectedScenarios(stringToArray(packagesData[selectedPackage].scenarios))
+            setSelectedCounties([])
+            setIsPkgStored(true)
+            setSidebarState('settings')
+            toggleDrawer(true)
         }
     }
 
