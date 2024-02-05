@@ -49,6 +49,7 @@ import './../../styles/components/dashboard.scss'
 
 import { createOrStatement, stringToArray, arrayToCommaSeparatedString } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
+import { searchObjectRetObject } from '@/app/utils/functions'
 
 
 const DRAWER_WIDTH = 212
@@ -60,6 +61,7 @@ type varUrl = {
 
 type modelVarUrls = {
     model: string,
+    countyname: string,
     vars: varUrl[]
 }
 
@@ -84,9 +86,10 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         modelQueryStr: ''
     })
     const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
-    useDidMountEffect(() => {
+    useEffect(() => {
 
         setApiParamsChanged(true)
+        console.log(apiParams)
         setDataResponse([]) // Clear previous data
 
     }, [apiParams]);
@@ -95,6 +98,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
     const [tentativePackage, setTentativePackage] = useState<number>(-1)
     const [sidebarState, setSidebarState] = useState<string>('')
+    const [nextPageUrl, setNextPageUrl] = useState<string | null>(null)
 
     const onFormDataSubmit = async () => {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
@@ -106,19 +110,22 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         })
 
         const fullUrl = `${apiUrl}?${queryParams.toString()}`;
+        console.log(apiParams.countyQueryStr)
 
         if (apiParamsChanged) {
             try {
                 const res = await fetch(fullUrl)
                 const data = await res.json()
-
                 const apiResponseData: modelVarUrls[] = []
 
                 for (const modelIdx in data.features) {
+
+                    // For each model in data response 
                     const assets = data.features[modelIdx].assets
 
                     const varsInModel: modelVarUrls = {
                         model: '',
+                        countyname: '',
                         vars: []
                     }
 
@@ -134,7 +141,13 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                     }
 
                     varsInModel.model = data.features[modelIdx].id
+                    varsInModel.countyname = data.features[modelIdx].properties.countyname
                     apiResponseData.push(varsInModel)
+
+                    console.log('nextitem')
+                    const nextItem = searchObjectRetObject(data.links, 'next')
+                    console.log(nextItem)
+                    //setNextPageUrl(responseData.next || null)
                 }
 
                 setDataResponse(apiResponseData)
@@ -170,16 +183,18 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const countiesList: string[] = (data.summaries['countyname']).map((obj: {}) => obj)
 
     const [selectedCounties, setSelectedCounties] = useState<string[]>([])
-    useDidMountEffect(() => {
+    useEffect(() => {
+        console.log('in counties useeffect')
         let selectedCountiesStr: string = ''
 
         if (selectedCounties.length > 0) {
-            const updatedApiParam: apiParamStrs = {
+            console.log('selectedcounties bigger than 0')
+            /* const updatedApiParam: apiParamStrs = {
                 ...apiParams,
                 countyQueryStr: createOrStatement('countyname', selectedCounties)
             }
 
-            setApiParams(updatedApiParam)
+            setApiParams(updatedApiParam) */
 
             selectedCountiesStr = arrayToCommaSeparatedString(selectedCounties)
         }
@@ -214,7 +229,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const [modelsSelected, setModelsSelected] = useState<string[]>([])
 
-    useDidMountEffect(() => {
+    useEffect(() => {
         let selectedModelsStr: string = ''
 
         if (modelsSelected.length > 0) {
@@ -245,12 +260,13 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         let selectedScenariosStr: string = ''
 
         if (selectedScenarios.length > 0) {
-            const updatedApiParam: apiParamStrs = {
-                ...apiParams,
-                scenariosQueryStr: createOrStatement('cmip6:experiment_id', selectedScenarios)
-            }
-
-            setApiParams(updatedApiParam)
+            /*             const updatedApiParam: apiParamStrs = {
+                            ...apiParams,
+                            scenariosQueryStr: createOrStatement('cmip6:experiment_id', selectedScenarios)
+                        }
+            
+                        setApiParams(updatedApiParam)
+             */
 
             selectedScenariosStr = arrayToCommaSeparatedString(selectedScenarios)
         }
@@ -285,7 +301,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     function savePackageToLocal() {
         if (tentativePackage >= 0) {
-            console.log('selectedpackage about to be saved...')
+
             setPackageSettings({
                 id: packagesData[tentativePackage].id,
                 dataset: packagesData[tentativePackage].dataset,
@@ -324,6 +340,27 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         setSidePanelOpen(open);
     }
 
+    const updateApiParams = (newParams: Partial<apiParamStrs>) => {
+        setApiParams(prevParams => ({
+            ...prevParams,
+            ...newParams
+        }));
+    }
+
+    useEffect(() => {
+        // Update apiParams whenever selectedCounties, selectedScenarios, or modelsSelected change
+        console.log('calling useeffect on selected arrays')
+
+
+        console.log('arrays bigger than 1')
+        updateApiParams({
+            countyQueryStr: createOrStatement('countyname', selectedCounties),
+            scenariosQueryStr: createOrStatement('cmip6:experiment_id', selectedScenarios),
+            modelQueryStr: createOrStatement('cmip6:source_id', modelsSelected)
+        });
+
+
+    }, [selectedCounties, selectedScenarios, modelsSelected]);
 
     useEffect(() => {
         setSelectedPackage(parseInt(localPackageSettings.id) >= 0 ? parseInt(localPackageSettings.id) : -1)
@@ -332,6 +369,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         setSelectedScenarios(localPackageSettings.scenarios.length > 0 ? stringToArray(localPackageSettings.scenarios) : [])
         setSelectedCounties(localPackageSettings.boundaries.length > 0 ? stringToArray(localPackageSettings.boundaries) : [])
         setSidebarState('settings')
+
 
         isAllModelsSelected.current = (modelsSelected.length == modelsList.length)
     }, [])

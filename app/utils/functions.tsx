@@ -43,7 +43,8 @@ export function handleDownload(url: string): void {
 
 export function createOrStatement(parameterName: string, values: string[]): string {
     if (values.length === 0) {
-        throw new Error('Values array must not be empty');
+        //throw new Error('Values array must not be empty');
+        return ''
     }
 
     const orStatements = values.map(value => `${parameterName}='${value}'`);
@@ -67,4 +68,30 @@ export function searchObject(obj: any, targetValue: any): boolean {
     }
 
     return false;
+}
+
+interface AnyObject {
+    [key: string]: any;
+}
+
+export function searchObjectRetObject(obj: AnyObject, property: string): any | undefined {
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const value = obj[key];
+
+            // If the current value is an object, recursively search it
+            if (typeof value === 'object' && value !== null) {
+                const result = searchObjectRetObject(value, property);
+                if (result !== undefined) {
+                    return result;
+                }
+            }
+
+            // Check if the current key matches the property
+            if (key === property) {
+                return obj;
+            }
+        }
+    }
+    return undefined;
 }

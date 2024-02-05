@@ -32,6 +32,7 @@ type varUrl = {
 
 type modelVarUrls = {
     model: string,
+    countyname: string,
     vars: varUrl[]
 }
 
@@ -237,6 +238,11 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
                                 <div className="container container--package-setting" key={item.model}>
                                     <Typography variant="h5">Model</Typography>
                                     {item.model}
+                                    <div className="option-group">
+                                        <Typography variant="h5">Boundary</Typography>
+                                        {item.countyname}
+                                    </div>
+
                                     <div className="option-group">
                                         <Typography variant="h5">Variables</Typography>
                                         {(item.vars.length > 0) && (
