@@ -87,12 +87,18 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     })
     const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
     useEffect(() => {
-
         setApiParamsChanged(true)
-        console.log(apiParams)
         setDataResponse([]) // Clear previous data
 
-    }, [apiParams]);
+    }, [apiParams])
+
+
+    function updateApiParams(newParams: Partial<apiParamStrs>) {
+        setApiParams(prevParams => ({
+            ...prevParams,
+            ...newParams
+        }))
+    }
 
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
@@ -188,14 +194,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         let selectedCountiesStr: string = ''
 
         if (selectedCounties.length > 0) {
-            console.log('selectedcounties bigger than 0')
-            /* const updatedApiParam: apiParamStrs = {
-                ...apiParams,
-                countyQueryStr: createOrStatement('countyname', selectedCounties)
-            }
-
-            setApiParams(updatedApiParam) */
-
             selectedCountiesStr = arrayToCommaSeparatedString(selectedCounties)
         }
 
@@ -233,14 +231,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         let selectedModelsStr: string = ''
 
         if (modelsSelected.length > 0) {
-            const updatedApiParam: apiParamStrs = {
-                countyQueryStr: selectedCounties.length > 0 ? createOrStatement('countyname', selectedCounties) : '',
-                scenariosQueryStr: selectedScenarios.length > 0 ? createOrStatement('cmip6:experiment_id', selectedScenarios) : '',
-                modelQueryStr: createOrStatement('cmip6:source_id', modelsSelected)
-            }
-
-            setApiParams(updatedApiParam)
-
             selectedModelsStr = arrayToCommaSeparatedString(modelsSelected)
         }
 
@@ -260,14 +250,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         let selectedScenariosStr: string = ''
 
         if (selectedScenarios.length > 0) {
-            /*             const updatedApiParam: apiParamStrs = {
-                            ...apiParams,
-                            scenariosQueryStr: createOrStatement('cmip6:experiment_id', selectedScenarios)
-                        }
-            
-                        setApiParams(updatedApiParam)
-             */
-
             selectedScenariosStr = arrayToCommaSeparatedString(selectedScenarios)
         }
 
@@ -340,27 +322,17 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         setSidePanelOpen(open);
     }
 
-    const updateApiParams = (newParams: Partial<apiParamStrs>) => {
-        setApiParams(prevParams => ({
-            ...prevParams,
-            ...newParams
-        }));
-    }
-
     useEffect(() => {
+
         // Update apiParams whenever selectedCounties, selectedScenarios, or modelsSelected change
-        console.log('calling useeffect on selected arrays')
 
-
-        console.log('arrays bigger than 1')
         updateApiParams({
             countyQueryStr: createOrStatement('countyname', selectedCounties),
             scenariosQueryStr: createOrStatement('cmip6:experiment_id', selectedScenarios),
             modelQueryStr: createOrStatement('cmip6:source_id', modelsSelected)
-        });
+        })
 
-
-    }, [selectedCounties, selectedScenarios, modelsSelected]);
+    }, [selectedCounties, selectedScenarios, modelsSelected])
 
     useEffect(() => {
         setSelectedPackage(parseInt(localPackageSettings.id) >= 0 ? parseInt(localPackageSettings.id) : -1)
