@@ -16,6 +16,7 @@ import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
 import Tooltip from '@mui/material/Tooltip'
 import Fade from '@mui/material/Fade'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import ListSubheader from '@mui/material/ListSubheader'
 
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
@@ -80,6 +81,7 @@ interface ChildFormProps {
     isPackageStored: boolean,
     nextPageUrl: string,
     handleNextPageChange: string,
+    genUseModelsList: string[],
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
     setSelectedVars: (selectedVars: string[]) => void,
@@ -90,7 +92,7 @@ interface ChildFormProps {
     onFormDataSubmit: () => unknown,
 }
 
-const PackageForm: React.FC<ChildFormProps> = ({ nextPageUrl, handleNextPageChange, isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, selectedScenarios, setSelectedScenarios, scenariosList, onFormDataSubmit, dataResponse, handleLocalPackageClear }) => {
+const PackageForm: React.FC<ChildFormProps> = ({ genUseModelsList, nextPageUrl, handleNextPageChange, isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, selectedScenarios, setSelectedScenarios, scenariosList, onFormDataSubmit, dataResponse, handleLocalPackageClear }) => {
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         models: false,
         vars: false,
@@ -335,13 +337,13 @@ const PackageForm: React.FC<ChildFormProps> = ({ nextPageUrl, handleNextPageChan
                                     renderOption={(props, option) => {
                                         return (
                                             <li {...props} key={option}>
-                                                {option}
+                                                {lookupValue(option, scenariosLookupTable)}
                                             </li>
                                         )
                                     }}
                                     renderTags={(tagValue, getTagProps) => {
                                         return tagValue.map((option, index) => (
-                                            <Chip {...getTagProps({ index })} key={option} label={option} />
+                                            <Chip {...getTagProps({ index })} key={option} label={lookupValue(option, scenariosLookupTable)} />
                                         ))
                                     }}
                                     renderInput={(params) => (
@@ -381,7 +383,16 @@ const PackageForm: React.FC<ChildFormProps> = ({ nextPageUrl, handleNextPageChan
                                             <Checkbox checked={isAllModelsSelected.current} />
                                             Select All
                                         </MenuItem>
+                                        <ListSubheader>General Use</ListSubheader>
+                                        {genUseModelsList.map((model) => (
+                                            <MenuItem key={model} value={model}>
+                                                <Checkbox checked={modelsSelected.includes(model)} />
+                                                <ListItemText primary={model} />
+                                            </MenuItem>
+                                        ))}
+                                        <ListSubheader>Not General Use</ListSubheader>
                                         {modelsList.map((model) => (
+                                            !genUseModelsList.includes(model) &&
                                             <MenuItem key={model} value={model}>
                                                 <Checkbox checked={modelsSelected.includes(model)} />
                                                 <ListItemText primary={model} />

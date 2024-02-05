@@ -3,6 +3,11 @@ type LookupTable = {
   [key: string]: string
 }
 
+interface flagTable {
+  value: string;
+  flag: boolean;
+}
+
 export const variablesLookupTable: LookupTable = {
   'pr': 'Precipitation',
   'rsds': 'Surface downward solar shortwave radiation',
@@ -17,10 +22,33 @@ export const variablesLookupTable: LookupTable = {
 }
 
 export const scenariosLookupTable: LookupTable = {
-  'ssp585': 'SSP5-8.5', 
-  'ssp370': 'SSP3-7.0', 
+  'ssp585': 'SSP5-8.5',
+  'ssp370': 'SSP3-7.0',
   'ssp245': 'SSP2-4.5',
   'historical': 'Historical'
+}
+
+export const modelsGenUseLookupTable: flagTable[] = [
+  { value: 'ACCESS-CM2', flag: true },
+  { value: 'CESM2-LENS', flag: false },
+  { value: 'CNRM-ESM2-1', flag: true },
+  { value: 'EC-Earth3', flag: true },
+  { value: 'EC-Earth3-Veg', flag: false },
+  { value: 'FGOALS-g3', flag: true },
+  { value: 'GFDL-ESM4', flag: false },
+  { value: 'HadGEM3-GC31-LL', flag: false },
+  { value: 'INM-CM5-0', flag: false },
+  { value: 'IPSL-CM6A-LR', flag: false },
+  { value: 'KACE-1-0-G', flag: false },
+  { value: 'MIROC6', flag: false },
+  { value: 'MPI-ESM1-2-HR', flag: true },
+  { value: 'MRI-ESM2-0', flag: false },
+  { value: 'TaiESM1', flag: false }
+]
+
+
+export function filterByFlag(list: flagTable[]): string[] {
+  return list.filter(item => item.flag).map(item => item.value)
 }
 
 // Create a lookup function

@@ -48,7 +48,7 @@ import './../../styles/components/dashboard.scss'
 
 import { createOrStatement, stringToArray, arrayToCommaSeparatedString, splitStringByPeriod } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
-import { variablesLookupTable, scenariosLookupTable, lookupValue } from '@/app/utils/lookupTables'
+import { variablesLookupTable, scenariosLookupTable, lookupValue, filterByFlag, modelsGenUseLookupTable } from '@/app/utils/lookupTables'
 
 const DRAWER_WIDTH = 212
 
@@ -226,6 +226,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     // MODELS
 
     const modelsList: string[] = (data.summaries['cmip6:source_id']).map((obj: {}) => obj)
+    const genUseModelsList: string[] = filterByFlag(modelsGenUseLookupTable)
 
     const [modelsSelected, setModelsSelected] = useState<string[]>([])
 
@@ -590,7 +591,9 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                             modelsSelected={modelsSelected}
                             setModelsSelected={setModelsSelected}
                             isAllModelsSelected={isAllModelsSelected}
-                            modelsList={modelsList} selectedVars={selectedVars}
+                            modelsList={modelsList} 
+                            genUseModelsList = {genUseModelsList}
+                            selectedVars={selectedVars}
                             setSelectedVars={setSelectedVars}
                             varsList={varsList}
                             selectedCounties={selectedCounties}
