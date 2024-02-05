@@ -49,8 +49,6 @@ import './../../styles/components/dashboard.scss'
 
 import { createOrStatement, stringToArray, arrayToCommaSeparatedString } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
-import { searchObjectRetObject } from '@/app/utils/functions'
-
 
 const DRAWER_WIDTH = 212
 
@@ -116,7 +114,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         })
 
         const fullUrl = `${apiUrl}?${queryParams.toString()}`;
-        console.log(apiParams.countyQueryStr)
 
         if (apiParamsChanged) {
             try {
@@ -150,10 +147,10 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                     varsInModel.countyname = data.features[modelIdx].properties.countyname
                     apiResponseData.push(varsInModel)
 
-                    console.log('nextitem')
-                    const nextItem = searchObjectRetObject(data.links, 'next')
-                    console.log(nextItem)
-                    //setNextPageUrl(responseData.next || null)
+                }
+
+                if (data.links[0].rel == 'next') {
+                    setNextPageUrl(data.links[0].href || null)
                 }
 
                 setDataResponse(apiResponseData)
@@ -190,7 +187,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const [selectedCounties, setSelectedCounties] = useState<string[]>([])
     useEffect(() => {
-        console.log('in counties useeffect')
         let selectedCountiesStr: string = ''
 
         if (selectedCounties.length > 0) {

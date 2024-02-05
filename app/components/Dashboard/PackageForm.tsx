@@ -77,6 +77,8 @@ interface ChildFormProps {
     dataResponse: modelVarUrls[]
     isAllModelsSelected: any,
     isPackageStored: boolean,
+    nextPageUrl: string, 
+    handleNextPageChange: string,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
     setSelectedVars: (selectedVars: string[]) => void,
@@ -87,7 +89,7 @@ interface ChildFormProps {
     onFormDataSubmit: () => unknown,
 }
 
-const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, selectedScenarios, setSelectedScenarios, scenariosList, onFormDataSubmit, dataResponse, handleLocalPackageClear }) => {
+const PackageForm: React.FC<ChildFormProps> = ({  nextPageUrl, handleNextPageChange, isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, selectedScenarios, setSelectedScenarios, scenariosList, onFormDataSubmit, dataResponse, handleLocalPackageClear }) => {
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         models: false,
         vars: false,
@@ -251,6 +253,8 @@ const PackageForm: React.FC<ChildFormProps> = ({ isPackageStored, localPackageSe
                                     </div>
                                 </div>
                             ))}
+
+                            
 
                             {isPackageStored && sidebarState == 'download' &&
                                 <div className="bottom-actions">
