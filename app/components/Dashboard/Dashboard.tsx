@@ -245,6 +245,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const isAllModelsSelected = useRef(false)
 
+    isAllModelsSelected.current = (modelsSelected.length == modelsList.length)
+
     // SCENARIOS
     const scenariosList: string[] = (data.summaries['cmip6:experiment_id']).map((obj: {}) => obj)
 
@@ -337,6 +339,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     }, [selectedCounties, selectedScenarios, modelsSelected])
 
+    
+    
     useEffect(() => {
         setSelectedPackage(parseInt(localPackageSettings.id) >= 0 ? parseInt(localPackageSettings.id) : -1)
         setSelectedVars(localPackageSettings.vars.length > 0 ? stringToArray(localPackageSettings.vars) : [])
@@ -346,7 +350,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         setSidebarState('settings')
 
 
-        isAllModelsSelected.current = (modelsSelected.length == modelsList.length)
+        
     }, [])
 
     return (

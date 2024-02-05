@@ -116,28 +116,31 @@ const PackageForm: React.FC<ChildFormProps> = ({ genUseModelsList, nextPageUrl, 
     // MODELS
 
     const handleModelsChange = (event: SelectChangeEvent<string[]>) => {
-        const selectedValues = event.target.value as string[];
+        const selectedValues = event.target.value as string[]
 
-        // Check if "Select All" option is selected
-        // HERE FOR ERROR WITH DESELECTING ?
         if (selectedValues.includes('all')) {
             if (isAllModelsSelected.current) {
-                // Deselect all options if "Select All" was previously selected
-                console.log('deselect all')
-                setModelsSelected([])
-                console.log(modelsSelected)
+                const newValuesArr: string[] = modelsSelected.filter(item => !event.target.value.includes(item))
+                // If "Select All" was previously selected, deselect the option clicked and Select all
+                setModelsSelected(newValuesArr)
+                isAllModelsSelected.current = false;
             } else {
-                console.log('select all')
-                // Select all options if "Select All" is selected
-                setModelsSelected(modelsList);
+                // If "Select All" is selected, select all options except "Select All"
+                setModelsSelected(modelsList)
+                isAllModelsSelected.current = true;
             }
-            // Toggle the selectAll state
-            isAllModelsSelected.current = !isAllModelsSelected.current
         } else {
-            // Remove "Select All" from selected options
-            setModelsSelected(selectedValues.filter(value => value !== 'all'))
-            // Ensure selectAll state is false when individual options are selected/deselected
-            isAllModelsSelected.current = false
+            // Check if "Select All" was previously selected
+            if (selectedValues.length === modelsList.length - 1 && selectedValues.includes('all')) {
+                const filteredValues = selectedValues.filter(value => value !== 'all');
+                setModelsSelected(filteredValues)
+                isAllModelsSelected.current = false
+            } else {
+                // If "Select All" was not previously selected or no individual item is being deselected,
+                // update the selected items
+                setModelsSelected(selectedValues);
+                isAllModelsSelected.current = false;
+            }
         }
     }
 
@@ -231,6 +234,10 @@ const PackageForm: React.FC<ChildFormProps> = ({ genUseModelsList, nextPageUrl, 
             isError = true
         }
     }
+
+    useEffect(() => {
+  
+    }, [])
 
     return (
         <div className="package-form">
