@@ -42,13 +42,13 @@ import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import Fade from '@mui/material/Fade';
 
-
 import SidePanel from './SidePanel'
 import PackageForm from './PackageForm'
 import './../../styles/components/dashboard.scss'
 
-import { createOrStatement, stringToArray, arrayToCommaSeparatedString } from "@/app/utils/functions"
+import { createOrStatement, stringToArray, arrayToCommaSeparatedString, splitStringByPeriod } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
+import { variablesLookupTable, scenariosLookupTable, lookupValue } from '@/app/utils/lookupTables'
 
 const DRAWER_WIDTH = 212
 
@@ -60,6 +60,7 @@ type varUrl = {
 type modelVarUrls = {
     model: string,
     countyname: string,
+    scenario: string,
     vars: varUrl[]
 }
 
@@ -129,6 +130,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                     const varsInModel: modelVarUrls = {
                         model: '',
                         countyname: '',
+                        scenario: '',
                         vars: []
                     }
 
@@ -143,10 +145,14 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                         varsInModel.vars.push(varInVars)
                     }
 
-                    varsInModel.model = data.features[modelIdx].id
+                    const modelScenarioStr = data.features[modelIdx].id
+                    const modelScenarioStrArr = splitStringByPeriod(modelScenarioStr)
+
+                    //varsInModel.model = data.features[modelIdx].id
+                    varsInModel.model = modelScenarioStrArr.length >= 0 ? modelScenarioStrArr[1] : ''
+                    varsInModel.scenario = modelScenarioStrArr.length >= 0 ? modelScenarioStrArr[2] : ''
                     varsInModel.countyname = data.features[modelIdx].properties.countyname
                     apiResponseData.push(varsInModel)
-
                 }
 
                 if (data.links[0].rel == 'next') {
@@ -465,9 +471,17 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                 </Typography>
                                 <ul className="package__settings">
                                     <li><Typography variant="body2">Dataset:</Typography> {pkg.dataset}</li>
-                                    <li><Typography variant="body2">Scenarios:</Typography> {pkg.scenarios}</li>
+                                    <li><Typography variant="body2">Scenarios:</Typography>
+                                        {stringToArray(pkg.scenarios).map((scenario, index) => (
+                                            ' ' + lookupValue(scenario, scenariosLookupTable) + (index !== stringToArray(pkg.scenarios).length - 1 ? ',' : '')
+                                        ))}
+                                    </li>
                                     <li><Typography variant="body2">Models:</Typography> {pkg.models}</li>
-                                    <li><Typography variant="body2">Vars:</Typography> {pkg.vars}</li>
+                                    <li><Typography variant="body2">Vars:</Typography>
+                                        {stringToArray(pkg.vars).map((variable, index) => (
+                                            ' ' + lookupValue(variable, variablesLookupTable) + (index !== stringToArray(pkg.vars).length - 1 ? ',' : '')
+                                        ))}
+                                    </li>
                                     <li><Typography variant="body2">Boundary Type:</Typography> {pkg.boundaryType}</li>
                                     <li><Typography variant="body2">Range:</Typography> {pkg.rangeStart} - {pkg.rangeEnd}</li>
                                     <li><Typography variant="body2">Frequency:</Typography> {pkg.frequency}</li>

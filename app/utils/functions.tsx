@@ -74,3 +74,6 @@ interface AnyObject {
     [key: string]: any;
 }
 
+export function splitStringByPeriod(inputString: string): string[] {
+    return inputString.split('.');
+}

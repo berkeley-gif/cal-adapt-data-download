@@ -20,7 +20,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
 import DataResultsTable from './DataResultsTable'
-import { variablesLookupTable, lookupValue } from '@/app/utils/lookupTables'
+import { variablesLookupTable, scenariosLookupTable, lookupValue } from '@/app/utils/lookupTables'
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -33,6 +33,7 @@ type varUrl = {
 type modelVarUrls = {
     model: string,
     countyname: string,
+    scenario: string,
     vars: varUrl[]
 }
 
@@ -77,7 +78,7 @@ interface ChildFormProps {
     dataResponse: modelVarUrls[]
     isAllModelsSelected: any,
     isPackageStored: boolean,
-    nextPageUrl: string, 
+    nextPageUrl: string,
     handleNextPageChange: string,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
@@ -89,7 +90,7 @@ interface ChildFormProps {
     onFormDataSubmit: () => unknown,
 }
 
-const PackageForm: React.FC<ChildFormProps> = ({  nextPageUrl, handleNextPageChange, isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, selectedScenarios, setSelectedScenarios, scenariosList, onFormDataSubmit, dataResponse, handleLocalPackageClear }) => {
+const PackageForm: React.FC<ChildFormProps> = ({ nextPageUrl, handleNextPageChange, isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, selectedScenarios, setSelectedScenarios, scenariosList, onFormDataSubmit, dataResponse, handleLocalPackageClear }) => {
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         models: false,
         vars: false,
@@ -237,9 +238,15 @@ const PackageForm: React.FC<ChildFormProps> = ({  nextPageUrl, handleNextPageCha
                     {(dataResponse.length > 0) ? (
                         <div>
                             {dataResponse.map((item) => (
-                                <div className="container container--package-setting" key={item.model}>
+                                <div className="container container--package-setting" key={item.model + '.' + item.scenario + '.' + item.countyname}>
                                     <Typography variant="h5">Model</Typography>
                                     {item.model}
+
+                                    <div className="option-group">
+                                        <Typography variant="h5">Scenario</Typography>
+                                        {lookupValue(item.scenario, scenariosLookupTable)}
+                                    </div>
+
                                     <div className="option-group">
                                         <Typography variant="h5">Boundary</Typography>
                                         {item.countyname}
@@ -254,7 +261,7 @@ const PackageForm: React.FC<ChildFormProps> = ({  nextPageUrl, handleNextPageCha
                                 </div>
                             ))}
 
-                            
+
 
                             {isPackageStored && sidebarState == 'download' &&
                                 <div className="bottom-actions">

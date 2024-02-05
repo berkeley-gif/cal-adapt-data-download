@@ -16,6 +16,13 @@ export const variablesLookupTable: LookupTable = {
   'huss': 'Specific humidity',
 }
 
+export const scenariosLookupTable: LookupTable = {
+  'ssp585': 'SSP5-8.5', 
+  'ssp370': 'SSP3-7.0', 
+  'ssp245': 'SSP2-4.5',
+  'historical': 'Historical'
+}
+
 // Create a lookup function
 export function lookupValue(key: string, table: LookupTable): string | undefined {
   return table[key]
