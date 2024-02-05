@@ -100,18 +100,9 @@ const PackageForm: React.FC<ChildFormProps> = ({ genUseModelsList, nextPageUrl, 
         scenarios: false
     })
 
-    //const [isError, setIsError] = useState(false)
-    let isError: boolean = false
+    const [isError, setIsError] = useState(false)
+
     let isFormInvalid: boolean = false
-
-    useEffect(() => {
-        isFormInvalid = searchObject(formErrorState, true)
-
-        if (isFormInvalid) {
-            isError = true
-        }
-
-    }, [formErrorState])
 
     // MODELS
 
@@ -188,6 +179,7 @@ const PackageForm: React.FC<ChildFormProps> = ({ genUseModelsList, nextPageUrl, 
 
     }, [selectedScenarios])
 
+    // FORM HANDLING 
     function validateFormData() {
         let newFormState = formErrorState
 
@@ -217,6 +209,10 @@ const PackageForm: React.FC<ChildFormProps> = ({ genUseModelsList, nextPageUrl, 
 
         setFormErrorState(newFormState)
         isFormInvalid = searchObject(formErrorState, true)
+        
+        if(isFormInvalid) {
+            setIsError(true)
+        }
     }
 
     const handleSubmit = () => {
@@ -228,10 +224,10 @@ const PackageForm: React.FC<ChildFormProps> = ({ genUseModelsList, nextPageUrl, 
 
             isFormInvalid = false
             setSidebarState('download')
-            isError = false
+            setIsError(false)
 
         } else {
-            isError = true
+            setIsError(true)
         }
     }
 
