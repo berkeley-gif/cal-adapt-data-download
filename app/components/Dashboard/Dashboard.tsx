@@ -103,7 +103,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
     const [tentativePackage, setTentativePackage] = useState<number>(-1)
     const [sidebarState, setSidebarState] = useState<string>('')
-    const [nextPageUrl, setNextPageUrl] = useState<string | null>(null)
+    const [nextPageUrl, setNextPageUrl] = useState<string>('')
 
     const onFormDataSubmit = async () => {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
@@ -607,6 +607,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                             setSelectedScenarios={setSelectedScenarios}
                             scenariosList={scenariosList}
                             onFormDataSubmit={onFormDataSubmit}
+                            nextPageUrl={nextPageUrl}
                             dataResponse={dataResponse}
                             isPackageStored={isPackageStored}
                             handleLocalPackageClear={handleLocalPackageClear}
