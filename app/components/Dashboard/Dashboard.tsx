@@ -654,7 +654,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                             alt="Cal Adapt logo"
                             className="cal-adapt-logo__mobile"
                         />
-                        <Typography variant="body1">Due to the size and format of data packages, the Cal-Adapt Data Download is best used on a desktop or laptop computer</Typography>
+                        <Typography variant="body1">Due to the size and format of data downloads, the Cal-Adapt Data Download is best used on a desktop or laptop computer</Typography>
                         <Button variant="contained" href="https://cal-adapt.org">Go to the homepage</Button>
                     </div>
                 </div>
