@@ -17,6 +17,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Fade from '@mui/material/Fade'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import ListSubheader from '@mui/material/ListSubheader'
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
@@ -81,6 +82,8 @@ interface ChildFormProps {
     isPackageStored: boolean,
     nextPageUrl: string,
     genUseModelsList: string[],
+    downloadLinks: string[],
+    setDownloadLinks: (links: string[]) => void,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
     setSelectedVars: (selectedVars: string[]) => void,
@@ -89,10 +92,36 @@ interface ChildFormProps {
     setSelectedScenarios: (selectedScenarios: string[]) => void,
     handleLocalPackageClear: () => void,
     onFormDataSubmit: () => unknown,
+    createZip: (links: string[]) => Promise<void>,
 }
 
-const PackageForm: React.FC<ChildFormProps> = ({ 
-    genUseModelsList, nextPageUrl, isPackageStored, localPackageSettings, modelsSelected, setModelsSelected, modelsList, sidebarState, selectedVars, isAllModelsSelected, setSidebarState, setSelectedVars, varsList, selectedCounties, setSelectedCounties, countiesList, selectedScenarios, setSelectedScenarios, scenariosList, onFormDataSubmit, dataResponse, handleLocalPackageClear }) => {
+const PackageForm: React.FC<ChildFormProps> = ({
+    genUseModelsList,
+    downloadLinks,
+    setDownloadLinks,
+    nextPageUrl,
+    isPackageStored,
+    localPackageSettings,
+    modelsSelected,
+    setModelsSelected,
+    modelsList,
+    sidebarState,
+    selectedVars,
+    isAllModelsSelected,
+    setSidebarState,
+    setSelectedVars,
+    varsList,
+    selectedCounties,
+    setSelectedCounties,
+    countiesList,
+    selectedScenarios,
+    setSelectedScenarios,
+    scenariosList,
+    onFormDataSubmit,
+    dataResponse,
+    handleLocalPackageClear,
+    createZip }) => {
+
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         models: false,
         vars: false,
@@ -209,8 +238,8 @@ const PackageForm: React.FC<ChildFormProps> = ({
 
         setFormErrorState(newFormState)
         isFormInvalid = searchObject(formErrorState, true)
-        
-        if(isFormInvalid) {
+
+        if (isFormInvalid) {
             setIsError(true)
         }
     }
@@ -232,14 +261,19 @@ const PackageForm: React.FC<ChildFormProps> = ({
     }
 
     useEffect(() => {
-  
+
     }, [])
 
     return (
         <div className="package-form">
             {(sidebarState === 'download') && (
                 <div className="package-contents">
-                    <Typography variant="h5">Download your data</Typography>
+                    <Typography className="inline" variant="h5">Download your data</Typography>
+                    {dataResponse.length > 0 &&
+                        <IconButton className="inline" onClick={() => createZip(downloadLinks)}>
+                            <DownloadOutlinedIcon />
+                        </IconButton>
+                    }
                     {(dataResponse.length > 0) ? (
                         <div>
                             {dataResponse.map((item) => (

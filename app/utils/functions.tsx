@@ -77,3 +77,22 @@ interface AnyObject {
 export function splitStringByPeriod(inputString: string): string[] {
     return inputString.split('.');
 }
+
+export function extractFilenameFromURL(url: string): string {
+    // Split the URL by '/' to get the parts
+    const parts = url.split('/')
+
+    // Get the last part of the URL which contains the filename
+    const filename = parts[parts.length - 1]
+
+    // Return the filename
+    return filename
+}
+
+export function getTodaysDateAsString(): string {
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0') // Month is zero-based, so we add 1
+    const day = String(today.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+}

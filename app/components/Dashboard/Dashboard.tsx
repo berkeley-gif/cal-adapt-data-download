@@ -42,11 +42,13 @@ import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import Fade from '@mui/material/Fade';
 
+import JSZip from 'jszip'
+
 import SidePanel from './SidePanel'
 import PackageForm from './PackageForm'
 import './../../styles/components/dashboard.scss'
 
-import { createOrStatement, stringToArray, arrayToCommaSeparatedString, splitStringByPeriod } from "@/app/utils/functions"
+import { createOrStatement, stringToArray, arrayToCommaSeparatedString, splitStringByPeriod, extractFilenameFromURL, getTodaysDateAsString } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
 import { variablesLookupTable, scenariosLookupTable, lookupValue, filterByFlag, modelsGenUseLookupTable } from '@/app/utils/lookupTables'
 
@@ -99,6 +101,12 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         }))
     }
 
+    const [downloadLinks, setDownloadLinks] = useState<string[]>([])
+
+    useEffect(() => {
+        console.log(downloadLinks)
+    }, [downloadLinks])
+
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
     const [tentativePackage, setTentativePackage] = useState<number>(-1)
@@ -142,6 +150,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                         }
 
                         varInVars.name = asset
+                        setDownloadLinks(prevState => [...prevState, assets[asset].href])
                         varInVars.href = assets[asset].href
                         varsInModel.vars.push(varInVars)
                     }
@@ -170,6 +179,30 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     function resetStateToSettings(): void {
         setSidebarState('settings')
+    }
+
+
+
+    async function createZip(links: string[]): Promise<void> {
+        const zip = new JSZip()
+
+        await Promise.all(links.map(async (link, index) => {
+            const response = await fetch(link)
+            const fileData = await response.blob()
+            const fileName = extractFilenameFromURL(link)
+            zip.file(`${fileName}`, fileData)
+        }))
+
+        const content = await zip.generateAsync({ type: 'blob' })
+        const todaysDateAsString: string = getTodaysDateAsString()
+
+        console.log(todaysDateAsString)
+        const url = window.URL.createObjectURL(content)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${todaysDateAsString}` + '-data-download-bundle.zip';
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 
     // VARIABLES
@@ -340,19 +373,9 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     }, [selectedCounties, selectedScenarios, modelsSelected])
 
-    useEffect(() => {
-
-        console.log(isMobileOrTablet)
-
-    }, [isMobileOrTablet])
-
     const handleResize = () => {
         const width: number = window.innerWidth
-
-        console.log(width)
         const tabletBreakpoint: number = 768
-
-        console.log('width < tabletBreakpoint: ' + (width < tabletBreakpoint))
 
         setIsMobileOrTablet(width < tabletBreakpoint)
     }
@@ -369,7 +392,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
         handleResize()
 
-        console.log(isMobileOrTablet)
         return () => {
             window.removeEventListener('resize', handleResize)
         }
@@ -632,6 +654,9 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                 dataResponse={dataResponse}
                                 isPackageStored={isPackageStored}
                                 handleLocalPackageClear={handleLocalPackageClear}
+                                createZip={createZip}
+                                downloadLinks={downloadLinks}
+                                setDownloadLinks={setDownloadLinks}
                             ></PackageForm>
                         }
 
