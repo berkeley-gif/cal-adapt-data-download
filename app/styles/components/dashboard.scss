@@ -1,3 +1,4 @@
+
 .container {
   background-color: #f7f9fb;
   border-radius: 16px;
@@ -54,6 +55,7 @@
 // Drawer Toolbar
 .toolbar-main {
   background-color: white;
+  height: 0;
 }
 
 // logo
@@ -62,9 +64,17 @@
 }
 
 .alerts {
-  display: flex;
-  gap: 28px;
   margin-bottom: 26px;
+  max-width: 1200px;
+
+  &-50 {
+    display: flex;
+    gap: 28px;
+  }
+
+  &-100 {
+    max-width: 1200px;
+  }
 }
 
 .cta {
@@ -88,3 +98,27 @@
     margin-bottom: -2px;
   }
 }
+
+.mobile-view {
+  background-image: url('../../../public/img/photos/ocean-thumbnail.png');
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center; /* Horizontal centering */
+  align-items: center; /* Vertical centering */
+
+  &__container {
+    height: 90%;
+    width: 90%;
+    background-color: #eef3f9;
+    padding: 50px;
+    display: flex;
+    gap: 50px;
+    flex-direction: column;
+    justify-content: center; /* Horizontal centering */
+    text-align: center;
+  }
+
+} 
