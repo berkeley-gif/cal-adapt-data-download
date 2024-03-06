@@ -68,16 +68,6 @@ const theme = createTheme({
     borderRadius: 16,
   },
   components: {
-    MuiIconButton: {
-      styleOverrides: {
-        // Define your custom styles for 'customVariant' here
-        '&.MuiIconButton-green': {
-          // Define your custom styles here
-          backgroundColor: '#D3F1F8'
-          // Add more styles as needed
-        },
-      },
-    },
     MuiAlert: {
       variants: [
         {
