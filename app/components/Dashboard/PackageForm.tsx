@@ -23,6 +23,7 @@ import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
 import DataResultsTable from './DataResultsTable'
 import { variablesLookupTable, scenariosLookupTable, lookupValue } from '@/app/utils/lookupTables'
+import LoadingSpinner from './LoadingSpinner'
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -267,7 +268,7 @@ const PackageForm: React.FC<ChildFormProps> = ({
     return (
         <div className="package-form">
             {(sidebarState === 'download') && (
-                <div className="package-contents">
+                <div className="package-contents loading-screen">
                     <Typography className="inline" variant="h5">Download your data</Typography>
                     {dataResponse.length > 0 &&
                         <IconButton variant="green" className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks)}>
@@ -331,7 +332,7 @@ const PackageForm: React.FC<ChildFormProps> = ({
                                 </div>
                             }
                         </div>
-                    ) : 'Loading...'}
+                    ) : <LoadingSpinner />}
                 </div>
             )}
             {sidebarState === 'settings' && (
