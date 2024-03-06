@@ -132,6 +132,8 @@ const PackageForm: React.FC<ChildFormProps> = ({
 
     const [isError, setIsError] = useState(false)
 
+    const [isLoading, setIsLoading] = useState(true)
+
     let isFormInvalid: boolean = false
 
     // MODELS
@@ -262,16 +264,22 @@ const PackageForm: React.FC<ChildFormProps> = ({
     }
 
     useEffect(() => {
+        if (dataResponse.length > 0)  {
+            setIsLoading(false)
+        }
+    }, [dataResponse])
 
+    useEffect(() => {
+        console.log(isLoading)
     }, [])
 
     return (
         <div className="package-form">
             {(sidebarState === 'download') && (
-                <div className="package-contents loading-screen">
+                <div className={'package-contents ' + (isLoading ? 'loading-screen' : '')}>
                     <Typography className="inline" variant="h5">Download your data</Typography>
                     {dataResponse.length > 0 &&
-                        <IconButton variant="green" className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks)}>
+                        <IconButton className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks)}>
                             <Tooltip
                                 TransitionComponent={Fade}
                                 TransitionProps={{ timeout: 600 }}
@@ -281,58 +289,59 @@ const PackageForm: React.FC<ChildFormProps> = ({
                             </Tooltip>
                         </IconButton>
                     }
-                    {(dataResponse.length > 0) ? (
-                        <div>
-                            {dataResponse.map((item) => (
-                                <div className="container container--package-setting" key={item.model + '.' + item.scenario + '.' + item.countyname}>
-                                    <Typography variant="h5">Model</Typography>
-                                    {item.model}
+                    {(dataResponse.length > 0) ?
+                        (
+                            <div>
+                                {dataResponse.map((item) => (
+                                    <div className="container container--package-setting" key={item.model + '.' + item.scenario + '.' + item.countyname}>
+                                        <Typography variant="h5">Model</Typography>
+                                        {item.model}
 
-                                    <div className="option-group">
-                                        <Typography variant="h5">Scenario</Typography>
-                                        {lookupValue(item.scenario, scenariosLookupTable)}
+                                        <div className="option-group">
+                                            <Typography variant="h5">Scenario</Typography>
+                                            {lookupValue(item.scenario, scenariosLookupTable)}
+                                        </div>
+
+                                        <div className="option-group">
+                                            <Typography variant="h5">Boundary</Typography>
+                                            {item.countyname}
+                                        </div>
+
+                                        <div className="option-group">
+                                            <Typography variant="h5">Variables</Typography>
+                                            {(item.vars.length > 0) && (
+                                                <DataResultsTable varsResData={item.vars} selectedVars={selectedVars}></DataResultsTable>
+                                            )}
+                                        </div>
                                     </div>
+                                ))}
 
-                                    <div className="option-group">
-                                        <Typography variant="h5">Boundary</Typography>
-                                        {item.countyname}
+
+
+                                {isPackageStored && sidebarState == 'download' &&
+                                    <div className="bottom-actions">
+                                        <Tooltip
+                                            TransitionComponent={Fade}
+                                            TransitionProps={{ timeout: 600 }}
+                                            title="Delete stored data package"
+                                        >
+                                            <IconButton onClick={() => handleLocalPackageClear()}>
+                                                <DeleteOutlineIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip
+                                            TransitionComponent={Fade}
+                                            TransitionProps={{ timeout: 600 }}
+                                            title="Review your package settings"
+                                        >
+                                            <IconButton onClick={() => (setSidebarState('settings'))}>
+                                                <UndoOutlinedIcon />
+                                            </IconButton>
+                                        </Tooltip>
                                     </div>
-
-                                    <div className="option-group">
-                                        <Typography variant="h5">Variables</Typography>
-                                        {(item.vars.length > 0) && (
-                                            <DataResultsTable varsResData={item.vars} selectedVars={selectedVars}></DataResultsTable>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-
-
-
-                            {isPackageStored && sidebarState == 'download' &&
-                                <div className="bottom-actions">
-                                    <Tooltip
-                                        TransitionComponent={Fade}
-                                        TransitionProps={{ timeout: 600 }}
-                                        title="Delete stored data package"
-                                    >
-                                        <IconButton onClick={() => handleLocalPackageClear()}>
-                                            <DeleteOutlineIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip
-                                        TransitionComponent={Fade}
-                                        TransitionProps={{ timeout: 600 }}
-                                        title="Review your package settings"
-                                    >
-                                        <IconButton onClick={() => (setSidebarState('settings'))}>
-                                            <UndoOutlinedIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </div>
-                            }
-                        </div>
-                    ) : <LoadingSpinner />}
+                                }
+                            </div>
+                        ) : <LoadingSpinner />}
                 </div>
             )}
             {sidebarState === 'settings' && (

@@ -103,9 +103,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const [downloadLinks, setDownloadLinks] = useState<string[]>([])
 
-    useEffect(() => {
-        console.log(downloadLinks)
-    }, [downloadLinks])
 
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
@@ -119,7 +116,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
         const queryParams = new URLSearchParams({
             limit: '50',
-            filter: "collection='loca2-county-day'" + (apiParams?.scenariosQueryStr ? " AND " + apiParams?.scenariosQueryStr : '') + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
+            filter: "collection='loca2-mon-county'" + (apiParams?.scenariosQueryStr ? " AND " + apiParams?.scenariosQueryStr : '') + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
             filter_lang: 'cql2-text',
         })
 
@@ -195,7 +192,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         const content = await zip.generateAsync({ type: 'blob' })
         const todaysDateAsString: string = getTodaysDateAsString()
 
-        console.log(todaysDateAsString)
         const url = window.URL.createObjectURL(content)
         const a = document.createElement('a')
         a.href = url
