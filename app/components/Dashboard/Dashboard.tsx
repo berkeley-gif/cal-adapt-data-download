@@ -111,7 +111,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [tentativePackage, setTentativePackage] = useState<number>(-1)
     const [sidebarState, setSidebarState] = useState<string>('')
     const [nextPageUrl, setNextPageUrl] = useState<string>('')
-    const [isMobileOrTablet, setIsMobileOrTablet] = useState(false)
+    const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(false)
+    const [isDataDaily, setIsDataDaily] = useState<boolean>(false)
 
     const onFormDataSubmit = async () => {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
@@ -186,9 +187,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     async function createZip(links: string[]): Promise<void> {
         const zip = new JSZip()
 
-        console.log('links')
-        console.log(links)
-
         await Promise.all(links.map(async (link, index) => {
             const response = await fetch(link)
             const fileData = await response.blob()
@@ -222,8 +220,10 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         })
 
         if (selectedFrequency == 'Monthly') {
+            setIsDataDaily(false)
             setCollectionStr('loca2-mon-county')
         } else if (selectedFrequency == 'Daily') {
+            setIsDataDaily(true)
             setCollectionStr('loca2-day-county')
         }
 
@@ -686,6 +686,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                 createZip={createZip}
                                 downloadLinks={downloadLinks}
                                 setDownloadLinks={setDownloadLinks}
+                                isDataDaily={isDataDaily}
                             ></PackageForm>
                         }
 

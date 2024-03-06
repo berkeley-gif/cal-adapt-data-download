@@ -69,7 +69,7 @@ interface FormFieldErrorStates {
 
 interface ChildFormProps {
     frequenciesList: string[],
-    selectedFrequency: string, 
+    selectedFrequency: string,
     modelsList: string[],
     modelsSelected: string[],
     varsList: string[],
@@ -86,10 +86,11 @@ interface ChildFormProps {
     nextPageUrl: string,
     genUseModelsList: string[],
     downloadLinks: string[],
+    isDataDaily: boolean,
     setDownloadLinks: (links: string[]) => void,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
-    setSelectedFrequency: (localPackageSettings: string) => void, 
+    setSelectedFrequency: (localPackageSettings: string) => void,
     setSelectedVars: (selectedVars: string[]) => void,
     setModelsSelected: (selectedModels: string[]) => void,
     setSelectedCounties: (selectedCounties: string[]) => void,
@@ -106,8 +107,8 @@ const PackageForm: React.FC<ChildFormProps> = ({
     nextPageUrl,
     isPackageStored,
     localPackageSettings,
-    selectedFrequency, 
-    setSelectedFrequency, 
+    selectedFrequency,
+    setSelectedFrequency,
     frequenciesList,
     modelsSelected,
     setModelsSelected,
@@ -127,7 +128,8 @@ const PackageForm: React.FC<ChildFormProps> = ({
     onFormDataSubmit,
     dataResponse,
     handleLocalPackageClear,
-    createZip }) => {
+    createZip,
+    isDataDaily }) => {
 
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         models: false,
@@ -285,7 +287,7 @@ const PackageForm: React.FC<ChildFormProps> = ({
             {(sidebarState === 'download') && (
                 <div className={'package-contents' + (isLoading ? ' loading-screen' : '')}>
                     <Typography className="inline" variant="h5">Download your data</Typography>
-                    {dataResponse.length > 0 &&
+                    {dataResponse.length > 0 && !isDataDaily &&
                         <IconButton className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks)}>
                             <Tooltip
                                 TransitionComponent={Fade}
