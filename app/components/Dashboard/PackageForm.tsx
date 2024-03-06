@@ -270,14 +270,11 @@ const PackageForm: React.FC<ChildFormProps> = ({
     }
 
     useEffect(() => {
+        console.log(dataResponse)
         if (dataResponse.length > 0) {
             setIsLoading(false)
         }
     }, [dataResponse])
-
-    useEffect(() => {
-        console.log('isloading' + isLoading)
-    }, [isLoading])
 
     useEffect(() => {
 

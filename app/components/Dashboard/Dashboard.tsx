@@ -69,7 +69,8 @@ type modelVarUrls = {
 type apiParamStrs = {
     countyQueryStr: string,
     scenariosQueryStr: string,
-    modelQueryStr: string
+    modelQueryStr: string,
+    freqQueryStr: string,
 }
 
 interface DashboardProps {
@@ -84,7 +85,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [apiParams, setApiParams] = useState<apiParamStrs>({
         countyQueryStr: '',
         scenariosQueryStr: '',
-        modelQueryStr: ''
+        modelQueryStr: '',
+        freqQueryStr: '',
     })
     const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
     useEffect(() => {
@@ -114,9 +116,11 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const onFormDataSubmit = async () => {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
 
+        console.log('apiparams')
+        console.log(apiParams)
         const queryParams = new URLSearchParams({
             limit: '50',
-            filter: "collection='loca2-day-county'" + (apiParams?.scenariosQueryStr ? " AND " + apiParams?.scenariosQueryStr : '') + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
+            filter: (apiParams?.freqQueryStr ? apiParams?.freqQueryStr : '') + (apiParams?.scenariosQueryStr ? " AND " + apiParams?.scenariosQueryStr : '') + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
             filter_lang: 'cql2-text',
         })
 
@@ -182,6 +186,9 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     async function createZip(links: string[]): Promise<void> {
         const zip = new JSZip()
 
+        console.log('links')
+        console.log(links)
+
         await Promise.all(links.map(async (link, index) => {
             const response = await fetch(link)
             const fileData = await response.blob()
@@ -195,7 +202,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         const url = window.URL.createObjectURL(content)
         const a = document.createElement('a')
         a.href = url
-        a.download = 'data-download-bundle-' + `${todaysDateAsString}` + '.zip' ;
+        a.download = 'data-download-bundle-' + `${todaysDateAsString}` + '-' + selectedFrequency + '.zip';
         a.click();
         window.URL.revokeObjectURL(url);
     }
@@ -203,14 +210,22 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     // FREQUENCY 
 
     const frequenciesList: string[] = ['Daily', 'Monthly']
-    
+
     const [selectedFrequency, setSelectedFrequency] = useState<string>('')
 
-    useDidMountEffect(() => {
+    const [collectionStr, setCollectionStr] = useState<string>('')
+
+    useEffect(() => {
         setPackageSettings({
             ...localPackageSettings,
             frequency: selectedFrequency
         })
+
+        if (selectedFrequency == 'Monthly') {
+            setCollectionStr('loca2-mon-county')
+        } else if (selectedFrequency == 'Daily') {
+            setCollectionStr('loca2-day-county')
+        }
 
     }, [selectedFrequency])
 
@@ -377,10 +392,11 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         updateApiParams({
             countyQueryStr: createOrStatement('countyname', selectedCounties),
             scenariosQueryStr: createOrStatement('cmip6:experiment_id', selectedScenarios),
-            modelQueryStr: createOrStatement('cmip6:source_id', modelsSelected)
+            modelQueryStr: createOrStatement('cmip6:source_id', modelsSelected),
+            freqQueryStr: "collection='" + collectionStr + "'"
         })
 
-    }, [selectedCounties, selectedScenarios, modelsSelected])
+    }, [selectedCounties, selectedScenarios, modelsSelected, collectionStr])
 
     const handleResize = () => {
         const width: number = window.innerWidth
