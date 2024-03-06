@@ -270,13 +270,17 @@ const PackageForm: React.FC<ChildFormProps> = ({
     }, [dataResponse])
 
     useEffect(() => {
-        console.log(isLoading)
+        console.log('isloading' + isLoading)
+    }, [isLoading])
+
+    useEffect(() => {
+
     }, [])
 
     return (
         <div className="package-form">
             {(sidebarState === 'download') && (
-                <div className={'package-contents ' + (isLoading ? 'loading-screen' : '')}>
+                <div className={'package-contents' + (isLoading ? ' loading-screen' : '')}>
                     <Typography className="inline" variant="h5">Download your data</Typography>
                     {dataResponse.length > 0 &&
                         <IconButton className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks)}>
