@@ -117,8 +117,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const onFormDataSubmit = async () => {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
 
-        console.log('apiparams')
-        console.log(apiParams)
         const queryParams = new URLSearchParams({
             limit: '50',
             filter: (apiParams?.freqQueryStr ? apiParams?.freqQueryStr : '') + (apiParams?.scenariosQueryStr ? " AND " + apiParams?.scenariosQueryStr : '') + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
@@ -184,7 +182,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     }
 
 
-    async function createZip(links: string[]): Promise<void> {
+    async function createZip(links: string[], extraFilenameStr: string): Promise<void> {
         const zip = new JSZip()
 
         await Promise.all(links.map(async (link, index) => {
@@ -200,7 +198,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         const url = window.URL.createObjectURL(content)
         const a = document.createElement('a')
         a.href = url
-        a.download = 'data-download-bundle-' + `${todaysDateAsString}` + '-' + selectedFrequency + '.zip';
+        a.download = 'data-download-bundle-' + `${todaysDateAsString}` + '-' + selectedFrequency + (extraFilenameStr ? '-' + extraFilenameStr : '') + '.zip';
         a.click();
         window.URL.revokeObjectURL(url);
     }

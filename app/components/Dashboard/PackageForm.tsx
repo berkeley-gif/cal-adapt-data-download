@@ -97,7 +97,7 @@ interface ChildFormProps {
     setSelectedScenarios: (selectedScenarios: string[]) => void,
     handleLocalPackageClear: () => void,
     onFormDataSubmit: () => unknown,
-    createZip: (links: string[]) => Promise<void>,
+    createZip: (links: string[], extraFilenameStr: string) => Promise<void>,
 }
 
 const PackageForm: React.FC<ChildFormProps> = ({
@@ -272,7 +272,6 @@ const PackageForm: React.FC<ChildFormProps> = ({
     }
 
     useEffect(() => {
-        console.log(dataResponse)
         if (dataResponse.length > 0) {
             setIsLoading(false)
         }
@@ -281,6 +280,17 @@ const PackageForm: React.FC<ChildFormProps> = ({
     useEffect(() => {
 
     }, [])
+
+
+    function genVarsLinks(variables: varUrl[]) : string [] {
+        let varsLinks: string[] = []
+
+        for (const idx in variables) {
+            varsLinks.push(variables[idx].href)
+        }
+
+        return varsLinks
+    }
 
     return (
         <div className="package-form">
@@ -317,6 +327,17 @@ const PackageForm: React.FC<ChildFormProps> = ({
                                         </div>
 
                                         <div className="option-group">
+                                            {
+                                                <IconButton className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(genVarsLinks(item.vars), ('variables-' + item.scenario + '-' + item.model))}>
+                                                    <Tooltip
+                                                        TransitionComponent={Fade}
+                                                        TransitionProps={{ timeout: 600 }}
+                                                        title="Download All Variables"
+                                                    >
+                                                        <DownloadOutlinedIcon />
+                                                    </Tooltip>
+                                                </IconButton>
+                                            }
                                             <Typography variant="h5">Variables</Typography>
                                             {(item.vars.length > 0) && (
                                                 <DataResultsTable varsResData={item.vars} selectedVars={selectedVars}></DataResultsTable>
