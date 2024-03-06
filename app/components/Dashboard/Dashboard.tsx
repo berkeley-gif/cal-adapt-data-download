@@ -182,7 +182,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     }
 
 
-
     async function createZip(links: string[]): Promise<void> {
         const zip = new JSZip()
 
@@ -200,7 +199,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         const url = window.URL.createObjectURL(content)
         const a = document.createElement('a')
         a.href = url
-        a.download = `${todaysDateAsString}` + '-data-download-bundle.zip';
+        a.download = 'data-download-bundle-' + `${todaysDateAsString}` + '.zip' ;
         a.click();
         window.URL.revokeObjectURL(url);
     }

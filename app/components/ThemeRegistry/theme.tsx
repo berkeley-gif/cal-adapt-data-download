@@ -3,8 +3,14 @@
 import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 import { createTheme } from '@mui/material/styles';
+import { IconButtonProps } from '@mui/material/IconButton'
 
 const { palette } = createTheme();
+
+// Define your custom variant type
+type CustomIconButtonProps = IconButtonProps & {
+  variant?: 'customVariant';
+};
 
 const theme = createTheme({
   palette: {
@@ -62,6 +68,16 @@ const theme = createTheme({
     borderRadius: 16,
   },
   components: {
+    MuiIconButton: {
+      styleOverrides: {
+        // Define your custom styles for 'customVariant' here
+        '&.MuiIconButton-green': {
+          // Define your custom styles here
+          backgroundColor: '#D3F1F8'
+          // Add more styles as needed
+        },
+      },
+    },
     MuiAlert: {
       variants: [
         {
