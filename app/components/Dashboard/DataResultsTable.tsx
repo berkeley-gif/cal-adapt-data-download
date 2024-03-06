@@ -25,7 +25,7 @@ const DataResultsTable: React.FC<DataResultsProps> = ({ varsResData, selectedVar
                 <TableHead>
                     <TableRow>
                         <TableCell>Name</TableCell>
-                        <TableCell align="center">Download</TableCell>
+                        <TableCell align="right">Download Single Variable</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -41,7 +41,6 @@ const DataResultsTable: React.FC<DataResultsProps> = ({ varsResData, selectedVar
                             </TableCell>
                             <TableCell align="right">
                                 <Button variant="contained" color="primary" onClick={() => { handleDownload(variable.href) }}>
-                                    <DownloadIcon />
                                     Download
                                 </Button>
                             </TableCell>

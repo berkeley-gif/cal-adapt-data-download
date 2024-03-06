@@ -298,7 +298,7 @@ const PackageForm: React.FC<ChildFormProps> = ({
                 <div className={'package-contents' + (isLoading ? ' loading-screen' : '')}>
                     <Typography className="inline" variant="h5">Download your data</Typography>
                     {dataResponse.length > 0 && !isDataDaily &&
-                        <IconButton className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks)}>
+                        <IconButton className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks, '')}>
                             <Tooltip
                                 TransitionComponent={Fade}
                                 TransitionProps={{ timeout: 600 }}
@@ -326,7 +326,7 @@ const PackageForm: React.FC<ChildFormProps> = ({
                                             {item.countyname}
                                         </div>
 
-                                        <div className="option-group">
+                                        <div className="option-group variables-group">
                                             {
                                                 <IconButton className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(genVarsLinks(item.vars), ('variables-' + item.scenario + '-' + item.model))}>
                                                     <Tooltip

@@ -118,7 +118,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
 
         const queryParams = new URLSearchParams({
-            limit: '50',
+            limit: '3480',
             filter: (apiParams?.freqQueryStr ? apiParams?.freqQueryStr : '') + (apiParams?.scenariosQueryStr ? " AND " + apiParams?.scenariosQueryStr : '') + (apiParams?.countyQueryStr ? " AND " + apiParams?.countyQueryStr : '') + (apiParams?.modelQueryStr ? " AND " + apiParams?.modelQueryStr : ''),
             filter_lang: 'cql2-text',
         })
