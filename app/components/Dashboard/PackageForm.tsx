@@ -68,6 +68,8 @@ interface FormFieldErrorStates {
 }
 
 interface ChildFormProps {
+    frequenciesList: string[],
+    selectedFrequency: string, 
     modelsList: string[],
     modelsSelected: string[],
     varsList: string[],
@@ -87,6 +89,7 @@ interface ChildFormProps {
     setDownloadLinks: (links: string[]) => void,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
+    setSelectedFrequency: (localPackageSettings: string) => void, 
     setSelectedVars: (selectedVars: string[]) => void,
     setModelsSelected: (selectedModels: string[]) => void,
     setSelectedCounties: (selectedCounties: string[]) => void,
@@ -103,6 +106,9 @@ const PackageForm: React.FC<ChildFormProps> = ({
     nextPageUrl,
     isPackageStored,
     localPackageSettings,
+    selectedFrequency, 
+    setSelectedFrequency, 
+    frequenciesList,
     modelsSelected,
     setModelsSelected,
     modelsList,
@@ -264,7 +270,7 @@ const PackageForm: React.FC<ChildFormProps> = ({
     }
 
     useEffect(() => {
-        if (dataResponse.length > 0)  {
+        if (dataResponse.length > 0) {
             setIsLoading(false)
         }
     }, [dataResponse])
@@ -368,6 +374,37 @@ const PackageForm: React.FC<ChildFormProps> = ({
                                 <p>{localPackageSettings.dataset}</p>
 
 
+                            </div>
+
+                        </div>
+
+                        <div className="container container--package-setting">
+                            <div className="option-group">
+                                <Typography className="option-group__title" variant="body2">Frequency</Typography>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Informational text about models"
+                                    placement="right-end"
+                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                <FormControl>
+                                    <Select
+                                        value={selectedFrequency}
+                                        onChange={(event: any) => {
+                                            setSelectedFrequency(event.target.value as string)
+                                        }}
+                                        MenuProps={MenuProps}
+                                        sx={{ mt: '15px', width: '380px' }}
+
+                                    >
+                                        {frequenciesList.map((frequency) => (
+                                            <MenuItem key={frequency} value={frequency}>
+                                                <ListItemText primary={frequency} />
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    {formErrorState.models && <div>One or more models need to be selected in order to continue</div>}
+                                </FormControl>
                             </div>
 
                         </div>

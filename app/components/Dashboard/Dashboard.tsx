@@ -200,6 +200,10 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         window.URL.revokeObjectURL(url);
     }
 
+    const frequenciesList: string[] = ['Daily', 'Monthly']
+    
+    const [selectedFrequency, setSelectedFrequency] = useState<string>('')
+
     // VARIABLES
 
     const varsList: string[] = (data.summaries['cmip6:variable_id']).map((obj: {}) => obj)
@@ -378,6 +382,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     useEffect(() => {
         setSelectedPackage(parseInt(localPackageSettings.id) >= 0 ? parseInt(localPackageSettings.id) : -1)
         setSelectedVars(localPackageSettings.vars.length > 0 ? stringToArray(localPackageSettings.vars) : [])
+        setSelectedFrequency('Monthly')
         setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
         setSelectedScenarios(localPackageSettings.scenarios.length > 0 ? stringToArray(localPackageSettings.scenarios) : [])
         setSelectedCounties(localPackageSettings.boundaries.length > 0 ? stringToArray(localPackageSettings.boundaries) : [])
@@ -633,6 +638,9 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                 modelsSelected={modelsSelected}
                                 setModelsSelected={setModelsSelected}
                                 isAllModelsSelected={isAllModelsSelected}
+                                frequenciesList={frequenciesList}
+                                selectedFrequency={selectedFrequency}
+                                setSelectedFrequency={setSelectedFrequency}
                                 modelsList={modelsList}
                                 genUseModelsList={genUseModelsList}
                                 selectedVars={selectedVars}
