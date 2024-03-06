@@ -270,8 +270,14 @@ const PackageForm: React.FC<ChildFormProps> = ({
                 <div className="package-contents">
                     <Typography className="inline" variant="h5">Download your data</Typography>
                     {dataResponse.length > 0 &&
-                        <IconButton variant="green" className="inline float-right" sx={{ mt: '-8px'}} onClick={() => createZip(downloadLinks)}>
-                            <DownloadOutlinedIcon />
+                        <IconButton variant="green" className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks)}>
+                            <Tooltip
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 600 }}
+                                title="Download All Results"
+                            >
+                                <DownloadOutlinedIcon />
+                            </Tooltip>
                         </IconButton>
                     }
                     {(dataResponse.length > 0) ? (
