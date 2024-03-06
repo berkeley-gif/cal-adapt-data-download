@@ -200,9 +200,19 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         window.URL.revokeObjectURL(url);
     }
 
+    // FREQUENCY 
+
     const frequenciesList: string[] = ['Daily', 'Monthly']
     
     const [selectedFrequency, setSelectedFrequency] = useState<string>('')
+
+    useDidMountEffect(() => {
+        setPackageSettings({
+            ...localPackageSettings,
+            frequency: selectedFrequency
+        })
+
+    }, [selectedFrequency])
 
     // VARIABLES
 
@@ -382,7 +392,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     useEffect(() => {
         setSelectedPackage(parseInt(localPackageSettings.id) >= 0 ? parseInt(localPackageSettings.id) : -1)
         setSelectedVars(localPackageSettings.vars.length > 0 ? stringToArray(localPackageSettings.vars) : [])
-        setSelectedFrequency('Monthly')
+        setSelectedFrequency(localPackageSettings.frequency !== '' ? localPackageSettings.frequency : 'Monthly')
         setModelsSelected(localPackageSettings.models.length > 0 ? stringToArray(localPackageSettings.models) : [])
         setSelectedScenarios(localPackageSettings.scenarios.length > 0 ? stringToArray(localPackageSettings.scenarios) : [])
         setSelectedCounties(localPackageSettings.boundaries.length > 0 ? stringToArray(localPackageSettings.boundaries) : [])
