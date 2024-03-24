@@ -25,7 +25,7 @@ const DataResultsTable: React.FC<DataResultsProps> = ({ varsResData, selectedVar
                 <TableHead>
                     <TableRow>
                         <TableCell>Name</TableCell>
-                        <TableCell align="right">Download Single Variable</TableCell>
+                        <TableCell align="right">Single variable</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

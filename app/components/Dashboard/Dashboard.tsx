@@ -118,6 +118,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [nextPageUrl, setNextPageUrl] = useState<string>('')
     const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(false)
     const [isDataDaily, setIsDataDaily] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [isBundling, setIsBundling] = useState(false)
 
     const onFormDataSubmit = async () => {
         const apiUrl = 'https://d3pv76zq0ekj5q.cloudfront.net/search'
@@ -232,10 +234,14 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     // Example loading indicator functions (replace with actual implementation)
     function showLoadingIndicator() {
+        setIsLoading(true)
+        setIsBundling(true)
         console.log('Loading...')
     }
 
     function hideLoadingIndicator() {
+        setIsLoading(false)
+        setIsBundling(false)
         console.log('Loading finished.')
     }
 
@@ -723,6 +729,10 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                 isDataDaily={isDataDaily}
                                 totalDataSize={totalDataSize}
                                 bytesToGBOrMB={bytesToGBOrMB}
+                                isLoading={isLoading}
+                                setIsLoading={setIsLoading}
+                                isBundling={isBundling}
+                                setIsBundling={setIsBundling}
                             ></PackageForm>
                         }
 
