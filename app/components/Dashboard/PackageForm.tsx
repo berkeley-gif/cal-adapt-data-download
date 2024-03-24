@@ -87,6 +87,7 @@ interface ChildFormProps {
     genUseModelsList: string[],
     downloadLinks: string[],
     isDataDaily: boolean,
+    totalDataSize: number,
     setDownloadLinks: (links: string[]) => void,
     setSidebarState: ((state: string) => void),
     setPackageSettings: (localPackageSettings: string[]) => void,
@@ -98,6 +99,7 @@ interface ChildFormProps {
     handleLocalPackageClear: () => void,
     onFormDataSubmit: () => unknown,
     createZip: (links: string[], extraFilenameStr: string) => Promise<void>,
+    bytesToGBOrMB: (bytes: number) => string
 }
 
 const PackageForm: React.FC<ChildFormProps> = ({
@@ -129,7 +131,9 @@ const PackageForm: React.FC<ChildFormProps> = ({
     dataResponse,
     handleLocalPackageClear,
     createZip,
-    isDataDaily }) => {
+    isDataDaily,
+    totalDataSize,
+    bytesToGBOrMB }) => {
 
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         models: false,
@@ -282,7 +286,7 @@ const PackageForm: React.FC<ChildFormProps> = ({
     }, [])
 
 
-    function genVarsLinks(variables: varUrl[]) : string [] {
+    function genVarsLinks(variables: varUrl[]): string[] {
         let varsLinks: string[] = []
 
         for (const idx in variables) {
@@ -297,16 +301,19 @@ const PackageForm: React.FC<ChildFormProps> = ({
             {(sidebarState === 'download') && (
                 <div className={'package-contents' + (isLoading ? ' loading-screen' : '')}>
                     <Typography className="inline" variant="h5">Download your data</Typography>
-                    {dataResponse.length > 0 && !isDataDaily &&
-                        <IconButton className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks, '')}>
-                            <Tooltip
-                                TransitionComponent={Fade}
-                                TransitionProps={{ timeout: 600 }}
-                                title="Download All Results"
-                            >
-                                <DownloadOutlinedIcon />
-                            </Tooltip>
-                        </IconButton>
+                    {dataResponse.length > 0 &&
+                        <div className="download-data">
+                            <span>(estimated bundle size {bytesToGBOrMB(totalDataSize)})</span>
+                            <IconButton className="inline float-right" sx={{ mt: '-8px' }} onClick={() => createZip(downloadLinks, '')}>
+                                <Tooltip
+                                    TransitionComponent={Fade}
+                                    TransitionProps={{ timeout: 600 }}
+                                    title="Download All Results"
+                                >
+                                    <DownloadOutlinedIcon />
+                                </Tooltip>
+                            </IconButton>
+                        </div>
                     }
                     {(dataResponse.length > 0) ?
                         (

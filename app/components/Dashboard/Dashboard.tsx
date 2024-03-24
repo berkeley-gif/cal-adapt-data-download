@@ -7,6 +7,10 @@ import logo from '@/public/img/logos/cal-adapt-data-download.png'
 
 import React, { useState, useEffect, useRef } from 'react'
 
+import { createWriteStream } from 'fs'
+import { Writable } from 'stream'
+import { downloadZip } from 'client-zip'
+
 import Alert from '@mui/material/Alert'
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
@@ -56,7 +60,8 @@ const DRAWER_WIDTH = 212
 
 type varUrl = {
     name: string,
-    href: string
+    href: string,
+    size: number
 }
 
 type modelVarUrls = {
@@ -80,6 +85,7 @@ interface DashboardProps {
 
 export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])
+    const [totalDataSize, setTotalDataSize] = useState<number>(0)
 
     // API PARAMS
     const [apiParams, setApiParams] = useState<apiParamStrs>({
@@ -105,7 +111,6 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
 
     const [downloadLinks, setDownloadLinks] = useState<string[]>([])
 
-
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
     const [overwriteDialogOpen, openOverwriteDialog] = useState<boolean>(false)
     const [tentativePackage, setTentativePackage] = useState<number>(-1)
@@ -115,7 +120,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
     const [isDataDaily, setIsDataDaily] = useState<boolean>(false)
 
     const onFormDataSubmit = async () => {
-        const apiUrl = 'https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/search'
+        const apiUrl = 'https://d3pv76zq0ekj5q.cloudfront.net/search'
 
         const queryParams = new URLSearchParams({
             limit: '3480',
@@ -129,12 +134,14 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
             try {
                 const res = await fetch(fullUrl)
                 const data = await res.json()
+
                 const apiResponseData: modelVarUrls[] = []
 
                 for (const modelIdx in data.features) {
 
                     // For each model in data response 
                     const assets = data.features[modelIdx].assets
+
 
                     const varsInModel: modelVarUrls = {
                         model: '',
@@ -143,22 +150,25 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                         vars: []
                     }
 
+                    // For each variable in models
                     for (const asset in assets) {
                         const varInVars: varUrl = {
                             name: '',
-                            href: ''
+                            href: '',
+                            size: 0
                         }
 
                         varInVars.name = asset
                         setDownloadLinks(prevState => [...prevState, assets[asset].href])
                         varInVars.href = assets[asset].href
+                        varInVars.size = assets[asset]['file:size']
+                        setTotalDataSize(totalDataSize => totalDataSize + varInVars.size)
                         varsInModel.vars.push(varInVars)
                     }
 
                     const modelScenarioStr = data.features[modelIdx].id
                     const modelScenarioStrArr = splitStringByPeriod(modelScenarioStr)
 
-                    //varsInModel.model = data.features[modelIdx].id
                     varsInModel.model = modelScenarioStrArr.length >= 0 ? modelScenarioStrArr[1] : ''
                     varsInModel.scenario = modelScenarioStrArr.length >= 0 ? modelScenarioStrArr[2] : ''
                     varsInModel.countyname = data.features[modelIdx].properties.countyname
@@ -181,26 +191,52 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
         setSidebarState('settings')
     }
 
+    function bytesToGBOrMB(bytes: number): string {
+        const fileSizeInGB = bytes / (1024 * 1024 * 1024);
+        const fileSizeInMB = bytes / (1024 * 1024);
+
+        if (fileSizeInGB >= 1) {
+            return fileSizeInGB.toFixed(2) + ' GB';
+        } else {
+            return fileSizeInMB.toFixed(2) + ' MB';
+        }
+    }
 
     async function createZip(links: string[], extraFilenameStr: string): Promise<void> {
-        const zip = new JSZip()
+        links.forEach(link => console.log(link))
 
-        await Promise.all(links.map(async (link, index) => {
-            const response = await fetch(link)
+        showLoadingIndicator()
+
+        const urlResponses = await Promise.all(links.map(url => fetch(url)))
+
+        const files = await Promise.all(urlResponses.map(async (response) => {
             const fileData = await response.blob()
-            const fileName = extractFilenameFromURL(link)
-            zip.file(`${fileName}`, fileData)
+            const fileName = extractFilenameFromURL(response.url)
+            return { name: fileName, input: fileData }
         }))
 
-        const content = await zip.generateAsync({ type: 'blob' })
+        const blob = await downloadZip(files).blob()
+        console.log(blob)
         const todaysDateAsString: string = getTodaysDateAsString()
 
-        const url = window.URL.createObjectURL(content)
+        const outputPath = 'data-download-bundle-' + `${todaysDateAsString}` + '-' + selectedFrequency + (extraFilenameStr ? '-' + extraFilenameStr : '') + '.zip';
+
+        hideLoadingIndicator()
+
         const a = document.createElement('a')
-        a.href = url
-        a.download = 'data-download-bundle-' + `${todaysDateAsString}` + '-' + selectedFrequency + (extraFilenameStr ? '-' + extraFilenameStr : '') + '.zip';
-        a.click();
-        window.URL.revokeObjectURL(url);
+        a.href = URL.createObjectURL(blob)
+        a.download = outputPath
+        a.click()
+        a.remove()
+    }
+
+    // Example loading indicator functions (replace with actual implementation)
+    function showLoadingIndicator() {
+        console.log('Loading...')
+    }
+
+    function hideLoadingIndicator() {
+        console.log('Loading finished.')
     }
 
     // FREQUENCY 
@@ -685,6 +721,8 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                 downloadLinks={downloadLinks}
                                 setDownloadLinks={setDownloadLinks}
                                 isDataDaily={isDataDaily}
+                                totalDataSize={totalDataSize}
+                                bytesToGBOrMB={bytesToGBOrMB}
                             ></PackageForm>
                         }
 
