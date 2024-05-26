@@ -22,6 +22,7 @@ import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
 import DataResultsTable from './DataResultsTable'
+import HtmlTooltip from './HtmlTooltip'
 import { variablesLookupTable, scenariosLookupTable, lookupValue } from '@/app/utils/lookupTables'
 import LoadingSpinner from './LoadingSpinner'
 
@@ -394,13 +395,17 @@ const PackageForm: React.FC<ChildFormProps> = ({
                         <div className="container container--package-setting">
                             <div className="option-group">
                                 <Typography className="option-group__title" variant="body2">Dataset</Typography>
-                                <Tooltip
+                                <HtmlTooltip
+                                    textFragment={
+                                        <React.Fragment>
+                                            <p>LOCA2 (Localized Constructed Analogs) hybrid- statistically downscaled CMIP6 climate projections</p>
+                                        </React.Fragment>
+                                    }
+                                    iconFragment={<InfoOutlinedIcon />}
                                     TransitionComponent={Fade}
                                     TransitionProps={{ timeout: 600 }}
-                                    title="Informational text about datasets"
                                     placement="right-end"
-                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
-
+                                />
                                 <p>{localPackageSettings.dataset}</p>
 
 
@@ -411,12 +416,18 @@ const PackageForm: React.FC<ChildFormProps> = ({
                         <div className="container container--package-setting">
                             <div className="option-group">
                                 <Typography className="option-group__title" variant="body2">Frequency</Typography>
-                                <Tooltip
+                                <HtmlTooltip
+                                    textFragment={
+                                        <React.Fragment>
+                                            <p>The timescale of the datae. All LOCA2 data is downscaled at a native daily resolution. A pre-aggregated version at a monthly resolution is also available</p>
+                                        </React.Fragment>
+                                    }
+                                    iconFragment={<InfoOutlinedIcon />}
                                     TransitionComponent={Fade}
                                     TransitionProps={{ timeout: 600 }}
-                                    title="Informational text about models"
                                     placement="right-end"
-                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                />
+
                                 <FormControl>
                                     <Select
                                         value={selectedFrequency}
@@ -443,12 +454,22 @@ const PackageForm: React.FC<ChildFormProps> = ({
                         <div className="container container--package-setting">
                             <div className="option-group">
                                 <Typography className="option-group__title" variant="body2">Scenarios</Typography>
-                                <Tooltip
+                                <HtmlTooltip
+                                    textFragment={
+                                        <React.Fragment>
+                                            <p>Shared Socioeconomic Pathways <a style={{ 'textDecoration': 'underline' }} href="https://www.ipcc-data.org/guidelines/pages/gcm_guide.html" target="_blank">(GCMs)</a> from the <a style={{ 'textDecoration': 'underline' }} href="https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change/" target="_blank">(SSPs)</a> describe potential pathways the world could take</p>
+                                            <ul style={{ 'marginLeft': '10px', 'marginTop': '10px' }}>
+                                                <li>SSP2-4.5: a middle of the road global emissions scenario</li>
+                                                <li>SSP3-7.0: high global emissions scenario</li>
+                                                <li>SSP5-8.5: very high global emissions scenario</li>
+                                            </ul>
+                                        </React.Fragment>
+                                    }
+                                    iconFragment={<InfoOutlinedIcon />}
                                     TransitionComponent={Fade}
                                     TransitionProps={{ timeout: 600 }}
-                                    title="Informational text about scenarios"
                                     placement="right-end"
-                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                />
                                 <Autocomplete
                                     multiple
                                     value={selectedScenarios}
@@ -487,12 +508,19 @@ const PackageForm: React.FC<ChildFormProps> = ({
                         <div className="container container--package-setting">
                             <div className="option-group">
                                 <Typography className="option-group__title" variant="body2">Models</Typography>
-                                <Tooltip
+                                <HtmlTooltip
+                                    textFragment={
+                                        <React.Fragment>
+                                            <p>Global Circulation Models <a style={{ 'textDecoration': 'underline' }} href="https://www.ipcc-data.org/guidelines/pages/gcm_guide.html" target="_blank">(GCMs)</a> from the <a style={{ 'textDecoration': 'underline' }} href="https://esgf-node.llnl.gov/projects/cmip6/" target="_blank">Coupled Model Intercomparison Project, Phase 6</a> represent physical processes in the atmosphere, ocean, cryosphere, and land surface.
+                                                For guidance on how to select models, please refer to the upcoming guidance page on the Analytics Engine. </p>
+                                        </React.Fragment>
+                                    }
+                                    iconFragment={<InfoOutlinedIcon />}
                                     TransitionComponent={Fade}
                                     TransitionProps={{ timeout: 600 }}
-                                    title="Informational text about models"
                                     placement="right-end"
-                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                />
+
                                 <FormControl error={formErrorState.models}>
                                     <Select
                                         multiple
@@ -531,12 +559,17 @@ const PackageForm: React.FC<ChildFormProps> = ({
                         <div className="container container--package-setting">
                             <div className="option-group">
                                 <Typography className="option-group__title" variant="body2">Variables</Typography>
-                                <Tooltip
+                                <HtmlTooltip
+                                    textFragment={
+                                        <React.Fragment>
+                                            <p>Climate variables available</p>
+                                        </React.Fragment>
+                                    }
+                                    iconFragment={<InfoOutlinedIcon />}
                                     TransitionComponent={Fade}
                                     TransitionProps={{ timeout: 600 }}
-                                    title="Informational text about variables"
                                     placement="right-end"
-                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                />
                                 <Autocomplete
                                     multiple
                                     value={selectedVars}
@@ -576,12 +609,17 @@ const PackageForm: React.FC<ChildFormProps> = ({
                         <div className="container container--package-setting">
                             <div className="option-group">
                                 <Typography className="option-group__title" variant="body2">Spatial Extent</Typography>
-                                <Tooltip
+                                <HtmlTooltip
+                                    textFragment={
+                                        <React.Fragment>
+                                            <p>Data is natively represented in 3km grids. Selecting a boundary layer (e.g. county), provides data for grid cells that are intersected by the boundary file.</p>
+                                        </React.Fragment>
+                                    }
+                                    iconFragment={<InfoOutlinedIcon />}
                                     TransitionComponent={Fade}
                                     TransitionProps={{ timeout: 600 }}
-                                    title="Informational text about spatial extent"
                                     placement="right-end"
-                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                />
                             </div>
 
                             <div className="option-group">
@@ -630,13 +668,18 @@ const PackageForm: React.FC<ChildFormProps> = ({
 
                         <div className="container container--package-setting">
                             <div className="option-group">
-                                <Typography className="option-group__title" variant="body2">Range</Typography>
-                                <Tooltip
+                                <Typography className="option-group__title" variant="body2">Time Frame</Typography>
+                                <HtmlTooltip
+                                    textFragment={
+                                        <React.Fragment>
+                                            <p>Data is available over the time period 1950-2100.</p>
+                                        </React.Fragment>
+                                    }
+                                    iconFragment={<InfoOutlinedIcon />}
                                     TransitionComponent={Fade}
                                     TransitionProps={{ timeout: 600 }}
-                                    title="Informational text about range"
                                     placement="right-end"
-                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                />
                                 <p>{localPackageSettings.rangeStart} - {localPackageSettings.rangeEnd}</p>
                             </div>
                         </div>
@@ -644,12 +687,17 @@ const PackageForm: React.FC<ChildFormProps> = ({
                         <div className="container container--package-setting">
                             <div className="option-group">
                                 <Typography className="option-group__title" variant="body2">Data Format</Typography>
-                                <Tooltip
+                                <HtmlTooltip
+                                    textFragment={
+                                        <React.Fragment>
+                                            <p><a style={{ 'textDecoration': 'underline' }} href="https://www.unidata.ucar.edu/software/netcdf/" target="_blank">NetCDF (Network Common Data Form)</a> is a machine-independent data array-oriented format for scientific data.</p>
+                                        </React.Fragment>
+                                    }
+                                    iconFragment={<InfoOutlinedIcon />}
                                     TransitionComponent={Fade}
                                     TransitionProps={{ timeout: 600 }}
-                                    title="Informational text about data format"
                                     placement="right-end"
-                                ><InfoOutlinedIcon></InfoOutlinedIcon></Tooltip>
+                                />
                                 <p>{localPackageSettings.dataFormat}</p>
                             </div>
                         </div>

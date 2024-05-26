@@ -1,0 +1,39 @@
+import * as React from 'react';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
+import { styled } from '@mui/material/styles'
+import PropTypes from 'prop-types';
+
+const HtmlTooltipContent = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: '#E5ECF6',
+        boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+        color: '#000000',
+        borderRadius: '6px',
+        maxWidth: 220,
+        padding: '15px'
+    },
+}))
+
+type HtmlTooltipProps = Omit<TooltipProps, 'title' | 'children'> & {
+    textFragment: React.ReactNode,
+    iconFragment: React.ReactElement
+}
+
+const HtmlTooltip: React.FC<HtmlTooltipProps> = ({ textFragment, iconFragment, ...props }) => {
+    return (
+        <div className='inline-tooltip'>
+            <HtmlTooltipContent title={textFragment} {...props}>
+                {iconFragment}
+            </HtmlTooltipContent>
+        </div >
+    )
+}
+
+HtmlTooltip.propTypes = {
+    textFragment: PropTypes.node.isRequired,
+    iconFragment: PropTypes.element.isRequired
+}
+
+export default HtmlTooltip
