@@ -633,7 +633,7 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                         Coming Soon
                                     </Typography>
                                     <Typography className="package__name" variant="body2" >
-                                        We're working on building more data packages
+                                        We&#39;re working on building more data packages
                                     </Typography>
                                 </div>
                         </div>
