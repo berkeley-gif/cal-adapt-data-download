@@ -33,6 +33,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
+import WatchLaterOutlined from '@mui/icons-material/WatchLaterOutlined';
 import StartIcon from '@mui/icons-material/Start';
 import Link from '@mui/material/Link';
 import List from '@mui/material/List';
@@ -626,7 +627,15 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                                     )}
                                 </div>
                             ))}
-
+                                <div className="package container container--package flex-center-col" >
+                                    <WatchLaterOutlined style={{'width': '50px', 'height': '50px'}}/>
+                                    <Typography className="package__name" variant="h6" >
+                                        Coming Soon
+                                    </Typography>
+                                    <Typography className="package__name" variant="body2" >
+                                        We're working on building more data packages
+                                    </Typography>
+                                </div>
                         </div>
                     </div>
 

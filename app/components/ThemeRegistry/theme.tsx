@@ -120,7 +120,7 @@ const theme = createTheme({
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          backgroundColor: '#E5ECF6',
+          backgroundColor: '#FFFFFF',
           boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
           color: '#000000',
           borderRadius: '6px',

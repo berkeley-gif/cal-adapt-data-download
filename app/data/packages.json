@@ -13,20 +13,5 @@
     "rangeEnd": "2100",
     "units": "Source",
     "disabled": false
-  },
-  {
-    "id": 1,
-    "name": "Statewide Summaries (Coming soon...)",
-    "dataset": "LOCA2",
-    "scenarios": "historical, ssp370",
-    "models": "ACCESS-CM2, MPI-ESM1-2-HR, EC-Earth3, FGOALS-g3, CNRM-ESM2-1",
-    "vars": "tasmax, tasmin, pr",
-    "boundaryType": "Census Tract",
-    "frequency": "Monthly",
-    "dataFormat": "CSV",
-    "rangeStart": "1950",
-    "rangeEnd": "2100",
-    "units": "Source",
-    "disabled": true
   }
 ]
