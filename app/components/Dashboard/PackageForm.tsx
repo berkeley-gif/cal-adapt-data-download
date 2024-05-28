@@ -398,7 +398,7 @@ const PackageForm: React.FC<ChildFormProps> = ({
                                 <HtmlTooltip
                                     textFragment={
                                         <React.Fragment>
-                                            <p>LOCA2 (Localized Constructed Analogs) hybrid- statistically downscaled CMIP6 climate projections</p>
+                                            <p>LOCA2 (Localized Constructed Analogs) hybrid-statistically downscaled CMIP6 climate projections</p>
                                         </React.Fragment>
                                     }
                                     iconFragment={<InfoOutlinedIcon />}
@@ -419,7 +419,7 @@ const PackageForm: React.FC<ChildFormProps> = ({
                                 <HtmlTooltip
                                     textFragment={
                                         <React.Fragment>
-                                            <p>The timescale of the datae. All LOCA2 data is downscaled at a native daily resolution. A pre-aggregated version at a monthly resolution is also available</p>
+                                            <p>The timescale of the data. All LOCA2 data is downscaled at a native daily resolution. A pre-aggregated version at a monthly resolution is also available</p>
                                         </React.Fragment>
                                     }
                                     iconFragment={<InfoOutlinedIcon />}
