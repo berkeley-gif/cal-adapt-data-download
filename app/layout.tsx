@@ -5,7 +5,7 @@ import ThemeRegistry from './components/ThemeRegistry/ThemeRegistry'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Cal Adapt - Data Download Tool',
+  title: 'Cal-Adapt Dashboard',
   description: '',
 }
 
