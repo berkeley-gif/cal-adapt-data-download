@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect, useRef } from 'react'
 
 import { downloadZip } from 'client-zip'
@@ -24,42 +26,21 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
 
-import SidePanel from './../Dashboard/SidePanel'
-import PackageForm from './../Data Download Tool/PackageForm'
+import SidePanel from '../../components/Dashboard/SidePanel'
+import PackageForm from '../../components/Data Download Tool/PackageForm'
+import { apiParamStrs, varUrl, modelVarUrls } from './../../dashboard/data-download-tool/types'
+import { useDashboardContextProvider } from '../../context/context'
+import { dataPackages } from '@/app/lib/data-download/dataPackages';
 
 import { createOrStatement, stringToArray, arrayToCommaSeparatedString, splitStringByPeriod, extractFilenameFromURL, getTodaysDateAsString } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
 import { variablesLookupTable, scenariosLookupTable, lookupValue, filterByFlag, modelsGenUseLookupTable } from '@/app/utils/lookupTables'
 
-type apiParamStrs = {
-    countyQueryStr: string,
-    scenariosQueryStr: string,
-    modelQueryStr: string,
-    freqQueryStr: string,
-}
 
-type varUrl = {
-    name: string,
-    href: string,
-    size: number
-}
+export default function DataDownload({ data }) {
+    console.log(data)
+    let { isSidePanelOpen, setSidePanelOpen } = useDashboardContextProvider()
 
-
-type modelVarUrls = {
-    model: string,
-    countyname: string,
-    scenario: string,
-    vars: varUrl[]
-}
-
-interface DataDownloadProps {
-    data: any,
-    packagesData: any,
-    isSidePanelOpen: boolean, 
-    setSidePanelOpen: (open: boolean) => void, 
-}
-
-export default function DataDownload({ data, packagesData, isSidePanelOpen, setSidePanelOpen}: DataDownloadProps) {
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])
     const [totalDataSize, setTotalDataSize] = useState<number>(0)
 
@@ -359,28 +340,28 @@ export default function DataDownload({ data, packagesData, isSidePanelOpen, setS
         if (tentativePackage >= 0) {
 
             setPackageSettings({
-                id: packagesData[tentativePackage].id,
-                dataset: packagesData[tentativePackage].dataset,
-                scenarios: packagesData[tentativePackage].scenarios,
-                models: packagesData[tentativePackage].models,
-                vars: packagesData[tentativePackage].vars,
-                boundaryType: packagesData[tentativePackage].boundaryType,
+                id: dataPackages[tentativePackage].id,
+                dataset: dataPackages[tentativePackage].dataset,
+                scenarios: dataPackages[tentativePackage].scenarios,
+                models: dataPackages[tentativePackage].models,
+                vars: dataPackages[tentativePackage].vars,
+                boundaryType: dataPackages[tentativePackage].boundaryType,
                 boundaries: '',
-                frequency: packagesData[tentativePackage].frequency,
-                dataFormat: packagesData[tentativePackage].dataFormat,
-                rangeStart: packagesData[tentativePackage].rangeStart,
-                rangeEnd: packagesData[tentativePackage].rangeEnd,
-                units: packagesData[tentativePackage].units,
-                disabled: packagesData[tentativePackage].disabled
+                frequency: dataPackages[tentativePackage].frequency,
+                dataFormat: dataPackages[tentativePackage].dataFormat,
+                rangeStart: dataPackages[tentativePackage].rangeStart,
+                rangeEnd: dataPackages[tentativePackage].rangeEnd,
+                units: dataPackages[tentativePackage].units,
+                disabled: dataPackages[tentativePackage].disabled
             })
 
-            setSelectedVars(stringToArray(packagesData[selectedPackage].vars))
-            setModelsSelected(stringToArray(packagesData[selectedPackage].models))
-            setSelectedScenarios(stringToArray(packagesData[selectedPackage].scenarios))
+            setSelectedVars(stringToArray(dataPackages[selectedPackage].vars))
+            setModelsSelected(stringToArray(dataPackages[selectedPackage].models))
+            setSelectedScenarios(stringToArray(dataPackages[selectedPackage].scenarios))
             setSelectedCounties([])
             setIsPkgStored(true)
             setSidebarState('settings')
-            toggleDrawer(true)
+            setSidePanelOpen(true)
         }
     }
 
@@ -390,10 +371,6 @@ export default function DataDownload({ data, packagesData, isSidePanelOpen, setS
             setIsPkgStored(false)
             setSidebarState('settings')
         }
-    }
-
-    function toggleDrawer(open: boolean) {
-        setSidePanelOpen(open);
     }
 
     useEffect(() => {
@@ -454,7 +431,7 @@ export default function DataDownload({ data, packagesData, isSidePanelOpen, setS
                     Select a data package preset from the options listed below
                 </Typography>
                 <div className="packages-grid">
-                    {packagesData.map((pkg: any) => (
+                    {dataPackages.map((pkg: any) => (
                         <div className="package container container--package" key={pkg.id}>
                             <Typography className="package__name" variant="h6" >
                                 {pkg.name}
@@ -542,14 +519,14 @@ export default function DataDownload({ data, packagesData, isSidePanelOpen, setS
                 anchor="right"
                 variant="temporary"
                 open={isSidePanelOpen}
-                onClose={() => toggleDrawer(false)}
+                onClose={() => setSidePanelOpen(false)}
             >
                 <Tooltip
                     TransitionComponent={Fade}
                     TransitionProps={{ timeout: 600 }}
                     title="Close the sidebar"
                 >
-                    <IconButton onClick={() => toggleDrawer(false)}>
+                    <IconButton onClick={() => setSidePanelOpen(false)}>
                         <CloseIcon />
                     </IconButton>
                 </Tooltip>

@@ -1,6 +1,6 @@
 import Drawer, { DrawerProps } from '@mui/material/Drawer'
 
-import './../../styles/components/sidepanel.scss'
+import './../../styles/dashboard/sidepanel.scss'
 
 interface SidePanelProps extends DrawerProps {
     classes?: Record<string, string>;

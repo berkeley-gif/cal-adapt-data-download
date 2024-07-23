@@ -21,10 +21,10 @@ import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
-import DataResultsTable from './../Data Download Tool/DataResultsTable'
-import HtmlTooltip from './../Dashboard/HtmlTooltip'
+import DataResultsTable from './DataResultsTable'
+import HtmlTooltip from '../Dashboard/HtmlTooltip'
 import { variablesLookupTable, scenariosLookupTable, lookupValue } from '@/app/utils/lookupTables'
-import LoadingSpinner from './../Dashboard/LoadingSpinner'
+import LoadingSpinner from '../Global/LoadingSpinner'
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;

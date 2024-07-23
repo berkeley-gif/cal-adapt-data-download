@@ -10,17 +10,18 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
 
+import { useDashboardContextProvider } from '../../context/context'
+
 interface ToolbarProps {
     toolName: string,
     tooltipTitle: string,
-    toggleDrawer: (open: boolean) => void,
     iconSrc: any,
     iconAlt: string,
-    isSidePanelOpen: boolean, 
-    setSidePanelOpen: (open: boolean) => void,
 }
 
-export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAlt, toggleDrawer, isSidePanelOpen, setSidePanelOpen }: ToolbarProps) {
+export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAlt }: ToolbarProps) {
+    let { isSidePanelOpen, setSidePanelOpen } = useDashboardContextProvider()
+
     return (
         <Toolbar className="toolbar-main" sx={{ justifyContent: `space-between` }}>
             <Breadcrumbs aria-label="breadcrumb">
@@ -34,7 +35,7 @@ export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAl
                 TransitionProps={{ timeout: 600 }}
                 title={tooltipTitle}
             >
-                <IconButton onClick={() => toggleDrawer(true)}>
+                <IconButton onClick={() => setSidePanelOpen(true)}>
                     <Image
                         src={iconSrc}
                         alt={iconAlt}

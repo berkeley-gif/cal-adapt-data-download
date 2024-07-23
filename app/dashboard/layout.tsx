@@ -5,7 +5,9 @@ import packageIcon from '@/public/img/icons/package.svg'
 import sidebarBg from '@/public/img/photos/ocean-thumbnail.png'
 import logo from '@/public/img/logos/cal-adapt-data-download.png'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { ReactNode, useState, useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
         purple: true;
@@ -13,71 +15,47 @@ declare module '@mui/material/Alert' {
     }
 }
 
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
+import AppBar from '@mui/material/AppBar'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import CssBaseline from '@mui/material/CssBaseline'
 import DatasetOutlinedIcon from '@mui/icons-material/DatasetOutlined'
-import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import StartIcon from '@mui/icons-material/Start';
-import Link from '@mui/material/Link';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Tooltip from '@mui/material/Tooltip';
-import Fade from '@mui/material/Fade';
-import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
+import Drawer from '@mui/material/Drawer'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
+import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined'
 
-import './../../styles/components/dashboard.scss'
+import '../styles/dashboard/dashboard.scss'
 
-import DataDownload from '../Data Download Tool/DataDownload'
-import CalDashToolbar from './CalDashToolbar'
+import CalDashToolbar from '../components/Dashboard/DashboardToolbar'
+import { DashboardContextProvider } from '../context/context'
+import { extractSegment } from '../utils/functions'
 
 const DRAWER_WIDTH = 212
 
-interface DashboardProps {
-    data: any,
-    packagesData: any,
+interface LayoutProps {
+    children: ReactNode;
 }
 
-export default function Dashboard({ data, packagesData }: DashboardProps) {
+export default function Layout({ children }: LayoutProps) {
+    const pathname = usePathname()
+    const selectedPage: string | null = extractSegment(pathname, 'dashboard/', '/')
     const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(false)
-    const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
-    const [selectedItem, setSelectedItem] = useState<string>('')
 
-    const handleItemClick = (item: string) => {
-        setSelectedItem(item);
-    }
-
-    const renderCalDashToolBar = () => {
-        switch (selectedItem) {
-            case 'Data Download Tool':
-                return <CalDashToolbar toolName='Data Download Tool' tooltipTitle='Review your selected package' toggleDrawer={toggleDrawer} iconSrc={packageIcon} iconAlt='Package icon that you can click on to see your current data package' isSidePanelOpen={isSidePanelOpen} setSidePanelOpen={setSidePanelOpen} />
-            case 'Solar Drought Visualizer':
-                return <CalDashToolbar toolName='Solar Drought Visualizer' tooltipTitle='Change your visualization parameters' toggleDrawer={toggleDrawer} iconSrc={packageIcon} iconAlt='Settings icon that you can click on to change your visualization' isSidePanelOpen={isSidePanelOpen} setSidePanelOpen={setSidePanelOpen} />
+    const renderCalDashToolBar = (): ReactNode => {
+        switch (selectedPage) {
+            case 'data-download-tool':
+                return <CalDashToolbar toolName='Data Download Tool' tooltipTitle='Review your selected package' iconSrc={packageIcon} iconAlt='Package icon that you can click on to see your current data package' />
+            case 'solar-drought-visualizer':
+                return <CalDashToolbar toolName='Solar Drought Visualizer' tooltipTitle='Change your visualization parameters' iconSrc={packageIcon} iconAlt='Settings icon that you can click on to change your visualization' />
             default:
-                return <CalDashToolbar toolName='Getting Started' tooltipTitle='Change your visualization parameters' toggleDrawer={toggleDrawer} iconSrc={packageIcon} iconAlt='Settings icon that you can click on to change your visualization' isSidePanelOpen={isSidePanelOpen} setSidePanelOpen={setSidePanelOpen} />
+                return <CalDashToolbar toolName='Getting Started' tooltipTitle='Change your visualization parameters' iconSrc={packageIcon} iconAlt='Settings icon that you can click on to change your visualization' />
         }
-    }
-
-    const renderContent = () => {
-        switch (selectedItem) {
-            case 'Data Download Tool':
-                return <DataDownload isSidePanelOpen={isSidePanelOpen} setSidePanelOpen={setSidePanelOpen} data={data} packagesData={packagesData} />
-            case 'Solar Drought Visualizer':
-                return <div>Solar Drought Visualizer</div>;
-            default:
-                return <div>Getting Started</div>;
-        }
-    };
-
-    function toggleDrawer(open: boolean) {
-        setSidePanelOpen(open)
     }
 
     const handleResize = () => {
@@ -105,7 +83,9 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                     position="fixed"
                     sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, ml: `${DRAWER_WIDTH}px`, backgroundColor: `#fffff`, boxShadow: `none`, borderBottom: `1px solid #e8e8e8` }}
                 >
-                    {renderCalDashToolBar()}
+                    <DashboardContextProvider>
+                        {renderCalDashToolBar()}
+                    </DashboardContextProvider>
                 </AppBar>
                 <Drawer
                     sx={{
@@ -146,24 +126,31 @@ export default function Dashboard({ data, packagesData }: DashboardProps) {
                             borderRadius: '12px'
                         },
                     }}>
-                        {['Data Download Tool', 'Solar Drought Visualizer'].map((text, index) => (
-                            <ListItem key={text} disablePadding onClick={() => handleItemClick(text)}>
-                                <ListItemButton>
-                                    <ListItemIcon>
-                                        {text == "Data Download Tool" ? <DatasetOutlinedIcon /> : <WbSunnyOutlinedIcon /> }
-                                    </ListItemIcon>
-                                    <ListItemText primary={text} />
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
+                        <ListItem key='data-download-tool' disablePadding>
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <DatasetOutlinedIcon />
+                                </ListItemIcon>
+                                <ListItemText primary='Data Download Tool' />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem key='solar-drought-visualizer' disablePadding>
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <WbSunnyOutlinedIcon />
+                                </ListItemIcon>
+                                <ListItemText primary='Solar Drought Visualizer' />
+                            </ListItemButton>
+                        </ListItem>
                     </List>
                 </Drawer>
                 <Box
                     component="main"
                     sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, mt: "64px" }}
                 >
-
-                    {renderContent()}
+                    <DashboardContextProvider>
+                        {children}
+                    </DashboardContextProvider>
                 </Box>
             </Box >
                 :
