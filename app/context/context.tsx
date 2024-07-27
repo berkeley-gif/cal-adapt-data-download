@@ -11,6 +11,10 @@ const DashboardContext = createContext<DashboardContextType | undefined>(undefin
 export const DashboardContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isSidePanelOpen, setSidePanelOpen] = useState<boolean>(false)
 
+    useEffect(() => {
+        console.log('sidepanel boolean set to: ' + isSidePanelOpen)
+    }, [isSidePanelOpen])
+    
     return (
         <DashboardContext.Provider value={{ isSidePanelOpen, setSidePanelOpen }}>
             {children}

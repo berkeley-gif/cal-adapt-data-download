@@ -26,7 +26,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
 
-import SidePanel from '../../components/Dashboard/SidePanel'
+import SidePanel from '../Dashboard/RightSidePanel'
 import PackageForm from '../../components/Data Download Tool/PackageForm'
 import { apiParamStrs, varUrl, modelVarUrls } from './../../dashboard/data-download-tool/types'
 import { useDashboardContextProvider } from '../../context/context'
@@ -38,7 +38,6 @@ import { variablesLookupTable, scenariosLookupTable, lookupValue, filterByFlag, 
 
 
 export default function DataDownload({ data }) {
-    console.log(data)
     let { isSidePanelOpen, setSidePanelOpen } = useDashboardContextProvider()
 
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])

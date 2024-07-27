@@ -6,7 +6,8 @@ import sidebarBg from '@/public/img/photos/ocean-thumbnail.png'
 import logo from '@/public/img/logos/cal-adapt-data-download.png'
 
 import React, { ReactNode, useState, useEffect } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
@@ -126,7 +127,7 @@ export default function Layout({ children }: LayoutProps) {
                             borderRadius: '12px'
                         },
                     }}>
-                        <ListItem key='data-download-tool' disablePadding>
+                        <ListItem key='data-download-tool' disablePadding component={Link} href="/dashboard/data-download-tool">
                             <ListItemButton>
                                 <ListItemIcon>
                                     <DatasetOutlinedIcon />
@@ -134,7 +135,7 @@ export default function Layout({ children }: LayoutProps) {
                                 <ListItemText primary='Data Download Tool' />
                             </ListItemButton>
                         </ListItem>
-                        <ListItem key='solar-drought-visualizer' disablePadding>
+                        <ListItem key='solar-drought-visualizer' disablePadding component={Link} href="/dashboard/solar-drought-visualizer">
                             <ListItemButton>
                                 <ListItemIcon>
                                     <WbSunnyOutlinedIcon />
