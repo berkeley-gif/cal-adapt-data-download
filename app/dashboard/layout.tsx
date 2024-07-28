@@ -4,6 +4,7 @@ import Image from 'next/image'
 import packageIcon from '@/public/img/icons/package.svg'
 import sidebarBg from '@/public/img/photos/ocean-thumbnail.png'
 import logo from '@/public/img/logos/cal-adapt-data-download.png'
+import { SidepanelProvider } from '@/app/context/SidepanelContext';
 
 import React, { ReactNode, useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -34,7 +35,6 @@ import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined'
 import '../styles/dashboard/dashboard.scss'
 
 import CalDashToolbar from '../components/Dashboard/DashboardToolbar'
-import { DashboardContextProvider } from '../context/context'
 import { extractSegment } from '../utils/functions'
 
 const DRAWER_WIDTH = 212
@@ -77,96 +77,94 @@ export default function Layout({ children }: LayoutProps) {
     }, [])
 
     return (
-        <div>
-            {!isMobileOrTablet ? <Box className="dashboard" sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <AppBar
-                    position="fixed"
-                    sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, ml: `${DRAWER_WIDTH}px`, backgroundColor: `#fffff`, boxShadow: `none`, borderBottom: `1px solid #e8e8e8` }}
-                >
-                    <DashboardContextProvider>
+        <SidepanelProvider>
+            <div>
+                {!isMobileOrTablet ? <Box className="dashboard" sx={{ display: 'flex' }}>
+                    <CssBaseline />
+                    <AppBar
+                        position="fixed"
+                        sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, ml: `${DRAWER_WIDTH}px`, backgroundColor: `#fffff`, boxShadow: `none`, borderBottom: `1px solid #e8e8e8` }}
+                    >
                         {renderCalDashToolBar()}
-                    </DashboardContextProvider>
-                </AppBar>
-                <Drawer
-                    sx={{
-                        width: DRAWER_WIDTH,
-                        flexShrink: 0,
-                        '& .MuiDrawer-paper': {
+                    </AppBar>
+                    <Drawer
+                        sx={{
                             width: DRAWER_WIDTH,
-                            boxSizing: 'border-box',
-                            backgroundImage: `url(${sidebarBg.src})`,
-                            backgroundRepeat: "no-repeat",
-                            backgroundSize: "cover",
-                            border: "none",
-                        },
-                    }}
-                    variant="permanent"
-                    anchor="left"
-                >
-                    <Toolbar>
-                        <Image
-                            src={logo}
-                            alt="Cal Adapt logo"
-                            className="cal-adapt-logo"
-                        />
-                    </Toolbar>
+                            flexShrink: 0,
+                            '& .MuiDrawer-paper': {
+                                width: DRAWER_WIDTH,
+                                boxSizing: 'border-box',
+                                backgroundImage: `url(${sidebarBg.src})`,
+                                backgroundRepeat: "no-repeat",
+                                backgroundSize: "cover",
+                                border: "none",
+                            },
+                        }}
+                        variant="permanent"
+                        anchor="left"
+                    >
+                        <Toolbar>
+                            <Image
+                                src={logo}
+                                alt="Cal Adapt logo"
+                                className="cal-adapt-logo"
+                            />
+                        </Toolbar>
 
 
-                    <List sx={{
-                        '& .MuiListItemIcon-root': {
-                            color: '#000',
-                        },
-                        // selected and (selected + hover) states
-                        '&& .Mui-selected, && .Mui-selected:hover': {
-                            bgcolor: 'rgba(247, 249, 251, 0.9)'
-                        },
-                        // hover states
-                        '& .MuiListItemButton-root:hover': {
-                            bgcolor: 'rgba(247, 249, 251, 0.6)',
-                            borderRadius: '12px'
-                        },
-                    }}>
-                        <ListItem key='data-download-tool' disablePadding component={Link} href="/dashboard/data-download-tool">
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <DatasetOutlinedIcon />
-                                </ListItemIcon>
-                                <ListItemText primary='Data Download Tool' />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem key='solar-drought-visualizer' disablePadding component={Link} href="/dashboard/solar-drought-visualizer">
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <WbSunnyOutlinedIcon />
-                                </ListItemIcon>
-                                <ListItemText primary='Solar Drought Visualizer' />
-                            </ListItemButton>
-                        </ListItem>
-                    </List>
-                </Drawer>
-                <Box
-                    component="main"
-                    sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, mt: "64px" }}
-                >
-                    <DashboardContextProvider>
+                        <List sx={{
+                            '& .MuiListItemIcon-root': {
+                                color: '#000',
+                            },
+                            // selected and (selected + hover) states
+                            '&& .Mui-selected, && .Mui-selected:hover': {
+                                bgcolor: 'rgba(247, 249, 251, 0.9)'
+                            },
+                            // hover states
+                            '& .MuiListItemButton-root:hover': {
+                                bgcolor: 'rgba(247, 249, 251, 0.6)',
+                                borderRadius: '12px'
+                            },
+                        }}>
+                            <ListItem key='data-download-tool' disablePadding component={Link} href="/dashboard/data-download-tool">
+                                <ListItemButton>
+                                    <ListItemIcon>
+                                        <DatasetOutlinedIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary='Data Download Tool' />
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem key='solar-drought-visualizer' disablePadding component={Link} href="/dashboard/solar-drought-visualizer">
+                                <ListItemButton>
+                                    <ListItemIcon>
+                                        <WbSunnyOutlinedIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary='Solar Drought Visualizer' />
+                                </ListItemButton>
+                            </ListItem>
+                        </List>
+                    </Drawer>
+                    <Box
+                        component="main"
+                        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, mt: "64px" }}
+                    >
                         {children}
-                    </DashboardContextProvider>
-                </Box>
-            </Box >
-                :
-                <div className="mobile-view">
-                    <div className="mobile-view__container">
-                        <Image
-                            src={logo}
-                            alt="Cal Adapt logo"
-                            className="cal-adapt-logo__mobile"
-                        />
-                        <Typography variant="body1">Due to the nature of the tools, the Cal-Adapt Dashboard is best used on a desktop or laptop computer</Typography>
-                        <Button variant="contained" href="https://cal-adapt.org">Go to the homepage</Button>
+                    </Box>
+                </Box >
+                    :
+                    <div className="mobile-view">
+                        <div className="mobile-view__container">
+                            <Image
+                                src={logo}
+                                alt="Cal Adapt logo"
+                                className="cal-adapt-logo__mobile"
+                            />
+                            <Typography variant="body1">Due to the nature of the tools, the Cal-Adapt Dashboard is best used on a desktop or laptop computer</Typography>
+                            <Button variant="contained" href="https://cal-adapt.org">Go to the homepage</Button>
+                        </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
+        </SidepanelProvider>
     )
 }

@@ -21,6 +21,7 @@ import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 
 import { searchObject } from "@/app/utils/functions"
 import { useDidMountEffect } from "@/app/utils/hooks"
+import { useSidepanel } from '@/app/context/SidepanelContext'
 import DataResultsTable from './DataResultsTable'
 import HtmlTooltip from '../Dashboard/HtmlTooltip'
 import { variablesLookupTable, scenariosLookupTable, lookupValue } from '@/app/utils/lookupTables'

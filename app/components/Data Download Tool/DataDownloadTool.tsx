@@ -26,11 +26,11 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
 
-import SidePanel from '../Dashboard/RightSidePanel'
-import PackageForm from '../../components/Data Download Tool/PackageForm'
+import SidePanel from '@/app/components/Dashboard/RightSidepanel'
+import { useSidepanel } from '@/app/context/SidepanelContext'
+import PackageForm from '@/app/components/Data Download Tool/PackageForm'
 import { apiParamStrs, varUrl, modelVarUrls } from './../../dashboard/data-download-tool/types'
-import { useDashboardContextProvider } from '../../context/context'
-import { dataPackages } from '@/app/lib/data-download/dataPackages';
+import { dataPackages } from '@/app/lib/data-download/dataPackages'
 
 import { createOrStatement, stringToArray, arrayToCommaSeparatedString, splitStringByPeriod, extractFilenameFromURL, getTodaysDateAsString } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
@@ -38,7 +38,7 @@ import { variablesLookupTable, scenariosLookupTable, lookupValue, filterByFlag, 
 
 
 export default function DataDownload({ data }) {
-    let { isSidePanelOpen, setSidePanelOpen } = useDashboardContextProvider()
+    const { open, toggleOpen } = useSidepanel()
 
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])
     const [totalDataSize, setTotalDataSize] = useState<number>(0)
@@ -360,7 +360,7 @@ export default function DataDownload({ data }) {
             setSelectedCounties([])
             setIsPkgStored(true)
             setSidebarState('settings')
-            setSidePanelOpen(true)
+            toggleOpen()
         }
     }
 
@@ -399,6 +399,7 @@ export default function DataDownload({ data }) {
 
     return (
         <div>
+            {/** Alerts */}
             <div className="alerts alerts-50">
                 <Alert variant="purple" severity="info">Looking for the full LOCA2 scientific data at daily resolution for the entire state of California?
                     <div className="cta">
@@ -517,15 +518,15 @@ export default function DataDownload({ data }) {
             <SidePanel
                 anchor="right"
                 variant="temporary"
-                open={isSidePanelOpen}
-                onClose={() => setSidePanelOpen(false)}
+                open={open}
+                onClose={toggleOpen}
             >
                 <Tooltip
                     TransitionComponent={Fade}
                     TransitionProps={{ timeout: 600 }}
                     title="Close the sidebar"
                 >
-                    <IconButton onClick={() => setSidePanelOpen(false)}>
+                    <IconButton onClick={toggleOpen}>
                         <CloseIcon />
                     </IconButton>
                 </Tooltip>

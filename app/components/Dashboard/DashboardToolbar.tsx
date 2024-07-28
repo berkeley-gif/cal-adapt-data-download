@@ -10,7 +10,7 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
 
-import { useDashboardContextProvider } from '../../context/context'
+import { useSidepanel } from '@/app/context/SidepanelContext'
 
 interface ToolbarProps {
     toolName: string,
@@ -20,7 +20,7 @@ interface ToolbarProps {
 }
 
 export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAlt }: ToolbarProps) {
-    let { isSidePanelOpen, setSidePanelOpen } = useDashboardContextProvider()
+    const { open, toggleOpen } = useSidepanel()
 
     return (
         <Toolbar className="toolbar-main" sx={{ justifyContent: `space-between` }}>
@@ -35,7 +35,7 @@ export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAl
                 TransitionProps={{ timeout: 600 }}
                 title={tooltipTitle}
             >
-                <IconButton onClick={() => setSidePanelOpen(true)}>
+                <IconButton onClick={toggleOpen}>
                     <Image
                         src={iconSrc}
                         alt={iconAlt}
