@@ -29,7 +29,7 @@ import Typography from '@mui/material/Typography'
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
 
 // Importing custom components and utilities
-import '@/app/styles/dashboard/data-download-tool.scss'
+
 
 import SidePanel from '@/app/components/Dashboard/RightSidepanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
