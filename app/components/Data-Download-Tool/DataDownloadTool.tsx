@@ -1,9 +1,11 @@
 'use client'
 
+// Importing necessary React hooks and utilities
 import React, { useState, useEffect, useRef } from 'react'
 
 import { downloadZip } from 'client-zip'
 
+// Importing Material-UI components
 import Alert from '@mui/material/Alert'
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
@@ -26,12 +28,14 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
 
+// Importing custom components and utilities
+import '@/app/styles/dashboard/data-download-tool.scss'
+
 import SidePanel from '@/app/components/Dashboard/RightSidepanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
-import PackageForm from '@/app/components/Data Download Tool/PackageForm'
-import { apiParamStrs, varUrl, modelVarUrls } from './../../dashboard/data-download-tool/types'
+import PackageForm from '@/app/components/Data-Download-Tool/PackageForm'
+import { apiParamStrs, varUrl, modelVarUrls } from '@/app/lib/data-download/types'
 import { dataPackages } from '@/app/lib/data-download/dataPackages'
-
 import { createOrStatement, stringToArray, arrayToCommaSeparatedString, splitStringByPeriod, extractFilenameFromURL, getTodaysDateAsString } from "@/app/utils/functions"
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
 import { variablesLookupTable, scenariosLookupTable, lookupValue, filterByFlag, modelsGenUseLookupTable } from '@/app/utils/lookupTables'
@@ -164,19 +168,17 @@ export default function DataDownload({ data }) {
     }
 
     function bytesToGBOrMB(bytes: number): string {
-        const fileSizeInGB = bytes / (1024 * 1024 * 1024);
-        const fileSizeInMB = bytes / (1024 * 1024);
+        const fileSizeInGB = bytes / (1024 * 1024 * 1024)
+        const fileSizeInMB = bytes / (1024 * 1024)
 
         if (fileSizeInGB >= 1) {
-            return fileSizeInGB.toFixed(2) + ' GB';
+            return fileSizeInGB.toFixed(2) + ' GB'
         } else {
-            return fileSizeInMB.toFixed(2) + ' MB';
+            return fileSizeInMB.toFixed(2) + ' MB'
         }
     }
 
     async function createZip(links: string[], extraFilenameStr: string): Promise<void> {
-        links.forEach(link => console.log(link))
-
         showLoadingIndicator()
 
         const urlResponses = await Promise.all(links.map(url => fetch(url)))
@@ -188,7 +190,6 @@ export default function DataDownload({ data }) {
         }))
 
         const blob = await downloadZip(files).blob()
-        console.log(blob)
         const todaysDateAsString: string = getTodaysDateAsString()
 
         const outputPath = 'data-download-bundle-' + `${todaysDateAsString}` + '-' + selectedFrequency + (extraFilenameStr ? '-' + extraFilenameStr : '') + '.zip';
@@ -202,17 +203,14 @@ export default function DataDownload({ data }) {
         a.remove()
     }
 
-    // Example loading indicator functions (replace with actual implementation)
     function showLoadingIndicator() {
         setIsLoading(true)
         setIsBundling(true)
-        console.log('Loading...')
     }
 
     function hideLoadingIndicator() {
         setIsLoading(false)
         setIsBundling(false)
-        console.log('Loading finished.')
     }
 
     // FREQUENCY 

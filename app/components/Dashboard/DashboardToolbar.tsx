@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-
+import React from 'react'
 import Image from 'next/image'
 
 import Breadcrumbs from '@mui/material/Breadcrumbs'
@@ -30,7 +29,7 @@ export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAl
                 </Link>
                 <Typography color="text.primary">{toolName}</Typography>
             </Breadcrumbs>
-            <Tooltip
+            <Tooltip 
                 TransitionComponent={Fade}
                 TransitionProps={{ timeout: 600 }}
                 title={tooltipTitle}

@@ -1,0 +1,68 @@
+.container {
+  background-color: #f7f9fb;
+  border-radius: 16px;
+  padding: 30px;
+
+  &--full {
+    width: 100%;
+  }
+
+  &--package {
+    background-color: #eef3f9;
+    border-radius: 16px;
+    padding: 25px;
+  }
+
+  & > div:nth-child(n + 2) {
+    padding-top: 20px;
+  }
+
+  & > p {
+    & > p {
+      padding-bottom: 5px;
+    }
+  }
+}
+
+.packages-grid {
+  margin: 16px 0;
+  display: flex;
+  justify-content: flex-start;
+  gap: 30px;
+  & > .package {
+    width: 50%;
+  }
+}
+
+.package {
+  &__settings {
+    list-style-type: none;
+    margin: 25px 0;
+
+    li {
+      p {
+        display: inline-block;
+      }
+    }
+  }
+}
+
+.package-contents {
+  padding-top: 20px;
+}
+
+.loading-screen {
+  display: grid;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.variables-group {
+  svg {
+    width: 17px;
+    height: 25px;
+    width: 25px;
+    margin-left: 0;
+    margin-bottom: -1px;
+  }
+}

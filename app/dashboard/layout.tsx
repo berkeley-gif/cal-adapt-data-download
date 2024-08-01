@@ -1,15 +1,15 @@
 'use client'
 
+import React, { ReactNode, useState, useEffect } from 'react'
+
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+
 import packageIcon from '@/public/img/icons/package.svg'
 import sidebarBg from '@/public/img/photos/ocean-thumbnail.png'
 import logo from '@/public/img/logos/cal-adapt-data-download.png'
 import { SidepanelProvider } from '@/app/context/SidepanelContext';
-
-import React, { ReactNode, useState, useEffect } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
         purple: true;
@@ -32,10 +32,10 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined'
 
-import '../styles/dashboard/dashboard.scss'
+import '@/app/styles/dashboard/dashboard.scss'
 
-import CalDashToolbar from '../components/Dashboard/DashboardToolbar'
-import { extractSegment } from '../utils/functions'
+import CalDashToolbar from '@/app/components/Dashboard/DashboardToolbar'
+import { extractSegment } from '@/app/utils/functions'
 
 const DRAWER_WIDTH = 212
 

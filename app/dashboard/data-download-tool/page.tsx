@@ -1,9 +1,10 @@
 import React from 'react'
 
-import DataDownload from '@/app/components/Data Download Tool/DataDownloadTool';
+import DataDownload from '@/app/components/Data-Download-Tool/DataDownloadTool';
+import '@/app/styles/dashboard/data-download-tool.scss'
 
 export async function getData() {
-    const res = await fetch('https://r0e5qa3kxj.execute-api.us-west-2.amazonaws.com/collections/loca2-mon-county')
+    const res = await fetch('https://d3pv76zq0ekj5q.cloudfront.net/collections/loca2-mon-county')
 
     if (!res.ok) {
         throw new Error('Failed to fetch data')

@@ -47,11 +47,19 @@ export const modelsGenUseLookupTable: flagTable[] = [
 ]
 
 
+/**
+* Filters a list of flags and returns a new list of values. This is a convenience function for use with filter ()
+* 
+* @param list - The list to filter.
+* @param flagTable - The flag table to filter on. Must be an array of flags.
+* 
+* @return { string [] } The filtered list of values. If there are no flags the array will be empty
+*/
 export function filterByFlag(list: flagTable[]): string[] {
   return list.filter(item => item.flag).map(item => item.value)
 }
 
-// Create a lookup function
+// Create a lookup function that returns the value associated with a key in a lookup
 export function lookupValue(key: string, table: LookupTable): string | undefined {
   return table[key]
 }

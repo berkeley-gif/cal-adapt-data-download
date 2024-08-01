@@ -1,9 +1,8 @@
 import React from 'react'
 
 import Drawer, { DrawerProps } from '@mui/material/Drawer'
-import { useSidepanel } from '@/app/context/SidepanelContext'
 
-import './../../styles/dashboard/sidepanel.scss'
+import '@/app/styles/dashboard/sidepanel.scss'
 
 interface SidePanelProps extends DrawerProps {
     classes?: Record<string, string>;
@@ -11,8 +10,6 @@ interface SidePanelProps extends DrawerProps {
 }
 
 const SidePanel: React.FC<SidePanelProps> = (props) => {
-    const { open, toggleOpen } = useSidepanel()
-    const { classes } = props
 
     return (
         <Drawer PaperProps={{

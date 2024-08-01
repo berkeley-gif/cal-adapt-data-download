@@ -1,7 +1,6 @@
 
 import { useState, useEffect, useRef, Dispatch, SetStateAction } from 'react'
 
-
 // Custom hook to store state in local cache
 type SetValue<T> = Dispatch<SetStateAction<T>>;
 
