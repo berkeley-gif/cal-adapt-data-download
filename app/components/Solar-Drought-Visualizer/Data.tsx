@@ -1,5 +1,5 @@
-const nCol = 10;
-const nRow = 5;
+const nCol = 7;
+const nRow = 12;
 
 const alphabet = [
     "A",

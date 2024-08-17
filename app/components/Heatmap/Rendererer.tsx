@@ -1,17 +1,17 @@
+import { useMemo } from 'react'
 import * as d3 from 'd3'
-
-import React, { useState, useEffect, useRef, useMemo } from 'react'
-
-import Typography from '@mui/material/Typography'
+import { InteractionData } from './Heatmap'
 
 const MARGIN = { top: 10, right: 10, bottom: 30, left: 30 }
-type HeatmapProps = {
+
+type RendererProps = {
     width: number;
     height: number;
     data: { x: string; y: string, value: number | null }[];
+    setHoveredCell: (hoveredCell: InteractionData | null) => void
 }
 
-export default function Heatmap({ width, height, data }: HeatmapProps) {
+export default function Renderer({ width, height, data, setHoveredCell }: RendererProps) {
     // bounds = area inside the axis
     const boundsWidth = width - MARGIN.right - MARGIN.left
     const boundsHeight = height - MARGIN.top - MARGIN.bottom
@@ -27,16 +27,16 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
             .scaleBand()
             .range([0, boundsWidth])
             .domain(allXGroups)
-            .padding(0.01)
-    }, [data, width])
+            .padding(0.01);
+    }, [data, width]);
 
     const yScale = useMemo(() => {
         return d3
             .scaleBand()
             .range([boundsHeight, 0])
             .domain(allYGroups)
-            .padding(0.01)
-    }, [data, height])
+            .padding(0.01);
+    }, [data, height]);
 
     const filteredValues = data.map((d) => d.value).filter((value): value is number => value !== null)
     const [min, max] = d3.extent(filteredValues)
@@ -47,10 +47,13 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
 
     const colorScale = d3
         .scaleSequential()
-        .interpolator(d3.interpolateInferno)
+        .interpolator(d3.interpolateRgb('#FD6A55', '#EEE8DA'))
         .domain([min, max])
 
-    const allRects = data.map((d, i) => {
+    const allShapes = data.map((d, i) => {
+        const x = xScale(d.x)
+        const y = yScale(d.y)
+
         if (d.value == null) {
             return
         }
@@ -58,13 +61,25 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
             <rect
                 key={i}
                 r={4}
-                x={xScale(d.y)}
-                y={yScale(d.x)}
+                x={xScale(d.x)}
+                y={yScale(d.y)}
                 width={xScale.bandwidth()}
                 height={yScale.bandwidth()}
+                opacity={1}
                 fill={colorScale(d.value)}
-                rx={5}
+                rx={0}
                 stroke={"white"}
+                onMouseEnter={(e) => {
+                    setHoveredCell({
+                        xLabel: 'group ' + d.x,
+                        yLabel: 'group ' + d.y,
+                        xPos: x + xScale.bandwidth() + MARGIN.left,
+                        yPos: y + xScale.bandwidth() / 2 + MARGIN.top,
+                        value: Math.round(d.value * 100) / 100,
+                    })
+                }}
+                onMouseLeave={() => setHoveredCell(null)}
+                cursor="pointer"
             />
         )
     })
@@ -80,7 +95,7 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
                 textAnchor="middle"
                 dominantBaseline="middle"
             >
-                <Typography variant="body1">{name}</Typography>
+                {name}
             </text>
 
         )
@@ -97,7 +112,7 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
                 textAnchor="end"
                 dominantBaseline="end"
             >
-                <Typography variant="body1">{name}</Typography>
+                {name}
             </text>
 
         )
@@ -111,7 +126,7 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
                     height={boundsHeight}
                     transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
                 >
-                    {allRects}
+                    {allShapes}
                     {xLabels}
                     {yLabels}
                 </g>
@@ -119,4 +134,3 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
         </div>
     )
 }
-
