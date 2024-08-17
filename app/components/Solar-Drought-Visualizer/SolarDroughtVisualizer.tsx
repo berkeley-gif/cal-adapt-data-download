@@ -43,6 +43,21 @@ export default function SolarDroughtViz() {
             </div>
             <Typography variant="h4">Solar Drought Visualizer</Typography>
             <div className="solar-drought-tool__heatmap">
+                <div className="flex-params">
+                    <div className="flex-params__item">
+                        <Typography className="option-group__title" variant="body2">Location</Typography>
+                        <Typography variant="body1">Alameda County</Typography>
+                    </div>
+                    <div className="flex-params__item">
+                        <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
+                        <Typography variant="body1">{globalWarmingSelected}</Typography>
+                    </div>
+                    <div className="flex-params__item">
+                        <Typography className="option-group__title" variant="body2">Photovoltaic Configuration</Typography>
+                        <Typography variant="body1">{photoConfigSelected}</Typography>
+                    </div>
+
+                </div>
                 <Heatmap width={550} height={481} data={data} />
             </div>
             <div className="solar-drought-tool__sidepanel">
