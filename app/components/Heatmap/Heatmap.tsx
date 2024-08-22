@@ -4,13 +4,14 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 
 import Renderer from '@/app/components/Heatmap/Rendererer'
 import MapTooltip from '@/app/components/Heatmap/MapTooltip'
+import { ApiResponse } from '../Solar-Drought-Visualizer/DataType'
 
 const MARGIN = { top: 10, right: 10, bottom: 30, left: 30 }
 
 type HeatmapProps = {
     width: number;
     height: number;
-    data: { x: string; y: string, value: number | null }[];
+    data: any;
 }
 
 export type InteractionData = {

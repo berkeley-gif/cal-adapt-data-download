@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
@@ -12,12 +12,13 @@ import Fade from '@mui/material/Fade'
 
 import Map from '@/app/components/Solar-Drought-Visualizer/Map'
 import Heatmap from '@/app/components/Heatmap/Heatmap'
-import { data } from '@/app/components/Solar-Drought-Visualizer/Data'
+import { dummyData } from '@/app/components/Solar-Drought-Visualizer/Data'
 import { Typography } from '@mui/material'
 import VizPrmsForm from './VisualizationParamsForm'
+import { ApiResponse } from './DataType'
 
 
-export default function SolarDroughtViz() {
+export default function SolarDroughtViz({ data }: any ) {
     // const data: any = await getData()
     const { open, toggleOpen } = useSidepanel()
 
@@ -34,6 +35,10 @@ export default function SolarDroughtViz() {
 
         console.log('onformdatasubmit')
     }
+
+    useEffect(() => {
+        console.log(data)
+    }, [])
 
     return (
         <div className="solar-drought-tool">
@@ -58,7 +63,7 @@ export default function SolarDroughtViz() {
                     </div>
 
                 </div>
-                <Heatmap width={550} height={481} data={data} />
+                <Heatmap width={900} height={480} data={data} />
             </div>
             <div className="solar-drought-tool__sidepanel">
                 {/** Sidepanel */}

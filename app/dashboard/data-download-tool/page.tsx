@@ -3,7 +3,7 @@ import React from 'react'
 import DataDownload from '@/app/components/Data-Download-Tool/DataDownloadTool';
 import '@/app/styles/dashboard/data-download-tool.scss'
 
-export async function getData() {
+async function getData() {
     const res = await fetch('https://d3pv76zq0ekj5q.cloudfront.net/collections/loca2-mon-county')
 
     if (!res.ok) {

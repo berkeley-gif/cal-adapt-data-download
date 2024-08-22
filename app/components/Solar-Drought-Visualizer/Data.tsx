@@ -1,4 +1,4 @@
-const nCol = 7;
+const nCol = 30;
 const nRow = 12;
 
 const alphabet = [
@@ -31,11 +31,11 @@ const alphabet = [
 ];
 
 type HeatmapData = { x: string; y: string; value: number }[];
-let data: HeatmapData = [];
+let dummyData: HeatmapData = [];
 
 for (let x = 0; x < nCol; x++) {
     for (let y = 0; y < nRow; y++) {
-        data.push({
+        dummyData.push({
             x: alphabet[x],
             y: alphabet[y],
             value: Math.random() * 40,
@@ -43,4 +43,4 @@ for (let x = 0; x < nCol; x++) {
     }
 }
 
-export { data };
+export { dummyData };
