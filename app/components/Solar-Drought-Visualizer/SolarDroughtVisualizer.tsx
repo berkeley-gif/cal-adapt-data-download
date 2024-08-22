@@ -63,7 +63,7 @@ export default function SolarDroughtViz({ data }: any ) {
                     </div>
 
                 </div>
-                <Heatmap width={900} height={480} data={data} />
+                <Heatmap width={900} height={500} data={data} />
             </div>
             <div className="solar-drought-tool__sidepanel">
                 {/** Sidepanel */}

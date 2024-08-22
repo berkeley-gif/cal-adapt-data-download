@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { Tooltip } from "@mui/material";
 import { InteractionData } from "./Heatmap";
 import '@/app/styles/dashboard/heatmap.scss'
@@ -25,11 +27,16 @@ export default function MapTooltip({ interactionData, width, height }: TooltipPr
 
     }
 
+    useEffect(() => {
+        console.log(interactionData)
+    }, [])
+
     return (
         <div style={{ width, height, position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
             <div className="map-tooltip" style={{ position: 'absolute', left: interactionData.xPos, top: interactionData.yPos }}>
                 {renderTooltipRow('x', interactionData.xLabel)}
                 {renderTooltipRow('y', interactionData.yLabel)}
+                {renderTooltipRow('value', interactionData.value)}
             </div>
         </div>
     )

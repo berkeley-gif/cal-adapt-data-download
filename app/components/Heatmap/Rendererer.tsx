@@ -57,19 +57,15 @@ export default function Renderer({ width, height, data, setHoveredCell }: Render
     const min = d3.min(flatData)
     const max = d3.max(flatData)
 
-    console.log('min: ' + min)
-    console.log('max: ' + max)
-
     const colorScale = d3.scaleSequential<number>()
-        .interpolator(d3.interpolateRgb('#FD6A55', '#EEE8DA'))
+        
+        .interpolator(d3.interpolateRgbBasis(["#FD6A55", "#EEE8DA", "#DAEAEE"]))
         .domain([min, max])
 
     // Create x-axis labels (for years)
     const xLabels = allXGroups.map((year, i) => {
         const xPos = xScale(year) ?? 0;
 
-        console.log('xpos')
-        console.log(xPos)
         return (
             <text
                 key={i}
