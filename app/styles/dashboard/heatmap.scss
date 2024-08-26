@@ -17,3 +17,9 @@
         border-color: transparent black transparent transparent
     }
 }
+
+.color-legend { 
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
