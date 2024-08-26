@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 
 import { Tooltip } from "@mui/material";
-import { InteractionData } from "./Heatmap";
+import { InteractionData } from "./Heatmap"
 import '@/app/styles/dashboard/heatmap.scss'
+import { lookupValue, monthsLookupTable } from '@/app/utils/lookupTables'
 
 type TooltipProps = {
     interactionData: InteractionData | null;
@@ -34,9 +35,9 @@ export default function MapTooltip({ interactionData, width, height }: TooltipPr
     return (
         <div style={{ width, height, position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
             <div className="map-tooltip" style={{ position: 'absolute', left: interactionData.xPos, top: interactionData.yPos }}>
-                {renderTooltipRow('x', interactionData.xLabel)}
-                {renderTooltipRow('y', interactionData.yLabel)}
-                {renderTooltipRow('value', interactionData.value)}
+                {renderTooltipRow('Year', interactionData.xLabel)}
+                {renderTooltipRow('Month', interactionData.yLabel)}
+                {renderTooltipRow('Solar Drought days', interactionData.value)}
             </div>
         </div>
     )

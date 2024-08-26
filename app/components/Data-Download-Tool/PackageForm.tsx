@@ -185,7 +185,6 @@ const PackageForm: React.FC<ChildFormProps> = ({
         }
     }
 
-    // MODELS
     useDidMountEffect(() => {
         if (modelsSelected.length > 0) {
             let newFormState = formErrorState

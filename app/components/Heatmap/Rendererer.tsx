@@ -7,6 +7,8 @@ import { filter } from 'jszip'
 
 const MARGIN = { top: 15, right: 15, bottom: 55, left: 55 }
 
+import { lookupValue, monthsLookupTable } from '@/app/utils/lookupTables'
+
 type RendererProps = {
     width: number;
     height: number;
@@ -85,7 +87,7 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
                 textAnchor="end"
                 dominantBaseline="middle"
             >
-                {month}
+                {lookupValue(month, monthsLookupTable)}
             </text>
         );
     });
@@ -105,8 +107,8 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
                 stroke="white"
                 onMouseEnter={() => {
                     setHoveredCell({
-                        xLabel: `Year ${d.x}`,
-                        yLabel: `Month ${d.y}`,
+                        xLabel: `${d.x}`,
+                        yLabel: lookupValue(String(d.y), monthsLookupTable),
                         xPos: x + xScale.bandwidth() / 2 + MARGIN.left,
                         yPos: y + yScale.bandwidth() / 2 + MARGIN.top,
                         value: Math.round(d.value * 100) / 100,
@@ -119,23 +121,7 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
     })
 
     useEffect(() => {
-        console.log('groups')
-
-        console.log('allxgroups')
-        console.log(allXGroups)
-
-        console.log('allygroups')
-        console.log(allYGroups)
-
-        console.log('heatmapdata')
-        console.log(heatmapData)
-
-        console.log('ylabels')
-        console.log(yLabels)
-
-
-        console.log('xlabels')
-        console.log(xLabels)
+        // debugging code
     }, [])
 
 

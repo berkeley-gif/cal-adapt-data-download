@@ -98,7 +98,7 @@ const VizPrmsForm: React.FC<VizFormProps> = ({
                                 }}
                                 MenuProps={MenuProps}
                                 sx={{ mt: '15px', width: '380px' }}
-
+                                disabled
                             >
                                 {globalWarmingList.map((level) => (
                                     <MenuItem key={level} value={level}>

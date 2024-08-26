@@ -38,7 +38,6 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
             .interpolator(d3.interpolateRgbBasis(["#FD6A55", "#EEE8DA", "#DAEAEE"]))
             .domain([min, max])
 
-
     return (
         <div style={{ position: 'relative' }}>
             <Renderer

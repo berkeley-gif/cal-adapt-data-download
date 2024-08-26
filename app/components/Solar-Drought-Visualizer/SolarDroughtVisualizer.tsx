@@ -17,27 +17,69 @@ import { Typography } from '@mui/material'
 import VizPrmsForm from './VisualizationParamsForm'
 import { ApiResponse } from './DataType'
 
+type apiParamStrs = {
+    pointQueryStr: string,
+    configQueryStr: string,
+}
 
-export default function SolarDroughtViz({ data }: any ) {
-    // const data: any = await getData()
+export default function SolarDroughtViz({ data }: any) {
     const { open, toggleOpen } = useSidepanel()
 
-    const [globalWarmingSelected, setGlobalWarmingSelected] = useState('1.2')
-
-    const globalWarmingList = ['1.2', '1.5', '2.0']
+    const [globalWarmingSelected, setGlobalWarmingSelected] = useState('1.5')
+    const globalWarmingList = ['1.5']
 
     const [photoConfigSelected, setPhotoConfigSelected] = useState('Utility Configuration')
-
     const photoConfigList = ['Utility Configuration', 'Distributed Configuration']
 
-    const onFormDataSubmit = async () => {
-        const apiUrl = 'https://d3pv76zq0ekj5q.cloudfront.net/search'
+    const [queriedData, setQueriedData] = useState(data)
 
-        console.log('onformdatasubmit')
+    // API PARAMS
+    const [apiParams, setApiParams] = useState<apiParamStrs>({
+        pointQueryStr: '',
+        configQueryStr: '',
+    })
+
+    const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
+    useEffect(() => {
+        setApiParamsChanged(true)
+    }, [apiParams])
+
+
+    function updateApiParams(newParams: Partial<apiParamStrs>) {
+        setApiParams(prevParams => ({
+            ...prevParams,
+            ...newParams
+        }))
+    }
+
+    const onFormDataSubmit = async () => {
+        // https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/-120,38?url=s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/srdu/d03&variable=srdu
+        const apiUrl = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/-120,38'
+
+        const queryParams = new URLSearchParams({
+            url: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/srdu/d03',
+            variable: 'srdu'
+        })
+
+        const fullUrl = `${apiUrl}?${queryParams.toString()}`;
+
+        if (apiParamsChanged) {
+            try {
+                const res = await fetch(fullUrl)
+                const newData = await res.json()
+
+                if (newData) {
+                    setQueriedData(newData)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+            setApiParamsChanged(false)
+        }
     }
 
     useEffect(() => {
-        console.log(data)
+        // debugging code
     }, [])
 
     return (
@@ -50,8 +92,8 @@ export default function SolarDroughtViz({ data }: any ) {
             <div className="solar-drought-tool__heatmap">
                 <div className="flex-params">
                     <div className="flex-params__item">
-                        <Typography className="option-group__title" variant="body2">Location</Typography>
-                        <Typography variant="body1">Alameda County</Typography>
+                        <Typography className="option-group__title" variant="body2">Coordinates</Typography>
+                        <Typography variant="body1">[120,38]</Typography>
                     </div>
                     <div className="flex-params__item">
                         <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
@@ -63,7 +105,7 @@ export default function SolarDroughtViz({ data }: any ) {
                     </div>
 
                 </div>
-                <Heatmap width={900} height={500} data={data} />
+                <Heatmap width={900} height={500} data={queriedData} />
             </div>
             <div className="solar-drought-tool__sidepanel">
                 {/** Sidepanel */}
