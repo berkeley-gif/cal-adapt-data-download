@@ -12,7 +12,6 @@ import Fade from '@mui/material/Fade'
 
 import Map from '@/app/components/Solar-Drought-Visualizer/Map'
 import Heatmap from '@/app/components/Heatmap/Heatmap'
-import { dummyData } from '@/app/components/Solar-Drought-Visualizer/Data'
 import { Typography } from '@mui/material'
 import VizPrmsForm from './VisualizationParamsForm'
 import { ApiResponse } from './DataType'
@@ -27,10 +26,9 @@ export default function SolarDroughtViz({ data }: any) {
 
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('1.5')
     const globalWarmingList = ['1.5']
-
     const [photoConfigSelected, setPhotoConfigSelected] = useState('Utility Configuration')
     const photoConfigList = ['Utility Configuration', 'Distributed Configuration']
-
+    const [configStr, setConfigStr] = useState<string>('')
     const [queriedData, setQueriedData] = useState(data)
 
     // API PARAMS
@@ -39,7 +37,23 @@ export default function SolarDroughtViz({ data }: any) {
         configQueryStr: '',
     })
 
+    useEffect(() => {
+        if (photoConfigSelected == "Utility Configuration") {
+            setConfigStr('srdu')
+        } else if (photoConfigSelected == "Distributed Configuration") {
+            setConfigStr('srdd')
+        }
+    }, [photoConfigSelected])
+
+    useEffect(() => {
+        updateApiParams({
+            configQueryStr: configStr
+        })
+        console.log('configStr: ' + configStr)
+    }, [configStr])
+
     const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
+
     useEffect(() => {
         setApiParamsChanged(true)
     }, [apiParams])
@@ -56,14 +70,18 @@ export default function SolarDroughtViz({ data }: any) {
         // https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/-120,38?url=s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/srdu/d03&variable=srdu
         const apiUrl = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/-120,38'
 
+        console.log('apiparams')
+        console.log(apiParams)
         const queryParams = new URLSearchParams({
-            url: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/srdu/d03',
-            variable: 'srdu'
+            url: `s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/${configStr}/d03`,
+            variable: apiParams.configQueryStr
         })
 
-        const fullUrl = `${apiUrl}?${queryParams.toString()}`;
+        const fullUrl = `${apiUrl}?${queryParams.toString()}`
 
         if (apiParamsChanged) {
+
+            console.log(fullUrl)
             try {
                 const res = await fetch(fullUrl)
                 const newData = await res.json()
@@ -80,6 +98,7 @@ export default function SolarDroughtViz({ data }: any) {
 
     useEffect(() => {
         // debugging code
+        setConfigStr('sdru')
     }, [])
 
     return (

@@ -29,7 +29,7 @@ export default function MapTooltip({ interactionData, width, height }: TooltipPr
     }
 
     useEffect(() => {
-        console.log(interactionData)
+        
     }, [])
 
     return (
