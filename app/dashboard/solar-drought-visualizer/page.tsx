@@ -1,4 +1,5 @@
 
+import MapboxMap from '@/app/components/Solar-Drought-Visualizer/MapboxMap'
 import SolarDroughtViz from "@/app/components/Solar-Drought-Visualizer/SolarDroughtVisualizer"
 import '@/app/styles/global/layout.scss'
 
@@ -19,7 +20,13 @@ export default async function SolarDroughtVizWrapper() {
     const data: any = await getData()
 
     return (
-        <SolarDroughtViz data={data}></SolarDroughtViz>
+        <div className="solar-drought-tool">
+            <div className="solar-drought-tool__intro"></div>
+            <div className="solar-drought-tool_map">
+                <MapboxMap></MapboxMap>
+            </div>
+            <SolarDroughtViz data={data}></SolarDroughtViz>
+        </div>
     )
 
 }
