@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, ChangeEvent, ChangeEventHandler } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Autocomplete from '@mui/material/Autocomplete'
 import Checkbox from '@mui/material/Checkbox'
@@ -59,7 +59,7 @@ const MenuProps: any = {
         horizontal: "center"
     },
     variant: "menu"
-};
+}
 
 interface FormFieldErrorStates {
     models: boolean;
@@ -111,7 +111,6 @@ const PackageForm: React.FC<ChildFormProps> = ({
     genUseModelsList,
     downloadLinks,
     setDownloadLinks,
-    nextPageUrl,
     isPackageStored,
     localPackageSettings,
     selectedFrequency,
@@ -186,7 +185,6 @@ const PackageForm: React.FC<ChildFormProps> = ({
         }
     }
 
-    // MODELS
     useDidMountEffect(() => {
         if (modelsSelected.length > 0) {
             let newFormState = formErrorState

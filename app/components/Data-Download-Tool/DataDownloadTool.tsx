@@ -105,7 +105,7 @@ export default function DataDownload({ data }) {
         })
 
         const fullUrl = `${apiUrl}?${queryParams.toString()}`;
-
+        
         if (apiParamsChanged) {
             try {
                 const res = await fetch(fullUrl)

@@ -20,6 +20,32 @@
   padding-top: 30px;
 }
 
+.container {
+  background-color: #f7f9fb;
+  border-radius: 16px;
+  padding: 30px;
+
+  &--full {
+    width: 100%;
+  }
+
+  &--package {
+    background-color: #eef3f9;
+    border-radius: 16px;
+    padding: 25px;
+  }
+
+  & > div:nth-child(n + 2) {
+    padding-top: 20px;
+  }
+
+  & > p {
+    & > p {
+      padding-bottom: 5px;
+    }
+  }
+}
+
 .option-group {
   &__title {
     display: inline-block;

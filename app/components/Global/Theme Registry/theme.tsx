@@ -1,7 +1,4 @@
 // components/ThemeRegistry/theme.ts
-
-import { Inter } from 'next/font/google';
-const inter = Inter({ subsets: ['latin'] });
 import { createTheme } from '@mui/material/styles';
 import { IconButtonProps } from '@mui/material/IconButton'
 
@@ -10,7 +7,7 @@ const { palette } = createTheme();
 // Define your custom variant type
 type CustomIconButtonProps = IconButtonProps & {
   variant?: 'customVariant';
-};
+}
 
 const theme = createTheme({
   palette: {
