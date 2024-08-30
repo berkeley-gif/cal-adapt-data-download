@@ -49,7 +49,7 @@ export default function SolarDroughtViz({ data }: any) {
         updateApiParams({
             configQueryStr: configStr
         })
-        console.log('configStr: ' + configStr)
+        
     }, [configStr])
 
     const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
@@ -70,8 +70,6 @@ export default function SolarDroughtViz({ data }: any) {
         // https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/-120,38?url=s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/srdu/d03&variable=srdu
         const apiUrl = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/-120,38'
 
-        console.log('apiparams')
-        console.log(apiParams)
         const queryParams = new URLSearchParams({
             url: `s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/${configStr}/d03`,
             variable: apiParams.configQueryStr
@@ -87,6 +85,7 @@ export default function SolarDroughtViz({ data }: any) {
                 const newData = await res.json()
 
                 if (newData) {
+                    toggleOpen(false)
                     setQueriedData(newData)
                 }
             } catch (err) {
@@ -98,7 +97,7 @@ export default function SolarDroughtViz({ data }: any) {
 
     useEffect(() => {
         // debugging code
-        setConfigStr('sdru')
+        setConfigStr('srdu')
     }, [])
 
     return (

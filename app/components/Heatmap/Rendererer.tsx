@@ -62,22 +62,24 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
     const xLabels = allXGroups.map((year, i) => {
         const xPos = xScale(year) ?? 0;
 
-        return (
-            <text
-                key={i}
-                x={xPos + xScale.bandwidth() / 2}
-                y={boundsHeight + 30}
-                textAnchor="middle"
-                dominantBaseline="middle"
-            >
-                {year}
-            </text>
-        );
-    });
+        if ((year && Number(year) % 5 == 0) || (Number(year) == 0)) {
+            return (
+                <text
+                    key={i}
+                    x={xPos + xScale.bandwidth() / 2}
+                    y={boundsHeight + 30}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                >
+                    {year}
+                </text>
+            )
+        }
+    })
 
     // Create y-axis labels (for months)
     const yLabels = allYGroups.map((month, i) => {
-        const yPos = yScale(month) ?? 0;
+        const yPos = yScale(month) ?? 0
 
         return (
             <text
