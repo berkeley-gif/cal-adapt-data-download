@@ -37,8 +37,7 @@ export default function MapboxMap({ locationSelected, setLocationSelected }: Map
         type: 'fill',
         paint: {
             'fill-color': 'transparent',
-            'fill-opacity': 1.0,
-            'fill-outline-color': '#000'
+            'fill-opacity': 0,
         }
     };
 
