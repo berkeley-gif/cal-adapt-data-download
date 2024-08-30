@@ -10,7 +10,7 @@ import { useSidepanel } from '@/app/context/SidepanelContext'
 import CloseIcon from '@mui/icons-material/Close'
 import Fade from '@mui/material/Fade'
 
-import Map from '@/app/components/Solar-Drought-Visualizer/Map'
+import MapboxMap from '@/app/components/Solar-Drought-Visualizer/MapboxMap'
 import Heatmap from '@/app/components/Heatmap/Heatmap'
 import { Typography } from '@mui/material'
 import VizPrmsForm from './VisualizationParamsForm'
@@ -24,6 +24,7 @@ type apiParamStrs = {
 export default function SolarDroughtViz({ data }: any) {
     const { open, toggleOpen } = useSidepanel()
 
+    const [locationSelected, setLocationSelected] = useState<[number, number] | null>(null)
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('1.5')
     const globalWarmingList = ['1.5']
     const [photoConfigSelected, setPhotoConfigSelected] = useState('Utility Configuration')
@@ -49,7 +50,7 @@ export default function SolarDroughtViz({ data }: any) {
         updateApiParams({
             configQueryStr: configStr
         })
-        
+
     }, [configStr])
 
     const [apiParamsChanged, setApiParamsChanged] = useState<boolean>(false)
@@ -78,14 +79,12 @@ export default function SolarDroughtViz({ data }: any) {
         const fullUrl = `${apiUrl}?${queryParams.toString()}`
 
         if (apiParamsChanged) {
-
-            console.log(fullUrl)
             try {
                 const res = await fetch(fullUrl)
                 const newData = await res.json()
 
                 if (newData) {
-                    toggleOpen(false)
+                    toggleOpen()
                     setQueriedData(newData)
                 }
             } catch (err) {
@@ -104,14 +103,14 @@ export default function SolarDroughtViz({ data }: any) {
         <div className="solar-drought-tool">
             <div className="solar-drought-tool__intro"></div>
             <div className="solar-drought-tool__map">
-                <Map></Map>
+                <MapboxMap locationSelected={locationSelected} setLocationSelected={setLocationSelected}></MapboxMap>
             </div>
             <Typography variant="h4">Solar Drought Visualizer</Typography>
             <div className="solar-drought-tool__heatmap">
                 <div className="flex-params">
                     <div className="flex-params__item">
                         <Typography className="option-group__title" variant="body2">Coordinates</Typography>
-                        <Typography variant="body1">[120,38]</Typography>
+                        <Typography variant="body1">{locationSelected?.toString()}</Typography>
                     </div>
                     <div className="flex-params__item">
                         <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>

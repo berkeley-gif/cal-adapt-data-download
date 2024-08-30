@@ -8,12 +8,15 @@ import { Button } from '@mui/material'
 import GeocoderControl from './geocoder-control'
 import * as turf from '@turf/turf'
 
-export default function MapboxMap() {
+type MapboxMapProps = {
+    locationSelected: [number, number] | null;
+    setLocationSelected: (locationSelected: [number, number] | null) => void;
+}
+
+export default function MapboxMap({ locationSelected, setLocationSelected }: MapboxMapProps) {
 
     const mapRef = useRef<mapboxgl.Map | null>(null);
     const [mapLoaded, setMapLoaded] = useState(false);
-
-    const [locationSelected, setLocationSelected] = useState<[number, number] | null>(null)
 
     const [marker, setMarker] = useState<[number, number] | null>(null)
 
@@ -45,7 +48,7 @@ export default function MapboxMap() {
 
     const handleMapClick = (e: MapMouseEvent) => {
         if (e.features && e.features.length > 0) {
-            var selectedFeature = e.features[0];        
+            var selectedFeature = e.features[0];
             const centroid = turf.centroid(selectedFeature).geometry.coordinates;
 
             setMarker([centroid[0], centroid[1]]);
@@ -72,7 +75,7 @@ export default function MapboxMap() {
                     interactiveLayerIds={["grid"]}
                     onClick={handleMapClick}
                 >
-                    { marker &&
+                    {marker &&
                         <Marker longitude={marker[0]} latitude={marker[1]}>
                         </Marker>
                     }
@@ -85,15 +88,11 @@ export default function MapboxMap() {
                 </Map>
             </div>
             <br></br>
-            <div>
-                <div>Selected Location: {locationSelected?.toString()}</div>
-
-                <Button onClick={() => { handleSubmit() }} 
-                    variant="contained"
-                    disabled={locationSelected == null}
-                    >
-                    Generate Visualization &gt;</Button>
-            </div>
+            <Button onClick={() => { handleSubmit() }}
+                variant="contained"
+                disabled={locationSelected == null}
+            >
+                Generate Visualization &gt;</Button>
         </div>
     )
 }
