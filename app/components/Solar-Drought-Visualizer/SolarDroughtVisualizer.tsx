@@ -138,7 +138,7 @@ export default function SolarDroughtViz() {
                         </div>
                         <div className="flex-params__item">
                             <Typography className='inline' variant="subtitle1">Edit parameters</Typography>
-                            <IconButton className='inline' onClick={() => toggleOpen}>
+                            <IconButton className='inline' onClick={toggleOpen}>
                                 <SettingsIcon />
                             </IconButton>
                         </div>

@@ -35,7 +35,7 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
 
     const colorScale =
         d3.scaleSequential<string>()
-            .interpolator(d3.interpolateRgbBasis(["#FD6A55", "#EEE8DA", "#DAEAEE"]))
+            .interpolator(d3.interpolateRgbBasis(["#FD6A55", "#FFFFFF", "#25c6da"]))
             .domain([min, max])
 
     return (
