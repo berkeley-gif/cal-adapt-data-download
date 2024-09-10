@@ -3,14 +3,17 @@
 import 'mapbox-gl/dist/mapbox-gl.css'
 import 'react-map-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import React, { useRef, useState, useEffect } from 'react'
+import Typography from '@mui/material/Typography'
 import { Marker, Map, Layer, Source, MapMouseEvent, NavigationControl } from 'react-map-gl'
 import { Button } from '@mui/material'
 import GeocoderControl from './geocoder-control'
 import * as turf from '@turf/turf'
 
+type Location = [number, number]
+
 type MapboxMapProps = {
-    locationSelected: [number, number] | null;
-    setLocationSelected: (locationSelected: [number, number] | null) => void;
+    locationSelected: Location | null;
+    setLocationSelected: (locationSelected: Location | null) => void;
 }
 
 export default function MapboxMap({ locationSelected, setLocationSelected }: MapboxMapProps) {
@@ -55,7 +58,7 @@ export default function MapboxMap({ locationSelected, setLocationSelected }: Map
 
             setLocationSelected(centroid as [number, number])
 
-            console.log(locationSelected, marker)
+            //console.log(locationSelected, marker)
 
             // TODO clear geocoder search bar when map is clicked on
         }
@@ -63,8 +66,8 @@ export default function MapboxMap({ locationSelected, setLocationSelected }: Map
 
     return (
         <div className="map">
-            <h3>Select a location to generate your visualization</h3>
-            <span>Click on the map, or search for a place and then click on the map.</span>
+            <Typography className="inline" variant="h5">Select a location to generate your visualization</Typography>
+            <Typography variant="body1">Click on the map, or search for an adress and then click on the map.</Typography>
             <div id="map">
                 <Map
                     onLoad={handleMapLoad}
@@ -88,11 +91,11 @@ export default function MapboxMap({ locationSelected, setLocationSelected }: Map
                 </Map>
             </div>
             <br></br>
-            <Button onClick={() => { handleSubmit() }}
+            {/**<Button onClick={() => { handleSubmit() }}
                 variant="contained"
                 disabled={locationSelected == null}
             >
-                Generate Visualization &gt;</Button>
+                Generate Visualization &gt;</Button>**/}
         </div>
     )
 }

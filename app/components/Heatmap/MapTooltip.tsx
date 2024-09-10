@@ -28,10 +28,6 @@ export default function MapTooltip({ interactionData, width, height }: TooltipPr
 
     }
 
-    useEffect(() => {
-        
-    }, [])
-
     return (
         <div style={{ width, height, position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
             <div className="map-tooltip" style={{ position: 'absolute', left: interactionData.xPos, top: interactionData.yPos }}>

@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import { color } from 'd3'
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 type ColorLegendProps = {
     height: number;
@@ -28,7 +28,7 @@ export const ColorLegend = ({
 
     const allTicks = xScale.ticks(4).map((tick, idx) => {
         return (
-            <>
+            <React.Fragment key={`tick-${idx}`}>
                 <line
                     x1={xScale(tick)}
                     x2={xScale(tick)}
@@ -46,7 +46,7 @@ export const ColorLegend = ({
                 >
                     {tick}
                 </text>
-            </>
+            </React.Fragment>
         )
     })
 

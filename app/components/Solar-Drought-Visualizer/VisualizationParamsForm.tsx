@@ -51,6 +51,7 @@ interface VizFormProps {
     setPhotoConfigSelected: (val: string) => void,
     photoConfigList: string[],
     onFormDataSubmit: () => unknown,
+    toggleOpen: () => void
 }
 
 const VizPrmsForm: React.FC<VizFormProps> = ({
@@ -60,7 +61,8 @@ const VizPrmsForm: React.FC<VizFormProps> = ({
     setPhotoConfigSelected,
     photoConfigList,
     globalWarmingList,
-    onFormDataSubmit
+    onFormDataSubmit,
+    toggleOpen
 }) => {
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         globalWarming: false,
@@ -68,6 +70,7 @@ const VizPrmsForm: React.FC<VizFormProps> = ({
     })
 
     const handleSubmit = () => {
+        toggleOpen()
         onFormDataSubmit()
     }
 
@@ -146,11 +149,12 @@ const VizPrmsForm: React.FC<VizFormProps> = ({
                     </div>
                 </div>
 
-                <div className="cta">
+                {/**                <div className="cta">
                     <Button onClick={() => {
                         handleSubmit()
                     }} variant="contained">Refresh your visualization</Button>
-                </div>
+                </div> */}
+
             </div>
 
         </div>
