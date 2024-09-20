@@ -92,6 +92,17 @@ const theme = createTheme({
         },
       },
     },
+    MuiAccordion: {
+      styleOverrides: {
+        root: {
+          boxShadow: 'none',
+          '&:before': {
+            display: 'none',
+          },
+          borderBottom: '1px solid var(--black-10, rgba(28, 28, 28, 0.10))',  
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: ({ ownerState }) => ({

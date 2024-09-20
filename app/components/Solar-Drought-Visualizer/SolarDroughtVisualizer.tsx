@@ -5,11 +5,16 @@ import React, { useState, useEffect, useRef } from 'react'
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
 import SettingsIcon from '@mui/icons-material/Settings'
+import Accordion, { AccordionSlots } from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Fade from '@mui/material/Fade'
+import CloseIcon from '@mui/icons-material/Close'
 
 import SidePanel from '@/app/components/Dashboard/RightSidepanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
-import CloseIcon from '@mui/icons-material/Close'
-import Fade from '@mui/material/Fade'
+
 import { useDidMountEffect } from "@/app/utils/hooks"
 
 import MapboxMap from '@/app/components/Solar-Drought-Visualizer/MapboxMap'
@@ -35,6 +40,13 @@ export default function SolarDroughtViz() {
     const photoConfigList = ['Utility Configuration', 'Distributed Configuration']
     const [configStr, setConfigStr] = useState<string>('')
     const [queriedData, setQueriedData] = useState(null)
+    const [accordionExpanded, setAccordionExpanded] = useState(false)
+    const mapRef = useRef<any>(null); // Ref for the Mapbox component
+
+    // ACCORDION
+    const expandMap = () => {
+        setAccordionExpanded((prevExpanded: boolean) => !prevExpanded)
+    }
 
     // API PARAMS
     const [apiParams, setApiParams] = useState<apiParams>({
@@ -76,6 +88,17 @@ export default function SolarDroughtViz() {
             point: point
         })
     }
+    // Ensure the Mapbox map resizes when the accordion is expanded
+    useEffect(() => {
+        console.log('accordion expanded changed')
+        if (accordionExpanded && mapRef.current) {
+            console.log('accordion expanded & mapref current')
+            setTimeout(() => {
+                mapRef.current?.resize(); // Force map resize after expansion
+                console.log('map resize')
+            }, 300); // Delay to allow the accordion transition to complete
+        }
+    }, [accordionExpanded]);
 
     function updateApiParams(newParams: Partial<apiParams>) {
         setApiParams(prevParams => ({
@@ -101,7 +124,6 @@ export default function SolarDroughtViz() {
         })
         const fullUrl = `${apiUrl}?${queryParams.toString()}`
 
-        console.log(`calling api at ${fullUrl}`)
         try {
             const res = await fetch(fullUrl)
             const newData = await res.json()
@@ -118,9 +140,45 @@ export default function SolarDroughtViz() {
     return (
         <div className="solar-drought-tool">
             <div className="solar-drought-tool__intro"><Typography variant="h4">Solar Drought Visualizer</Typography></div>
-            <div className="solar-drought-tool__map">
-                <MapboxMap locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
-            </div>
+            <Accordion
+                expanded={accordionExpanded}
+                onChange={expandMap}
+                slots={{ transition: Fade as AccordionSlots['transition'] }}
+                slotProps={{ transition: { timeout: 400 } }}
+                sx={[
+                    accordionExpanded
+                        ? {
+                            '& .MuiAccordion-region': {
+                                height: 'auto',
+                            },
+                            '& .MuiAccordionDetails-root': {
+                                display: 'block',
+                            },
+                        }
+                        : {
+                            '& .MuiAccordion-region': {
+                                height: 0,
+                            },
+                            '& .MuiAccordionDetails-root': {
+                                display: 'none',
+                            },
+                        },
+                ]}
+            >
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1-content"
+                    id="panel1-header"
+                >
+                    <Typography className="inline" variant="h5">Select a location to generate your visualization</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <div className="solar-drought-tool__map">
+                        <MapboxMap ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
+                    </div>
+                </AccordionDetails>
+            </Accordion>
+
             {queriedData &&
                 (<div className="solar-drought-tool__heatmap">
                     <div className="flex-params">
