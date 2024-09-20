@@ -1,17 +1,26 @@
 .solar-drought-tool {
-    &__heatmap {
-        width: 1000px;
-    }
+  &__heatmap {
+    width: 1000px;
 
-    &__intro {
-        margin-bottom: 30px;
-    }
-    
+
+  }
+
+  &__intro {
+    margin-bottom: 30px;
+  }
+
+  .loading-screen {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    height: 300px;
+  }
 }
 
 .flex-params {
-    display: flex;
-    gap: 40px;
-    margin: 35px 0;
-    justify-content: end;
+  display: flex;
+  gap: 40px;
+  margin: 35px 0;
+  justify-content: end;
 }

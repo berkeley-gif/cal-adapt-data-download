@@ -23,6 +23,7 @@ import { Typography } from '@mui/material'
 import VizPrmsForm from './VisualizationParamsForm'
 import { ApiResponse } from './DataType'
 import '@/app/styles/dashboard/solar-drought-visualizer.scss'
+import LoadingSpinner from '../Global/LoadingSpinner'
 
 const TOOL_WIDTH = 1000
 
@@ -42,8 +43,11 @@ export default function SolarDroughtViz() {
     const photoConfigList = ['Utility Configuration', 'Distributed Configuration']
     const [configStr, setConfigStr] = useState<string>('')
     const [queriedData, setQueriedData] = useState(null)
+    const [isLocationSet, setIsLocationSet] = useState<boolean>(false)
     const [accordionExpanded, setAccordionExpanded] = useState(false)
     const mapRef = useRef<any>(null); // Ref for the Mapbox component
+    const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     // ACCORDION
     const expandMap = () => {
@@ -89,7 +93,17 @@ export default function SolarDroughtViz() {
         updateApiParams({
             point: point
         })
+        setIsLocationSet(true)
     }
+
+    // QUERIED DATA
+    useEffect(() => {
+        if (queriedData) {
+            setIsLoading(false)
+        }
+
+    }, [queriedData])
+
     // Ensure the Mapbox map resizes when the accordion is expanded
     useEffect(() => {
         console.log('accordion expanded changed')
@@ -116,7 +130,9 @@ export default function SolarDroughtViz() {
             return
         }
 
-        console.log(`location is selected at ${apiParams.point}`)
+        setIsLoading(true)
+        setAccordionExpanded(false)
+        
         const [long, lat] = apiParams.point
         const apiUrl = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/${long},${lat}`
 
@@ -140,67 +156,82 @@ export default function SolarDroughtViz() {
     }
 
     return (
-        <div className="solar-drought-tool" style={{'width': `${TOOL_WIDTH}px`}}>
+        <div className="solar-drought-tool" style={{ 'width': `${TOOL_WIDTH}px` }}>
             <div className="solar-drought-tool__intro"><Typography variant="h4">Solar Drought Visualizer</Typography></div>
-            <Accordion
-                expanded={accordionExpanded}
-                onChange={expandMap}
-                slots={{ transition: Fade as AccordionSlots['transition'] }}
-                slotProps={{ transition: { timeout: 400 } }}
-                sx={[
-                    accordionExpanded
-                        ? {
-                            '& .MuiAccordion-region': {
-                                height: 'auto',
-                            },
-                            '& .MuiAccordionDetails-root': {
-                                display: 'block',
-                            },
-                        }
-                        : {
-                            '& .MuiAccordion-region': {
-                                height: 0,
-                            },
-                            '& .MuiAccordionDetails-root': {
-                                display: 'none',
-                            },
-                        },
-                ]}
-            >
-                <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1-content"
-                    id="panel1-header"
-                >
+            {!isLocationSet &&
+                <div className="solar-drought-tool__initial-map">
                     <Typography className="inline" variant="h5">Select a location to generate your visualization</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
                     <div className="solar-drought-tool__map">
-                        <MapboxMap ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
+                        <MapboxMap mapMarker={mapMarker} setMapMarker={setMapMarker} ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
                     </div>
-                </AccordionDetails>
-            </Accordion>
-
-            {queriedData &&
-                (<div className="solar-drought-tool__heatmap" style={{'width': `${TOOL_WIDTH}px`}}>
-                    <div className="flex-params">
-                        <div className="flex-params__item">
-                            <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
-                            <Typography variant="body1">{globalWarmingSelected}</Typography>
+                </div>
+            }
+            {isLocationSet &&
+                <Accordion
+                    expanded={accordionExpanded}
+                    onChange={expandMap}
+                    slots={{ transition: Fade as AccordionSlots['transition'] }}
+                    slotProps={{ transition: { timeout: 400 } }}
+                    sx={[
+                        accordionExpanded
+                            ? {
+                                '& .MuiAccordion-region': {
+                                    height: 'auto',
+                                },
+                                '& .MuiAccordionDetails-root': {
+                                    display: 'block',
+                                },
+                            }
+                            : {
+                                '& .MuiAccordion-region': {
+                                    height: 0,
+                                },
+                                '& .MuiAccordionDetails-root': {
+                                    display: 'none',
+                                },
+                            },
+                    ]}
+                >
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1-content"
+                        id="panel1-header"
+                    >
+                        <Typography className="inline" variant="h5">Change your location</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <div className="solar-drought-tool__map">
+                            <MapboxMap mapMarker={mapMarker} setMapMarker={setMapMarker} ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
                         </div>
-                        <div className="flex-params__item">
-                            <Typography className="option-group__title" variant="body2">Photovoltaic Configuration</Typography>
-                            <Typography variant="body1">{photoConfigSelected}</Typography>
+                    </AccordionDetails>
+                </Accordion>}
+            <div className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '')} style={{ 'width': `${TOOL_WIDTH}px` }}>
+                {queriedData && !isLoading &&
+                    (<div>
+                        <div className="flex-params">
+                            <div className="flex-params__item">
+                                <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
+                                <Typography variant="body1">{globalWarmingSelected}</Typography>
+                            </div>
+                            <div className="flex-params__item">
+                                <Typography className="option-group__title" variant="body2">Photovoltaic Configuration</Typography>
+                                <Typography variant="body1">{photoConfigSelected}</Typography>
+                            </div>
+                            <div className="flex-params__item">
+                                <Typography className='inline' variant="subtitle1">Edit parameters</Typography>
+                                <IconButton className='inline' onClick={toggleOpen}>
+                                    <SettingsIcon />
+                                </IconButton>
+                            </div>
                         </div>
-                        <div className="flex-params__item">
-                            <Typography className='inline' variant="subtitle1">Edit parameters</Typography>
-                            <IconButton className='inline' onClick={toggleOpen}>
-                                <SettingsIcon />
-                            </IconButton>
-                        </div>
-                    </div>
-                    <Heatmap width={TOOL_WIDTH} height={500} data={queriedData && queriedData} />
-                </div>)}
+                        <Heatmap width={TOOL_WIDTH} height={500} data={queriedData && queriedData} />
+                    </div>)}
+                {isLoading &&
+                    (
+                        <LoadingSpinner />
+                    )
+                }
+            </div>
             <div className="solar-drought-tool__sidepanel">
                 {/** Sidepanel */}
                 <SidePanel
@@ -231,6 +262,6 @@ export default function SolarDroughtViz() {
                 </SidePanel>
             </div>
 
-        </div>
+        </div >
     )
 }

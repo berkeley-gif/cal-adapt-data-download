@@ -16,13 +16,14 @@ type Location = [number, number]
 type MapboxMapProps = {
     locationSelected: Location | null;
     setLocationSelected: (locationSelected: Location | null) => void;
+    mapMarker: [number, number] | null;
+    setMapMarker: (marker: [number, number] | null) => void;
 }
 const MapboxMap = forwardRef<mapboxgl.Map | null, MapboxMapProps>(
-    ({ locationSelected, setLocationSelected }, ref) => {
+    ({ locationSelected, setLocationSelected, mapMarker, setMapMarker }, ref) => {
 
-        const mapRef = useRef<mapboxgl.Map | null>(null); // Internal ref for the map instance
-        const [mapLoaded, setMapLoaded] = useState(false);
-        const [marker, setMarker] = useState<[number, number] | null>(null)
+        const mapRef = useRef<mapboxgl.Map | null>(null) // Internal ref for the map instance
+        const [mapLoaded, setMapLoaded] = useState(false)
 
         const initialViewState = {
             longitude: -122.4,
@@ -52,7 +53,7 @@ const MapboxMap = forwardRef<mapboxgl.Map | null, MapboxMapProps>(
                 const selectedFeature = e.features[0];
                 const centroid = turf.centroid(selectedFeature).geometry.coordinates;
 
-                setMarker([centroid[0], centroid[1]]);
+                setMapMarker([centroid[0], centroid[1]]);
                 setLocationSelected(centroid as [number, number]);
             }
         }
@@ -73,8 +74,8 @@ const MapboxMap = forwardRef<mapboxgl.Map | null, MapboxMapProps>(
                         interactiveLayerIds={["grid"]}
                         onClick={handleMapClick}
                     >
-                        {marker &&
-                            <Marker longitude={marker[0]} latitude={marker[1]}>
+                        {mapMarker &&
+                            <Marker longitude={mapMarker[0]} latitude={mapMarker[1]}>
                             </Marker>
                         }
 

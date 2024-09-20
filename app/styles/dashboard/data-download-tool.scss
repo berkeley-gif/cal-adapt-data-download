@@ -1,5 +1,3 @@
-
-
 .packages-grid {
   margin: 16px 0;
   display: flex;
@@ -25,6 +23,12 @@
 
 .package-contents {
   padding-top: 20px;
+
+  .lds-spinner {
+    width: 80px;
+    height: 80px;
+    margin-top: -180px;
+  }
 }
 
 .loading-screen {
