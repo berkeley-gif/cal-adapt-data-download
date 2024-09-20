@@ -65,7 +65,7 @@ export const ColorLegend = ({
     }, [width, height, colorScale])
 
     return (
-        <div style={{ width, height }}>
+        <div style={{ width, height, 'marginLeft': '120px' }}>
             <div
                 style={{
                     position: 'relative',

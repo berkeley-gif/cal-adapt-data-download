@@ -24,6 +24,8 @@ import VizPrmsForm from './VisualizationParamsForm'
 import { ApiResponse } from './DataType'
 import '@/app/styles/dashboard/solar-drought-visualizer.scss'
 
+const TOOL_WIDTH = 1000
+
 type Location = [number, number]
 
 type apiParams = {
@@ -138,7 +140,7 @@ export default function SolarDroughtViz() {
     }
 
     return (
-        <div className="solar-drought-tool">
+        <div className="solar-drought-tool" style={{'width': `${TOOL_WIDTH}px`}}>
             <div className="solar-drought-tool__intro"><Typography variant="h4">Solar Drought Visualizer</Typography></div>
             <Accordion
                 expanded={accordionExpanded}
@@ -180,7 +182,7 @@ export default function SolarDroughtViz() {
             </Accordion>
 
             {queriedData &&
-                (<div className="solar-drought-tool__heatmap">
+                (<div className="solar-drought-tool__heatmap" style={{'width': `${TOOL_WIDTH}px`}}>
                     <div className="flex-params">
                         <div className="flex-params__item">
                             <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
@@ -197,7 +199,7 @@ export default function SolarDroughtViz() {
                             </IconButton>
                         </div>
                     </div>
-                    <Heatmap width={1000} height={500} data={queriedData && queriedData} />
+                    <Heatmap width={TOOL_WIDTH} height={500} data={queriedData && queriedData} />
                 </div>)}
             <div className="solar-drought-tool__sidepanel">
                 {/** Sidepanel */}
