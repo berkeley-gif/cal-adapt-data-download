@@ -9,6 +9,8 @@ import { Button } from '@mui/material'
 import GeocoderControl from './geocoder-control'
 import * as turf from '@turf/turf'
 
+import '@/app/styles/dashboard/mapbox-map.scss'
+
 type Location = [number, number]
 
 type MapboxMapProps = {
@@ -64,9 +66,12 @@ export default function MapboxMap({ locationSelected, setLocationSelected }: Map
     }
 
     return (
-        <div className="map">
-            <Typography className="inline" variant="h5">Select a location to generate your visualization</Typography>
-            <Typography variant="body1">Click on the map, or search for an adress and then click on the map.</Typography>
+        <div className="map-container">
+            <div className="map-text">
+                <Typography className="inline" variant="h5">Select a location to generate your visualization</Typography>
+                <Typography variant="body1">Click on the map, or search for an adress and then click on the map.</Typography>
+            </div>
+
             <div id="map">
                 <Map
                     onLoad={handleMapLoad}

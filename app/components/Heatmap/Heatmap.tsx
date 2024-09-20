@@ -5,7 +5,6 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 
 import Renderer from '@/app/components/Heatmap/Rendererer'
 import MapTooltip from '@/app/components/Heatmap/MapTooltip'
-import { ApiResponse } from '../Solar-Drought-Visualizer/DataType'
 import { ColorLegend } from "../Solar-Drought-Visualizer/ColorLegend"
 import '@/app/styles/dashboard/heatmap.scss'
 

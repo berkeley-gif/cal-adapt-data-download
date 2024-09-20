@@ -17,6 +17,7 @@ import Heatmap from '@/app/components/Heatmap/Heatmap'
 import { Typography } from '@mui/material'
 import VizPrmsForm from './VisualizationParamsForm'
 import { ApiResponse } from './DataType'
+import '@/app/styles/dashboard/solar-drought-visualizer.scss'
 
 type Location = [number, number]
 
@@ -124,10 +125,6 @@ export default function SolarDroughtViz() {
                 (<div className="solar-drought-tool__heatmap">
                     <Typography variant="h4">Solar Drought Visualizer</Typography>
                     <div className="flex-params">
-                        <div className="flex-params__item">
-                            <Typography className="option-group__title" variant="body2">Coordinates</Typography>
-                            <Typography variant="body1">{apiParams.point?.toString()}</Typography>
-                        </div>
                         <div className="flex-params__item">
                             <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
                             <Typography variant="body1">{globalWarmingSelected}</Typography>
