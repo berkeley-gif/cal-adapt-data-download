@@ -11,6 +11,7 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Fade from '@mui/material/Fade'
 import CloseIcon from '@mui/icons-material/Close'
+import EditLocationOutlinedIcon from '@mui/icons-material/EditLocationOutlined';
 
 import SidePanel from '@/app/components/Dashboard/RightSidepanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
@@ -132,7 +133,7 @@ export default function SolarDroughtViz() {
 
         setIsLoading(true)
         setAccordionExpanded(false)
-        
+
         const [long, lat] = apiParams.point
         const apiUrl = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/${long},${lat}`
 
@@ -161,7 +162,7 @@ export default function SolarDroughtViz() {
             {!isLocationSet &&
                 <div className="solar-drought-tool__initial-map">
                     <Typography className="inline" variant="h5">Select a location to generate your visualization</Typography>
-                    <div className="solar-drought-tool__map">
+                    <div className="solar-drought-tool__map" style={{ 'marginTop': '30px'}}>
                         <MapboxMap mapMarker={mapMarker} setMapMarker={setMapMarker} ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
                     </div>
                 </div>
@@ -197,7 +198,8 @@ export default function SolarDroughtViz() {
                         aria-controls="panel1-content"
                         id="panel1-header"
                     >
-                        <Typography className="inline" variant="h5">Change your location</Typography>
+                        <EditLocationOutlinedIcon />
+                        <Typography className="inline" variant="h5" style={{'marginLeft': '10px'}}>Change your location</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <div className="solar-drought-tool__map">
