@@ -94,7 +94,6 @@ export default function MapboxMap({ locationSelected, setLocationSelected }: Map
                     <GeocoderControl zoom={13} mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN || ''} position="top-left" />
                 </Map>
             </div>
-            <br></br>
             {/**<Button onClick={() => { handleSubmit() }}
                 variant="contained"
                 disabled={locationSelected == null}

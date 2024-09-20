@@ -117,13 +117,12 @@ export default function SolarDroughtViz() {
 
     return (
         <div className="solar-drought-tool">
-            <div className="solar-drought-tool__intro"></div>
+            <div className="solar-drought-tool__intro"><Typography variant="h4">Solar Drought Visualizer</Typography></div>
             <div className="solar-drought-tool__map">
                 <MapboxMap locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
             </div>
             {queriedData &&
                 (<div className="solar-drought-tool__heatmap">
-                    <Typography variant="h4">Solar Drought Visualizer</Typography>
                     <div className="flex-params">
                         <div className="flex-params__item">
                             <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
@@ -140,7 +139,7 @@ export default function SolarDroughtViz() {
                             </IconButton>
                         </div>
                     </div>
-                    <Heatmap width={900} height={500} data={queriedData && queriedData} />
+                    <Heatmap width={1000} height={500} data={queriedData && queriedData} />
                 </div>)}
             <div className="solar-drought-tool__sidepanel">
                 {/** Sidepanel */}

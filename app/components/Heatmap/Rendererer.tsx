@@ -1,11 +1,11 @@
-import { useMemo, useEffect } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import * as d3 from 'd3'
 import { InteractionData } from './Heatmap'
 
 import { ApiResponse } from '../Solar-Drought-Visualizer/DataType'
 import { filter } from 'jszip'
 
-const MARGIN = { top: 15, right: 15, bottom: 55, left: 55 }
+const MARGIN = { top: 0, right: 15, bottom: 65, left: 115 }
 
 import { lookupValue, monthsLookupTable } from '@/app/utils/lookupTables'
 
@@ -122,11 +122,6 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
         )
     })
 
-    useEffect(() => {
-        // debugging code
-    }, [])
-
-
     return (
         <div className="heatmap">
             <svg width={width} height={height}>
@@ -136,10 +131,25 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
                     transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
                 >
                     {allRects}
-                    {xLabels}
+                    {xLabels.map((label, i) =>
+                        label ? React.cloneElement(label, {
+                            y: boundsHeight + 60,
+                        })
+                            : null
+                    )}
+                    <text
+                        x={boundsWidth / 2}
+                        y={boundsHeight + 30}
+                        textAnchor="middle"
+                        fontSize="1rem"
+                        fontWeight="bold"
+                    >
+                        Years from reaching GWL
+                    </text>
                     {yLabels}
                 </g>
             </svg>
+
         </div>
     )
 }
