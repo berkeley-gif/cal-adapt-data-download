@@ -38,6 +38,26 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
             .interpolator(d3.interpolateRgbBasis(["#FD6A55", "#ffffff", "#25c6da"]))
             .domain([min, max])
 
+    // modded color scale
+    /*   const colorScale =
+          d3.scaleSequential<string>()
+              .interpolator(d3.interpolateRgbBasis(["#FD6A55", '#5EC795', "#ffffff", '#FFBB78', "#25c6da"]))
+              .domain([min, max]) */
+
+    // viridis color scale
+    /*     const colorScale =
+            d3.scaleSequential<string>()
+                .interpolator(d3.interpolateRgbBasis(["#440154", "#482878", "#3e4989", "#31688e", "#26828e", "#1f9e89", "#35b779", "#6ece58", "#b5de2b", "#fde725"
+                ]))
+                .domain([min, max]) */
+
+    // cividis color scale
+    /*     const colorScale =
+            d3.scaleSequential<string>()
+                .interpolator(d3.interpolateRgbBasis([ "#002051", "#11366c", "#3c4d6e", "#62646f", "#7f7c75", "#9a9478", "#bbaf71", "#e2cb5c", "#fdea45"
+                ]))
+                .domain([min, max]) */
+
     return (
         <div style={{ position: 'relative' }}>
             <Renderer
@@ -50,7 +70,7 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
             <MapTooltip interactionData={hoveredCell} width={width} height={height} />
             <div className="color-legend" style={{ width: width }}>
                 <ColorLegend width={400} height={100} colorScale={colorScale} min={min} max={max} />
-                
+
             </div>
         </div>
     )
