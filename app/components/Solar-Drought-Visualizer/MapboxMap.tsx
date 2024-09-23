@@ -60,10 +60,6 @@ const MapboxMap = forwardRef<mapboxgl.Map | null, MapboxMapProps>(
 
         return (
             <div className="map-container">
-                <div className="map-text">
-                    <Typography variant="body1">Click on the map, or search for an address and then click on the map.</Typography>
-                </div>
-
                 <div id="map">
                     <Map
                         onLoad={handleMapLoad}

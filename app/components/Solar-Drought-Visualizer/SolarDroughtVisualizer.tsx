@@ -46,6 +46,8 @@ type apiParams = {
 export default function SolarDroughtViz() {
     const { open, toggleOpen } = useSidepanel()
 
+    const heatmapSection = useRef<HTMLDivElement>(null)
+
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('1.5')
     const globalWarmingList = ['1.5']
     const [photoConfigSelected, setPhotoConfigSelected] = useState('Utility Configuration')
@@ -62,6 +64,17 @@ export default function SolarDroughtViz() {
     // ACCORDION
     const expandMap = () => {
         setAccordionExpanded((prevExpanded: boolean) => !prevExpanded)
+    }
+
+    // SCROLL TO MAP
+    const scrollToMap = () => {
+        if (heatmapSection.current) {
+            const top = heatmapSection.current.scrollTop
+            heatmapSection.current.scroll({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
     }
 
     // API PARAMS
@@ -112,10 +125,11 @@ export default function SolarDroughtViz() {
             setIsLoading(false)
 
             if (queriedData.data[0][0]) {
-                console.log('point is valid')
+                // Point is valid
                 setIsPointValid(true)
+                scrollToMap()
             } else {
-                console.log('point is invalid')
+                // Point is Invalid
                 setIsPointValid(false)
             }
         }
@@ -149,7 +163,6 @@ export default function SolarDroughtViz() {
     const onFormDataSubmit = async () => {
         // https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/-120,38?url=s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/srdu/d03&variable=srdu
         if (!apiParams.point) {
-            console.log("Location is not selected")
             return
         }
 
@@ -171,7 +184,7 @@ export default function SolarDroughtViz() {
 
             if (newData) {
                 setQueriedData(newData)
-                console.log(queriedData)
+
 
             }
         } catch (err) {
@@ -184,56 +197,60 @@ export default function SolarDroughtViz() {
         <div className="solar-drought-tool" style={{ 'width': `${TOOL_WIDTH}px` }}>
             <div className="solar-drought-tool__intro"><Typography variant="h4">Solar Drought Visualizer</Typography>
                 <Typography variant="body1">This tool shows when there are likely to be significant reductions in solar energy availability in the future. To be more specific, it shows the number of solar resource drought days (less than 40% average generation) per month throughout a representative 30-year period. </Typography>
+                <a style={{ 'textDecoration': 'underline' }} href="https://docs.google.com/document/d/1HRISAkRb0TafiCSCOq773iqt2TtT2A9adZqDTAShvhE/edit?usp=sharing" target="_blank">Read more in the documentation</a>
             </div>
 
             {!isLocationSet &&
                 <div className="solar-drought-tool__initial-map">
                     <Typography className="inline" variant="h5">Select a location to generate your visualization</Typography>
-                    <div className="solar-drought-tool__map" style={{ 'marginTop': '30px' }}>
+                    <div className="solar-drought-tool__map" style={{ 'marginTop': '10px' }}>
                         <MapboxMap mapMarker={mapMarker} setMapMarker={setMapMarker} ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
                     </div>
                 </div>
             }
             {isLocationSet &&
-                <Accordion
-                    expanded={accordionExpanded}
-                    onChange={expandMap}
-                    slots={{ transition: Fade as AccordionSlots['transition'] }}
-                    slotProps={{ transition: { timeout: 400 } }}
-                    sx={[
-                        accordionExpanded
-                            ? {
-                                '& .MuiAccordion-region': {
-                                    height: 'auto',
+                <div ref={heatmapSection}>
+                    <Accordion
+                        expanded={accordionExpanded}
+                        onChange={expandMap}
+                        slots={{ transition: Fade as AccordionSlots['transition'] }}
+                        slotProps={{ transition: { timeout: 400 } }}
+                        sx={[
+                            accordionExpanded
+                                ? {
+                                    '& .MuiAccordion-region': {
+                                        height: 'auto',
+                                    },
+                                    '& .MuiAccordionDetails-root': {
+                                        display: 'block',
+                                    },
+                                }
+                                : {
+                                    '& .MuiAccordion-region': {
+                                        height: 0,
+                                    },
+                                    '& .MuiAccordionDetails-root': {
+                                        display: 'none',
+                                    },
                                 },
-                                '& .MuiAccordionDetails-root': {
-                                    display: 'block',
-                                },
-                            }
-                            : {
-                                '& .MuiAccordion-region': {
-                                    height: 0,
-                                },
-                                '& .MuiAccordionDetails-root': {
-                                    display: 'none',
-                                },
-                            },
-                    ]}
-                >
-                    <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1-content"
-                        id="panel1-header"
+                        ]}
                     >
-                        <EditLocationOutlinedIcon />
-                        <Typography className="inline" variant="h5" style={{ 'marginLeft': '10px' }}>Change your location</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <div className="solar-drought-tool__map">
-                            <MapboxMap mapMarker={mapMarker} setMapMarker={setMapMarker} ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
-                        </div>
-                    </AccordionDetails>
-                </Accordion>}
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="panel1-content"
+                            id="panel1-header"
+                        >
+                            <EditLocationOutlinedIcon />
+                            <Typography className="inline" variant="h5" style={{ 'marginLeft': '10px' }}>Change your location</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <div className="solar-drought-tool__map">
+                                <MapboxMap mapMarker={mapMarker} setMapMarker={setMapMarker} ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
+                            </div>
+                        </AccordionDetails>
+                    </Accordion>
+                </div>}
+
             <div className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '') + (!isLoading && !isPointValid ? ' invalid-point-screen' : '')} style={{ 'width': `${TOOL_WIDTH}px` }}>
                 {queriedData && !isLoading && isPointValid &&
                     (<div>
@@ -254,7 +271,7 @@ export default function SolarDroughtViz() {
                             </div>
                         </div>
                         <div className="alerts">
-                            <Alert variant="purple" severity="info">Global models estimate that 1.5 degree warming will be reached between <strong>2030</strong> and <strong>2040</strong>
+                            <Alert variant="purple" severity="info">Global models estimate that 1.5° global warming levels (GWL) will be reached between <strong>2030</strong> and <strong>2040</strong>
                                 <div className="cta">
                                     <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels">Learn more about GWL</Button>
                                 </div>
