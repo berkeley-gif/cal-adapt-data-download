@@ -57,6 +57,7 @@ export default function SolarDroughtViz() {
     const mapRef = useRef<any>(null); // Ref for the Mapbox component
     const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [isPointValid, setIsPointValid] = useState<boolean>(false)
 
     // ACCORDION
     const expandMap = () => {
@@ -109,18 +110,31 @@ export default function SolarDroughtViz() {
     useEffect(() => {
         if (queriedData) {
             setIsLoading(false)
+
+            if (queriedData.data[0][0]) {
+                console.log('point is valid')
+                setIsPointValid(true)
+            } else {
+                console.log('point is invalid')
+                setIsPointValid(false)
+            }
         }
 
     }, [queriedData])
 
+    // IS LOADING
+    useEffect(() => {
+        if (!isLoading && !isPointValid) {
+            console.log('map point invalid')
+        }
+
+    }, [isLoading])
+
     // Ensure the Mapbox map resizes when the accordion is expanded
     useEffect(() => {
-        console.log('accordion expanded changed')
         if (accordionExpanded && mapRef.current) {
-            console.log('accordion expanded & mapref current')
             setTimeout(() => {
                 mapRef.current?.resize(); // Force map resize after expansion
-                console.log('map resize')
             }, 300); // Delay to allow the accordion transition to complete
         }
     }, [accordionExpanded]);
@@ -157,6 +171,8 @@ export default function SolarDroughtViz() {
 
             if (newData) {
                 setQueriedData(newData)
+                console.log(queriedData)
+
             }
         } catch (err) {
             console.log(err)
@@ -218,8 +234,8 @@ export default function SolarDroughtViz() {
                         </div>
                     </AccordionDetails>
                 </Accordion>}
-            <div className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '')} style={{ 'width': `${TOOL_WIDTH}px` }}>
-                {queriedData && !isLoading &&
+            <div className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '') + (!isLoading && !isPointValid ? ' invalid-point-screen' : '')} style={{ 'width': `${TOOL_WIDTH}px` }}>
+                {queriedData && !isLoading && isPointValid &&
                     (<div>
                         <div className="flex-params">
                             <div className="flex-params__item">
@@ -250,6 +266,14 @@ export default function SolarDroughtViz() {
                 {isLoading &&
                     (
                         <LoadingSpinner />
+                    )
+                }
+                {!isLoading && !isPointValid && isLocationSet &&
+                    (
+                        <div>
+                            <Alert variant="grey" severity="info">The point you selected is not a valid point in the grid. <span className="underline" onClick={expandMap}><strong>Select another location</strong></span> to try again
+                            </Alert>
+                        </div>
                     )
                 }
             </div>

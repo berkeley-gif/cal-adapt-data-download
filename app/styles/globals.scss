@@ -63,3 +63,10 @@ a {
     max-width: 1200px;
   }
 }
+
+.underline {
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
