@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
-import SettingsIcon from '@mui/icons-material/Settings'
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import Accordion, { AccordionSlots } from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
@@ -233,7 +233,7 @@ export default function SolarDroughtViz() {
                             <div className="flex-params__item">
                                 <Typography className='inline' variant="subtitle1">Edit parameters</Typography>
                                 <IconButton className='inline' onClick={toggleOpen}>
-                                    <SettingsIcon />
+                                    <SettingsOutlinedIcon />
                                 </IconButton>
                             </div>
                         </div>

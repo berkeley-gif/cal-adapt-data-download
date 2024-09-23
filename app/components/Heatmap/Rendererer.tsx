@@ -62,7 +62,7 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
     const xLabels = allXGroups.map((year, i) => {
         const xPos = xScale(year) ?? 0;
 
-        if ((year && Number(year) % 5 == 0) || (Number(year) == 0)) {
+        if ((year && Number(year) % 5 == 0) || (Number(year) == 0) || (Number(year) == 14)) {
             return (
                 <text
                     key={i}

@@ -2,6 +2,8 @@ import * as d3 from 'd3'
 import { color } from 'd3'
 import React, { useEffect, useRef } from 'react'
 
+import Typography from '@mui/material/Typography'
+
 type ColorLegendProps = {
     height: number;
     width: number;
@@ -70,7 +72,8 @@ export const ColorLegend = ({
                 style={{
                     position: 'relative',
                     transform: `translate(${COLOR_LEGEND_MARGIN.left}px),
-                        ${COLOR_LEGEND_MARGIN.top}px`
+                        ${COLOR_LEGEND_MARGIN.top}px`,
+                        marginBottom: '25px'
                 }}
             >
                 <canvas ref={canvasRef} width={boundsWidth} height={boundsHeight} />
@@ -82,6 +85,7 @@ export const ColorLegend = ({
                     {allTicks}
                 </svg>
             </div>
+            <Typography style={{marginLeft: '12px'}} variant="subtitle1">Average number of solar resource drought days</Typography>
         </div>
     )
 }

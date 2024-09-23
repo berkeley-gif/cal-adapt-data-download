@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import packageIcon from '@/public/img/icons/package.svg'
+import settingsIcon from '@/public/img/icons/SettingsOutlined.svg'
 import sidebarBg from '@/public/img/photos/ocean-thumbnail.png'
 import logo from '@/public/img/logos/cal-adapt-data-download.png'
 import { SidepanelProvider } from '@/app/context/SidepanelContext';
@@ -53,7 +54,7 @@ export default function Layout({ children }: LayoutProps) {
             case 'data-download-tool':
                 return <CalDashToolbar toolName='Data Download Tool' tooltipTitle='Review your selected package' iconSrc={packageIcon} iconAlt='Package icon that you can click on to see your current data package' />
             case 'solar-drought-visualizer':
-                return <CalDashToolbar toolName='Solar Drought Visualizer' tooltipTitle='Change your visualization parameters' iconSrc={packageIcon} iconAlt='Settings icon that you can click on to change your visualization' />
+                return <CalDashToolbar toolName='Solar Drought Visualizer' tooltipTitle='Change your visualization parameters' iconSrc={settingsIcon} iconAlt='Settings icon that you can click on to change your visualization' />
             default:
                 return <CalDashToolbar toolName='Getting Started' tooltipTitle='Change your visualization parameters' iconSrc={packageIcon} iconAlt='Settings icon that you can click on to change your visualization' />
         }

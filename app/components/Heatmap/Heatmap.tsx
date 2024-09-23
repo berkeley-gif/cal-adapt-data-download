@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 
 import Renderer from '@/app/components/Heatmap/Rendererer'
 import MapTooltip from '@/app/components/Heatmap/MapTooltip'
+
 import { ColorLegend } from "../Solar-Drought-Visualizer/ColorLegend"
 import '@/app/styles/dashboard/heatmap.scss'
 
@@ -49,6 +50,7 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
             <MapTooltip interactionData={hoveredCell} width={width} height={height} />
             <div className="color-legend" style={{ width: width }}>
                 <ColorLegend width={400} height={100} colorScale={colorScale} min={min} max={max} />
+                
             </div>
         </div>
     )
