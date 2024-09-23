@@ -7,6 +7,9 @@
 
   &__intro {
     margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
   }
 
   .loading-screen {
@@ -15,6 +18,11 @@
     flex-direction: column;
     justify-content: center;
     height: 300px;
+  }
+
+  .alerts {
+    margin-left: 103px;
+    margin-right: 14px;
   }
 }
 

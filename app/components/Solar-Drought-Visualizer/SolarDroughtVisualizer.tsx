@@ -12,6 +12,14 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Fade from '@mui/material/Fade'
 import CloseIcon from '@mui/icons-material/Close'
 import EditLocationOutlinedIcon from '@mui/icons-material/EditLocationOutlined';
+import Alert from '@mui/material/Alert'
+declare module '@mui/material/Alert' {
+    interface AlertPropsVariantOverrides {
+        purple: true;
+        grey: true;
+    }
+}
+import Button from '@mui/material/Button'
 
 import SidePanel from '@/app/components/Dashboard/RightSidepanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
@@ -158,11 +166,14 @@ export default function SolarDroughtViz() {
 
     return (
         <div className="solar-drought-tool" style={{ 'width': `${TOOL_WIDTH}px` }}>
-            <div className="solar-drought-tool__intro"><Typography variant="h4">Solar Drought Visualizer</Typography></div>
+            <div className="solar-drought-tool__intro"><Typography variant="h4">Solar Drought Visualizer</Typography>
+                <Typography variant="body1">This tool shows when there are likely to be significant reductions in solar energy availability in the future. To be more specific, it shows the number of solar resource drought days (less than 40% average generation) per month throughout a representative 30-year period. </Typography>
+            </div>
+
             {!isLocationSet &&
                 <div className="solar-drought-tool__initial-map">
                     <Typography className="inline" variant="h5">Select a location to generate your visualization</Typography>
-                    <div className="solar-drought-tool__map" style={{ 'marginTop': '30px'}}>
+                    <div className="solar-drought-tool__map" style={{ 'marginTop': '30px' }}>
                         <MapboxMap mapMarker={mapMarker} setMapMarker={setMapMarker} ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
                     </div>
                 </div>
@@ -199,7 +210,7 @@ export default function SolarDroughtViz() {
                         id="panel1-header"
                     >
                         <EditLocationOutlinedIcon />
-                        <Typography className="inline" variant="h5" style={{'marginLeft': '10px'}}>Change your location</Typography>
+                        <Typography className="inline" variant="h5" style={{ 'marginLeft': '10px' }}>Change your location</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <div className="solar-drought-tool__map">
@@ -226,6 +237,14 @@ export default function SolarDroughtViz() {
                                 </IconButton>
                             </div>
                         </div>
+                        <div className="alerts">
+                            <Alert variant="purple" severity="info">Global models estimate that 1.5 degree warming will be reached between <strong>2030</strong> and <strong>2040</strong>
+                                <div className="cta">
+                                    <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels">Learn more about GWL</Button>
+                                </div>
+                            </Alert>
+                        </div>
+
                         <Heatmap width={TOOL_WIDTH} height={500} data={queriedData && queriedData} />
                     </div>)}
                 {isLoading &&
