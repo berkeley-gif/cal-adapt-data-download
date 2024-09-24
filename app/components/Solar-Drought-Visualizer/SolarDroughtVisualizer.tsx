@@ -271,7 +271,7 @@ export default function SolarDroughtViz() {
                             </div>
                         </div>
                         <div className="alerts">
-                            <Alert variant="purple" severity="info">Global models estimate that 1.5° global warming levels (GWL) will be reached between <strong>2030</strong> and <strong>2040</strong>
+                            <Alert variant="purple" severity="info">Global models estimate that 1.5° global warming levels (GWL) will be reached between <strong>2024</strong> and <strong>2041</strong>
                                 <div className="cta">
                                     <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels">Learn more about GWL</Button>
                                 </div>
