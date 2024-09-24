@@ -17,7 +17,7 @@ export default function MapTooltip({ interactionData, width, height }: TooltipPr
         return null
     }
 
-    const renderTooltipRow = (label: string, value: string) => {
+    const renderTooltipRow = (label: string, value: string | number) => {
         return (
             <div>
                 <b>{label}</b>

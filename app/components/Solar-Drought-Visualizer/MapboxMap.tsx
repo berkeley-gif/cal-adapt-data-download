@@ -87,4 +87,6 @@ const MapboxMap = forwardRef<mapboxgl.Map | null, MapboxMapProps>(
     }
 )
 
+MapboxMap.displayName = 'MapboxMap'
+
 export default MapboxMap

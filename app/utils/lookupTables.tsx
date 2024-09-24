@@ -29,18 +29,18 @@ export const scenariosLookupTable: LookupTable = {
 }
 
 export const monthsLookupTable: LookupTable = {
-  '1': 'January',
-  '2': 'February',
-  '3': 'March',
-  '4': 'April',
-  '5': 'May',
-  '6': 'June',
-  '7': 'July',
-  '8': 'August',
-  '9': 'September',
-  '10': 'October',
-  '11': 'November',
-  '12': 'December'
+  1: 'January',
+  2: 'February',
+  3: 'March',
+  4: 'April',
+  5: 'May',
+  6: 'June',
+  7: 'July',
+  8: 'August',
+  9: 'September',
+  10: 'October',
+  11: 'November',
+  12: 'December'
 }
 
 
@@ -76,6 +76,6 @@ export function filterByFlag(list: flagTable[]): string[] {
 }
 
 // Create a lookup function that returns the value associated with a key in a lookup
-export function lookupValue(key: string, table: LookupTable): string | undefined {
+export function lookupValue(key: string | number, table: LookupTable): string | undefined {
   return table[key]
 }

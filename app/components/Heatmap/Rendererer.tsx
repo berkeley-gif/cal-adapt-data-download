@@ -59,7 +59,7 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
 
 
     // Create x-axis labels (for years)
-    const xLabels = allXGroups.map((year, i) => {
+    const xLabels = allXGroups.map((year: number, i: number) => {
         const xPos = xScale(year) ?? 0;
 
         if ((year && Number(year) % 5 == 0) || (Number(year) == 0) || (Number(year) == 14)) {
@@ -78,7 +78,7 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
     })
 
     // Create y-axis labels (for months)
-    const yLabels = allYGroups.map((month, i) => {
+    const yLabels = allYGroups.map((month: number, i: number) => {
         const yPos = yScale(month) ?? 0
 
         return (
@@ -94,9 +94,9 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
         );
     });
 
-    const allRects = heatmapData.map((d, i) => {
-        const x = xScale(d.x)
-        const y = yScale(d.y)
+    const allRects = heatmapData.map((d: { x: number; y: number; value: number }, i: number) => {
+        const x = xScale(d.x) ?? 0
+        const y = yScale(d.y) ?? 0
 
         return (
             <rect
@@ -110,7 +110,7 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
                 onMouseEnter={() => {
                     setHoveredCell({
                         xLabel: `${d.x}`,
-                        yLabel: lookupValue(String(d.y), monthsLookupTable),
+                        yLabel: lookupValue(String(d.y), monthsLookupTable) ?? 'Unknown', 
                         xPos: x + xScale.bandwidth() / 2 + MARGIN.left,
                         yPos: y + yScale.bandwidth() / 2 + MARGIN.top,
                         value: Math.round(d.value * 100) / 100,
@@ -131,7 +131,7 @@ export default function Renderer({ width, height, data, setHoveredCell, colorSca
                     transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
                 >
                     {allRects}
-                    {xLabels.map((label, i) =>
+                    {xLabels.map((label: React.ReactElement<any> | null, i: number) =>
                         label ? React.cloneElement(label, {
                             y: boundsHeight + 60,
                         })

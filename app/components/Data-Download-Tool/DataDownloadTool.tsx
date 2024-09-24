@@ -40,8 +40,11 @@ import { createOrStatement, stringToArray, arrayToCommaSeparatedString, splitStr
 import { useDidMountEffect, useLocalStorageState } from "@/app/utils/hooks"
 import { variablesLookupTable, scenariosLookupTable, lookupValue, filterByFlag, modelsGenUseLookupTable } from '@/app/utils/lookupTables'
 
+type DataDownloadProps = {
+    data: any // or a more specific type like `data: Array<any>` or `data: { [key: string]: any }`
+  }
 
-export default function DataDownload({ data }) {
+export default function DataDownload({ data }: DataDownloadProps) {
     const { open, toggleOpen } = useSidepanel()
 
     const [dataResponse, setDataResponse] = useState<modelVarUrls[]>([])

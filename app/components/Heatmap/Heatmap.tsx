@@ -28,15 +28,20 @@ export type InteractionData = {
 export default function Heatmap({ width, height, data }: HeatmapProps) {
     // cell that is being hovered, for tooltips
     const [hoveredCell, setHoveredCell] = useState<InteractionData | null>(null)
-
+/* 
     const flatData: number[] = data.data.flat()
     const min = d3.min(flatData)
-    const max = d3.max(flatData)
+    const max = d3.max(flatData) */
+
+    // Flatten data and filter out undefined values
+    const flatData: number[] = data.data.flat().filter((d: number | undefined): d is number => d !== undefined)
+    const min = d3.min(flatData) as number | null
+    const max = d3.max(flatData) as number | null
 
     const colorScale =
         d3.scaleSequential<string>()
             .interpolator(d3.interpolateRgbBasis(["#FD6A55", "#ffffff", "#25c6da"]))
-            .domain([min, max])
+            .domain([min ?? 0, max ?? 1]) // fallback values if min/max are null
 
     // modded color scale
     /*   const colorScale =
