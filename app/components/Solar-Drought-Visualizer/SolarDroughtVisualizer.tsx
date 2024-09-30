@@ -48,8 +48,8 @@ export default function SolarDroughtViz() {
 
     const heatmapSection = useRef<HTMLDivElement>(null)
 
-    const [globalWarmingSelected, setGlobalWarmingSelected] = useState('1.5')
-    const globalWarmingList = ['1.5']
+    const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
+    const globalWarmingList = ['2']
     const [photoConfigSelected, setPhotoConfigSelected] = useState('Utility Configuration')
     const photoConfigList = ['Utility Configuration', 'Distributed Configuration']
     const [configStr, setConfigStr] = useState<string>('')
@@ -271,7 +271,7 @@ export default function SolarDroughtViz() {
                             </div>
                         </div>
                         <div className="alerts">
-                            <Alert variant="purple" severity="info">Global models estimate that 1.5° global warming levels (GWL) will be reached between <strong>2024</strong> and <strong>2041</strong>
+                            <Alert variant="purple" severity="info">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
                                 <div className="cta">
                                     <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels">Learn more about GWL</Button>
                                 </div>
@@ -288,7 +288,7 @@ export default function SolarDroughtViz() {
                 {!isLoading && !isPointValid && isLocationSet &&
                     (
                         <div>
-                            <Alert variant="grey" severity="info">The point you selected is not a valid point in the grid. <span className="underline" onClick={expandMap}><strong>Select another location</strong></span> to try again
+                            <Alert variant="grey" severity="info">This location is not suitable for solar resources to be developed. <span className="underline" onClick={expandMap}><strong>Select another location</strong></span> to try again
                             </Alert>
                         </div>
                     )
