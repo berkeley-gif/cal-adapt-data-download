@@ -288,7 +288,7 @@ export default function SolarDroughtViz() {
                 {!isLoading && !isPointValid && isLocationSet &&
                     (
                         <div>
-                            <Alert variant="grey" severity="info">This location is not suitable for solar resources to be developed. <span className="underline" onClick={expandMap}><strong>Select another location</strong></span> to try again
+                            <Alert variant="grey" severity="info">You have selected a location with land use or land cover restrictions. No data will be returned <span className="underline" onClick={expandMap}><strong>Select another location</strong></span> to try again
                             </Alert>
                         </div>
                     )
