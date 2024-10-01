@@ -105,7 +105,7 @@ const VizPrmsForm: React.FC<VizFormProps> = ({
                             >
                                 {globalWarmingList.map((level) => (
                                     <MenuItem key={level} value={level}>
-                                        <ListItemText primary={level} />
+                                        <ListItemText primary={level + '°'} />
                                     </MenuItem>
                                 ))}
                             </Select>
