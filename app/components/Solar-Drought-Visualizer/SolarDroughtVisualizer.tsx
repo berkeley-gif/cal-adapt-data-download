@@ -257,7 +257,7 @@ export default function SolarDroughtViz() {
                         <div className="flex-params">
                             <div className="flex-params__item">
                                 <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
-                                <Typography variant="body1">{globalWarmingSelected}</Typography>
+                                <Typography variant="body1">{globalWarmingSelected}°</Typography>
                             </div>
                             <div className="flex-params__item">
                                 <Typography className="option-group__title" variant="body2">Photovoltaic Configuration</Typography>

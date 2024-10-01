@@ -84,7 +84,7 @@ const VizPrmsForm: React.FC<VizFormProps> = ({
                         <HtmlTooltip
                             textFragment={
                                 <React.Fragment>
-                                    <p>An explanation about Global Warming Levels</p>
+                                    <p>A "global warming level" refers to the increase in global-mean temperature with respect to preindustrial conditions.</p>
                                 </React.Fragment>
                             }
                             iconFragment={<InfoOutlinedIcon />}
@@ -120,7 +120,8 @@ const VizPrmsForm: React.FC<VizFormProps> = ({
                         <HtmlTooltip
                             textFragment={
                                 <React.Fragment>
-                                    <p>An explanation about photovoltaic configuration</p>
+                                    <p>The set of photovoltaic system design parameters. "Utility" is based on typical installations maintained by utility companies, while "Distributed" corresponds to a residential rooftop installation.
+                                    </p>
                                 </React.Fragment>
                             }
                             iconFragment={<InfoOutlinedIcon />}
