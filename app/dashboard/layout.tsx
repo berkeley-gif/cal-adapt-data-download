@@ -1,11 +1,10 @@
 'use client'
 
-import React, { ReactNode, useState, useEffect } from 'react'
+import React, { ReactNode, useState } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
 
 import { SidepanelProvider } from '@/app/context/SidepanelContext';
 declare module '@mui/material/Alert' {
@@ -15,16 +14,17 @@ declare module '@mui/material/Alert' {
     }
 }
 
+// Material elements 
 import { Box, CssBaseline, AppBar, Toolbar, Typography, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, useMediaQuery } from '@mui/material'
 import { styled } from '@mui/system'
 import { useTheme } from '@mui/material/styles'
 
 import Button from '@mui/material/Button'
 import DatasetOutlinedIcon from '@mui/icons-material/DatasetOutlined'
-//import Drawer from '@mui/material/Drawer'
 import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined'
 
 import '@/app/styles/dashboard/dashboard.scss'
 
@@ -78,6 +78,7 @@ const ResponsiveSidebar = styled('div')(({ theme, open }: { theme: any; open: bo
 const menuItems = [
     { text: 'Data Download Tool', icon: <DatasetOutlinedIcon />, path: '/dashboard/data-download-tool' },
     { text: 'Solar Drought Visualizer', icon: <WbSunnyOutlinedIcon />, path: '/dashboard/solar-drought-visualizer' },
+    { text: 'Data Explorer', icon: <MapOutlinedIcon />, path: '/dashboard/data-explorer' }
 ]
 
 interface LayoutProps {
@@ -90,7 +91,6 @@ export default function Layout({ children }: LayoutProps) {
     const selectedPage: string | null = extractSegment(pathname, 'dashboard/', '/')
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    //const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(false)
 
     const toggleDrawer = () => setOpen((prev) => !prev);
 
@@ -100,31 +100,17 @@ export default function Layout({ children }: LayoutProps) {
                 return <CalDashToolbar drawerWidth={drawerWidth} sidebarOpen={open} toolName='Data Download Tool' tooltipTitle='Review your selected package' iconSrc={packageIcon} iconAlt='Package icon that you can click on to see your current data package' />
             case 'solar-drought-visualizer':
                 return <CalDashToolbar drawerWidth={drawerWidth} sidebarOpen={open} toolName='Solar Drought Visualizer' tooltipTitle='Change your visualization parameters' iconSrc={settingsIcon} iconAlt='Settings icon that you can click on to change your visualization' />
+            case 'data-explorer':
+                return <CalDashToolbar drawerWidth={drawerWidth} sidebarOpen={open} toolName='Data Explorer' />
             default:
                 return <CalDashToolbar drawerWidth={drawerWidth} sidebarOpen={open} toolName='Getting Started' tooltipTitle='Change your visualization parameters' iconSrc={packageIcon} iconAlt='Settings icon that you can click on to change your visualization' />
         }
     }
 
-    /** const handleResize = () => {
-        const width: number = window.innerWidth
-        const tabletBreakpoint: number = 768
-
-        setIsMobileOrTablet(width < tabletBreakpoint)
-    }
-
-    useEffect(() => {
-        window.addEventListener('resize', handleResize)
-
-        handleResize()
-
-        return () => {
-            window.removeEventListener('resize', handleResize)
-        }
-    }, [])  **/
-
     return (
         <SidepanelProvider>
-            <Box sx={{ display: 'flex', flexDirection: 'row', minHeight: '100vh', height: '100%' }}>
+            {!isMobile ? <Box sx={{ display: 'flex', flexDirection: 'row', minHeight: '100vh', height: '100%' }}>
+
                 <CssBaseline />
                 <ResponsiveSidebar theme={theme} open={open}>
                     <DrawerHeader>
@@ -181,95 +167,19 @@ export default function Layout({ children }: LayoutProps) {
                     </AppBar>
                     {children}
                 </Box>
-            </Box>
-
-            {/*             <div>
-                {!isMobileOrTablet ? <Box className="dashboard" sx={{ display: 'flex' }}>
-                    <CssBaseline />
-                    <AppBar
-                        position="fixed"
-                        sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, ml: `${DRAWER_WIDTH}px`, backgroundColor: `#fffff`, boxShadow: `none`, borderBottom: `1px solid #e8e8e8` }}
-                    >
-                        {renderCalDashToolBar()}
-                    </AppBar>
-                    <Drawer
-                        sx={{
-                            width: DRAWER_WIDTH,
-                            flexShrink: 0,
-                            '& .MuiDrawer-paper': {
-                                width: DRAWER_WIDTH,
-                                boxSizing: 'border-box',
-                                backgroundImage: `url(${sidebarBg.src})`,
-                                backgroundRepeat: "no-repeat",
-                                backgroundSize: "cover",
-                                border: "none",
-                            },
-                        }}
-                        variant="permanent"
-                        anchor="left"
-                    >
-                        <Toolbar>
-                            <Image
-                                src={logo}
-                                alt="Cal Adapt logo"
-                                className="cal-adapt-logo"
-                            />
-                        </Toolbar>
-
-
-                        <List sx={{
-                            '& .MuiListItemIcon-root': {
-                                color: '#000',
-                            },
-                            // selected and (selected + hover) states
-                            '&& .Mui-selected, && .Mui-selected:hover': {
-                                bgcolor: 'rgba(247, 249, 251, 0.9)'
-                            },
-                            // hover states
-                            '& .MuiListItemButton-root:hover': {
-                                bgcolor: 'rgba(247, 249, 251, 0.6)',
-                                borderRadius: '12px'
-                            },
-                        }}>
-                            <ListItem key='data-download-tool' disablePadding component={Link} href="/dashboard/data-download-tool">
-                                <ListItemButton>
-                                    <ListItemIcon>
-                                        <DatasetOutlinedIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary='Data Download Tool' />
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem key='solar-drought-visualizer' disablePadding component={Link} href="/dashboard/solar-drought-visualizer">
-                                <ListItemButton>
-                                    <ListItemIcon>
-                                        <WbSunnyOutlinedIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary='Solar Drought Visualizer' />
-                                </ListItemButton>
-                            </ListItem>
-                        </List>
-                    </Drawer>
-                    <Box
-                        component="main"
-                        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3, mt: "64px" }}
-                    >
-                        {children}
-                    </Box>
-                </Box >
-                    :
-                    <div className="mobile-view">
-                        <div className="mobile-view__container">
-                            <Image
-                                src={logo}
-                                alt="Cal Adapt logo"
-                                className="cal-adapt-logo__mobile"
-                            />
-                            <Typography variant="body1">Due to the nature of the tools, the Cal-Adapt Dashboard is best used on a desktop or laptop computer</Typography>
-                            <Button variant="contained" href="https://cal-adapt.org">Go to the homepage</Button>
-                        </div>
+            </Box> :
+                <div className="mobile-view">
+                    <div className="mobile-view__container">
+                        <Image
+                            src={logo}
+                            alt="Cal Adapt logo"
+                            className="cal-adapt-logo__mobile"
+                        />
+                        <Typography variant="body1">Due to the nature of the tools, the Cal-Adapt Dashboard is best used on a desktop or laptop computer</Typography>
+                        <Button variant="contained" href="https://cal-adapt.org">Go to the homepage</Button>
                     </div>
-                }
-            </div> */}
+                </div>
+            }
         </SidepanelProvider>
     )
 }

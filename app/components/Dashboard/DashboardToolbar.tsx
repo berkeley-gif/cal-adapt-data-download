@@ -13,9 +13,9 @@ import { useSidepanel } from '@/app/context/SidepanelContext'
 
 interface ToolbarProps {
     toolName: string,
-    tooltipTitle: string,
-    iconSrc: any,
-    iconAlt: string,
+    tooltipTitle: string | null,
+    iconSrc: any | null,
+    iconAlt: string | null,
     sidebarOpen: boolean,
     drawerWidth: number
 }
@@ -31,18 +31,22 @@ export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAl
                 </Link>
                 <Typography color="text.primary">{toolName}</Typography>
             </Breadcrumbs>
-            <Tooltip
-                TransitionComponent={Fade}
-                TransitionProps={{ timeout: 600 }}
-                title={tooltipTitle}
-            >
-                <IconButton onClick={toggleOpen}>
-                    <Image
-                        src={iconSrc}
-                        alt={iconAlt}
-                    />
-                </IconButton>
-            </Tooltip>
+            {iconSrc &&
+                <Tooltip
+                    TransitionComponent={Fade}
+                    TransitionProps={{ timeout: 600 }}
+                    title={tooltipTitle}
+                >
+
+                    <IconButton onClick={toggleOpen}>
+                        <Image
+                            src={iconSrc}
+                            alt={iconAlt}
+                        />
+                    </IconButton>
+
+                </Tooltip>
+            }
         </Toolbar>
     )
 }
