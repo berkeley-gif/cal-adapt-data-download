@@ -6,10 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import packageIcon from '@/public/img/icons/package.svg'
-import settingsIcon from '@/public/img/icons/SettingsOutlined.svg'
-import sidebarBg from '@/public/img/photos/ocean-thumbnail.png'
-import logo from '@/public/img/logos/cal-adapt-data-download.png'
+
 import { SidepanelProvider } from '@/app/context/SidepanelContext';
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
@@ -18,49 +15,96 @@ declare module '@mui/material/Alert' {
     }
 }
 
-import AppBar from '@mui/material/AppBar'
-import Box from '@mui/material/Box'
+import { Box, CssBaseline, AppBar, Toolbar, Typography, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, useMediaQuery } from '@mui/material'
+import { styled } from '@mui/system'
+import { useTheme } from '@mui/material/styles'
+
 import Button from '@mui/material/Button'
-import CssBaseline from '@mui/material/CssBaseline'
 import DatasetOutlinedIcon from '@mui/icons-material/DatasetOutlined'
-import Drawer from '@mui/material/Drawer'
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
-import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
+//import Drawer from '@mui/material/Drawer'
 import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ChevronRightIcon from '@mui/icons-material/ChevronLeft'
 
 import '@/app/styles/dashboard/dashboard.scss'
 
 import CalDashToolbar from '@/app/components/Dashboard/DashboardToolbar'
 import { extractSegment } from '@/app/utils/functions'
 
-const DRAWER_WIDTH = 212
+import packageIcon from '@/public/img/icons/package.svg'
+import settingsIcon from '@/public/img/icons/SettingsOutlined.svg'
+import sidebarBg from '@/public/img/photos/ocean-thumbnail.png'
+import logo from '@/public/img/logos/cal-adapt-data-download.png'
+
+const drawerWidth = 212
+interface LayoutProps {
+    children: ReactNode;
+}
+
+const DrawerHeader = styled('div')(() => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: '64px',
+    padding: '0 16px',
+    position: 'absolute',
+    top: 0,
+    width: '100%',
+    zIndex: 1201
+}))
+
+const ResponsiveSidebar = styled('div')(({ theme, open }: { theme: any; open: boolean }) => ({
+    width: open ? drawerWidth : theme.spacing(9),
+    flexShrink: 0,
+    height: '100vh',
+    transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1)',
+    backgroundImage: `url(${sidebarBg.src})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    position: 'relative',
+    paddingTop: '64px',
+    '& .MuiDrawer-paper': {
+        width: open ? drawerWidth : theme.spacing(9),
+        boxSizing: 'border-box',
+        height: '100%',
+        border: 'none',
+        overflowX: 'hidden',
+        transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1)',
+    },
+}))
+
+const menuItems = [
+    { text: 'Data Download Tool', icon: <DatasetOutlinedIcon />, path: '/dashboard/data-download-tool' },
+    { text: 'Solar Drought Visualizer', icon: <WbSunnyOutlinedIcon />, path: '/dashboard/solar-drought-visualizer' },
+]
 
 interface LayoutProps {
     children: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
+    const [open, setOpen] = useState(true);
     const pathname = usePathname()
     const selectedPage: string | null = extractSegment(pathname, 'dashboard/', '/')
-    const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(false)
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    //const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(false)
+
+    const toggleDrawer = () => setOpen((prev) => !prev);
 
     const renderCalDashToolBar = (): ReactNode => {
         switch (selectedPage) {
             case 'data-download-tool':
-                return <CalDashToolbar toolName='Data Download Tool' tooltipTitle='Review your selected package' iconSrc={packageIcon} iconAlt='Package icon that you can click on to see your current data package' />
+                return <CalDashToolbar drawerWidth={drawerWidth} sidebarOpen={open} toolName='Data Download Tool' tooltipTitle='Review your selected package' iconSrc={packageIcon} iconAlt='Package icon that you can click on to see your current data package' />
             case 'solar-drought-visualizer':
-                return <CalDashToolbar toolName='Solar Drought Visualizer' tooltipTitle='Change your visualization parameters' iconSrc={settingsIcon} iconAlt='Settings icon that you can click on to change your visualization' />
+                return <CalDashToolbar drawerWidth={drawerWidth} sidebarOpen={open} toolName='Solar Drought Visualizer' tooltipTitle='Change your visualization parameters' iconSrc={settingsIcon} iconAlt='Settings icon that you can click on to change your visualization' />
             default:
-                return <CalDashToolbar toolName='Getting Started' tooltipTitle='Change your visualization parameters' iconSrc={packageIcon} iconAlt='Settings icon that you can click on to change your visualization' />
+                return <CalDashToolbar drawerWidth={drawerWidth} sidebarOpen={open} toolName='Getting Started' tooltipTitle='Change your visualization parameters' iconSrc={packageIcon} iconAlt='Settings icon that you can click on to change your visualization' />
         }
     }
 
-    const handleResize = () => {
+    /** const handleResize = () => {
         const width: number = window.innerWidth
         const tabletBreakpoint: number = 768
 
@@ -75,11 +119,68 @@ export default function Layout({ children }: LayoutProps) {
         return () => {
             window.removeEventListener('resize', handleResize)
         }
-    }, [])
+    }, [])  **/
 
     return (
         <SidepanelProvider>
-            <div>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <ResponsiveSidebar theme={theme} open={open}>
+                    <DrawerHeader>
+                        {open && (
+                            <Image src={logo} alt="Cal Adapt California state logo" style={{ height: '40px' }} />
+                        )}
+
+                        <IconButton onClick={toggleDrawer} aria-label="toggle drawer">
+                            {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                        </IconButton>
+                    </DrawerHeader>
+
+                    <List
+                        sx={{
+                            '& .MuiListItemIcon-root': { color: '#000' },
+                            '&& .Mui-selected, && .Mui-selected:hover': { bgcolor: 'rgba(247, 249, 251, 0.9)' },
+                            '& .MuiListItemButton-root:hover': { bgcolor: 'rgba(247, 249, 251, 0.6)', borderRadius: '12px' },
+                        }}
+                    >
+                        {menuItems.map((item) => (
+                            <ListItem key={item.text} disablePadding component={Link} href={item.path}>
+                                <ListItemButton>
+                                    <ListItemIcon>{item.icon}</ListItemIcon>
+                                    <ListItemText primary={item.text || 'Untitled'} sx={{ opacity: open ? 1 : 0 }} />
+                                </ListItemButton>
+                            </ListItem>
+                        ))}
+                    </List>
+                </ResponsiveSidebar>
+                <Box
+                    component="main"
+                    sx={{
+                        flexGrow: 1,
+                        bgColor: 'background.default',
+                        p: 3,
+                        mt: "64px",
+                        transition: 'margin 225ms cubic-bezier(0.4, 0, 0.6, 1)',
+                    }}
+                >
+                    <AppBar
+                        position="fixed"
+                        sx={{
+                            width: `calc(100% - ${open ? drawerWidth : theme.spacing(9)}px)`,
+                            ml: open ? `${drawerWidth}px` : theme.spacing(9),
+                            backgroundColor: '#ffffff',
+                            boxShadow: 'none',
+                            borderBottom: '1px solid #e8e8e8',
+                            zIndex: 1100,
+                        }}
+                    >
+                        {renderCalDashToolBar()}
+                    </AppBar>
+                    {children}
+                </Box>
+            </Box>
+
+            {/*             <div>
                 {!isMobileOrTablet ? <Box className="dashboard" sx={{ display: 'flex' }}>
                     <CssBaseline />
                     <AppBar
@@ -165,7 +266,7 @@ export default function Layout({ children }: LayoutProps) {
                         </div>
                     </div>
                 }
-            </div>
+            </div> */}
         </SidepanelProvider>
     )
 }

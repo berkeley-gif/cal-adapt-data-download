@@ -16,20 +16,22 @@ interface ToolbarProps {
     tooltipTitle: string,
     iconSrc: any,
     iconAlt: string,
+    sidebarOpen: boolean,
+    drawerWidth: number
 }
 
-export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAlt }: ToolbarProps) {
+export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAlt, sidebarOpen, drawerWidth }: ToolbarProps) {
     const { open, toggleOpen } = useSidepanel()
 
     return (
-        <Toolbar className="toolbar-main" sx={{ justifyContent: `space-between` }}>
+        <Toolbar className="toolbar-main" sx={{ ml: sidebarOpen ? 0 : `72px`, justifyContent: `space-between` }}>
             <Breadcrumbs aria-label="breadcrumb">
                 <Link underline="hover" color="inherit" href="/">
                     Dashboard
                 </Link>
                 <Typography color="text.primary">{toolName}</Typography>
             </Breadcrumbs>
-            <Tooltip 
+            <Tooltip
                 TransitionComponent={Fade}
                 TransitionProps={{ timeout: 600 }}
                 title={tooltipTitle}
