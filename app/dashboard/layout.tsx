@@ -24,7 +24,7 @@ import DatasetOutlinedIcon from '@mui/icons-material/DatasetOutlined'
 //import Drawer from '@mui/material/Drawer'
 import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import ChevronRightIcon from '@mui/icons-material/ChevronLeft'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import '@/app/styles/dashboard/dashboard.scss'
 
@@ -56,7 +56,8 @@ const DrawerHeader = styled('div')(() => ({
 const ResponsiveSidebar = styled('div')(({ theme, open }: { theme: any; open: boolean }) => ({
     width: open ? drawerWidth : theme.spacing(9),
     flexShrink: 0,
-    height: '100vh',
+    minHeight: '100vh',
+    height: 'auto',
     transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1)',
     backgroundImage: `url(${sidebarBg.src})`,
     backgroundRepeat: 'no-repeat',
@@ -67,7 +68,7 @@ const ResponsiveSidebar = styled('div')(({ theme, open }: { theme: any; open: bo
     '& .MuiDrawer-paper': {
         width: open ? drawerWidth : theme.spacing(9),
         boxSizing: 'border-box',
-        height: '100%',
+        minHeight: '100%',
         border: 'none',
         overflowX: 'hidden',
         transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1)',
@@ -123,7 +124,7 @@ export default function Layout({ children }: LayoutProps) {
 
     return (
         <SidepanelProvider>
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', minHeight: '100vh', height: '100%' }}>
                 <CssBaseline />
                 <ResponsiveSidebar theme={theme} open={open}>
                     <DrawerHeader>
@@ -161,6 +162,8 @@ export default function Layout({ children }: LayoutProps) {
                         p: 3,
                         mt: "64px",
                         transition: 'margin 225ms cubic-bezier(0.4, 0, 0.6, 1)',
+                        overflowY: 'auto',
+                        height: 'calc(100vh - 64px)'
                     }}
                 >
                     <AppBar
