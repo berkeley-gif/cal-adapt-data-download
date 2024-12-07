@@ -26,7 +26,7 @@ export default function CalDashToolbar({ toolName, tooltipTitle, iconSrc, iconAl
     return (
         <Toolbar className="toolbar-main" sx={{ ml: sidebarOpen ? 0 : `72px`, justifyContent: `space-between` }}>
             <Breadcrumbs aria-label="breadcrumb">
-                <Link underline="hover" color="inherit" href="/">
+                <Link underline="hover" color="inherit" href="/dashboard">
                     Cal-Adapt Dashboard
                 </Link>
                 <Typography color="text.primary">{toolName}</Typography>

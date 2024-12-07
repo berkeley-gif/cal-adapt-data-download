@@ -161,7 +161,6 @@ export default function SolarDroughtViz() {
     }
 
     const onFormDataSubmit = async () => {
-        // https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/-120,38?url=s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/srdu/d03&variable=srdu
         if (!apiParams.point) {
             return
         }
