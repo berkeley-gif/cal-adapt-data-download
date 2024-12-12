@@ -40,7 +40,7 @@ import { variablesLookupTable, scenariosLookupTable, lookupValue, filterByFlag, 
 
 type DataDownloadProps = {
     data: any // or a more specific type like `data: Array<any>` or `data: { [key: string]: any }`
-  }
+}
 
 export default function DataDownload({ data }: DataDownloadProps) {
     const { open, toggleOpen } = useSidepanel()
@@ -106,7 +106,7 @@ export default function DataDownload({ data }: DataDownloadProps) {
         })
 
         const fullUrl = `${apiUrl}?${queryParams.toString()}`;
-        
+
         if (apiParamsChanged) {
             try {
                 const res = await fetch(fullUrl)
