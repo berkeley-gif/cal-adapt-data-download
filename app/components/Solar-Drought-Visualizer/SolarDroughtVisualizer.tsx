@@ -104,7 +104,6 @@ export default function SolarDroughtViz() {
     useEffect(() => {
         // Compare previous and current state
         if (JSON.stringify(prevApiParams.current) !== JSON.stringify(apiParams)) {
-            console.log(`apiparams have been updated from previous state`)
             onFormDataSubmit()
         }
 
