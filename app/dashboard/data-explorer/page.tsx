@@ -1,6 +1,7 @@
 import React from 'react'
 
 import DataExplorer from '@/app/components/Data-Explorer/DataExplorer'
+import '@/app/styles/dashboard/data-explorer.scss'
 
 // Use this function to gather the initial map rendering data, using default values
 async function getData() {

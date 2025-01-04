@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { globalWarmingLevelsList } from '@/app/lib/data-explorer/global-warming-levels'
 import { metricsList } from '@/app/lib/data-explorer/metrics'
 import Map from './Map'
+import MapUI from './MapUI'
 
 type DataExplorerProps = {
     data: any
@@ -16,8 +17,8 @@ export default function DataExplorer({ data }: DataExplorerProps) {
 
     return (
         <div>
-            Data Explorer content
-            <Map gwlSelected={gwlSelected} setGwlSelected={setGwlSelected} metricSelected={metricSelected} setMetricSelected={setMetricSelected} data={data}></Map>
+            <MapUI gwlSelected={gwlSelected} setGwlSelected={setGwlSelected} metricSelected={metricSelected} setMetricSelected={setMetricSelected}></MapUI>
+            {/**<Map gwlSelected={gwlSelected} setGwlSelected={setGwlSelected} metricSelected={metricSelected} setMetricSelected={setMetricSelected} data={data}></Map>**/}
         </div>
     )
 }
