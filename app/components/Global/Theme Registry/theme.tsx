@@ -65,6 +65,13 @@ const theme = createTheme({
     borderRadius: 16,
   },
   components: {
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          boxShadow: 'none', // Remove the drop shadow
+        },
+      },
+    },
     MuiAlert: {
       variants: [
         {
@@ -99,7 +106,7 @@ const theme = createTheme({
           '&:before': {
             display: 'none',
           },
-          borderBottom: '1px solid var(--black-10, rgba(28, 28, 28, 0.10))',  
+          borderBottom: '1px solid var(--black-10, rgba(28, 28, 28, 0.10))',
         },
       },
     },
