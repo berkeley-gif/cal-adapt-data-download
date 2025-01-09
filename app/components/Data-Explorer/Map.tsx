@@ -215,7 +215,14 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                 </Box>
                 <Box sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: "relative" }} id="map">
                     {!tileJson ? (
-                        <LoadingSpinner />
+                        <Box sx={{ 
+                            position: 'absolute', 
+                            top: '50%', 
+                            left: '50%', 
+                            transform: 'translate(-50%, -50%)'
+                        }}>
+                            <LoadingSpinner />
+                        </Box>
                     ) : (
                         <Map
                             ref={mapRef}
