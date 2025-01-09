@@ -10,6 +10,7 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
+import LoadingSpinner from '../Global/LoadingSpinner'
 
 type MapProps = {
     metricSelected: number;
@@ -167,19 +168,21 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                     </FormControl>
                 </Box>
                 <Box sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: "relative" }} id="map">
-                    <Map
-                        ref={mapRef}
-                        onLoad={handleMapLoad}
-                        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-                        initialViewState={initialViewState}
-                        mapStyle="mapbox://styles/mapbox/streets-v9"
-                        scrollZoom={false}
-                        minZoom={3.5}
-                        style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
-                    >
-                        <NavigationControl position="bottom-left" />
-                        <ScaleControl position="bottom-right" maxWidth={100} unit="metric" />
-                        {tileJson && (
+                    {!tileJson ? (
+                        <LoadingSpinner />
+                    ) : (
+                        <Map
+                            ref={mapRef}
+                            onLoad={handleMapLoad}
+                            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+                            initialViewState={initialViewState}
+                            mapStyle="mapbox://styles/mapbox/streets-v9"
+                            scrollZoom={false}
+                            minZoom={3.5}
+                            style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+                        >
+                            <NavigationControl position="bottom-left" />
+                            <ScaleControl position="bottom-right" maxWidth={100} unit="metric" />
                             <Source type="raster" tiles={tileJson.tiles} tileSize={256}>
                                 <Layer
                                     id="tile-layer"
@@ -187,14 +190,14 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                                     paint={{ 'raster-opacity': 0.8 }}
                                 />
                             </Source>
-                        )}
-                        <MapLegend 
-                            colormap={colormap}
-                            min={parseFloat(VARIABLES[selectedVariable].rescale.split(',')[0])}
-                            max={parseFloat(VARIABLES[selectedVariable].rescale.split(',')[1])}
-                            title={VARIABLES[selectedVariable].title}
-                        />
-                    </Map>
+                            <MapLegend 
+                                colormap={colormap}
+                                min={parseFloat(VARIABLES[selectedVariable].rescale.split(',')[0])}
+                                max={parseFloat(VARIABLES[selectedVariable].rescale.split(',')[1])}
+                                title={VARIABLES[selectedVariable].title}
+                            />
+                        </Map>
+                    )}
                 </Box>
             </Grid>
         )
