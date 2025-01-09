@@ -33,6 +33,10 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
     const min = d3.min(flatData)
     const max = d3.max(flatData) */
 
+    if (!data) {
+        return null;
+    }
+
     // Flatten data and filter out undefined values
     const flatData: number[] = data.data.flat().filter((d: number | undefined): d is number => d !== undefined)
     const min = d3.min(flatData) as number | null

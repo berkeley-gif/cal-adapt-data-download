@@ -1,8 +1,4 @@
 .solar-drought-tool {
-  &__heatmap {
-    width: 1000px;
-  }
-
   &__intro {
     margin-bottom: 30px;
     display: flex;
@@ -35,6 +31,11 @@
 .flex-params {
   display: flex;
   gap: 40px;
-  margin: 35px 0;
-  justify-content: end;
+  margin: 0 0 35px 0;
+  justify-content: flex-end;
+}
+
+.solar-drought-tool__heatmap {
+    transition: width 1s ease;
+    transform-origin: right;
 }
