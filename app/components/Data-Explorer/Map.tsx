@@ -18,11 +18,12 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
     ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
         const mapRef = useRef<MapRef | null>(null)
         const [mapLoaded, setMapLoaded] = useState(false)
+        const [tileJson, setTileJson] = useState(null)
 
         const initialViewState = {
-            longitude: -122.4,
-            latitude: 37.8,
-            zoom: 8
+            longitude: -120,
+            latitude: 37.4,
+            zoom: 5
         }
 
         // Forward the internal ref to the parent using useImperativeHandle
@@ -33,6 +34,24 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
             mapRef.current = map;
             setMapLoaded(true);
         }
+
+        useEffect(() => {
+            const fetchTileJson = async () => {
+                const url = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/WebMercatorQuad/tilejson.json?url=s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/TX99p/d02/TX99p.zarr&variable=TX99p&datetime=3.0&rescale=1.18,35.19&colormap_name=magma`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Error: ${response.status} ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    setTileJson(data);
+                } catch (error) {
+                    console.error('Failed to fetch TileJSON:', error);
+                }
+            };
+
+            fetchTileJson();
+        }, [metricSelected]);
 
     return (
         <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
@@ -53,6 +72,15 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                     >
                         <NavigationControl position="bottom-left" />
                         <ScaleControl position="bottom-right" maxWidth={100} unit="metric" />
+                        {tileJson && (
+                            <Source type="raster" tiles={tileJson.tiles} tileSize={256}>
+                                <Layer
+                                    id="tile-layer"
+                                    type="raster"
+                                    paint={{ 'raster-opacity': 0.8 }}
+                                />
+                            </Source>
+                        )}
                     </Map>
                 </Box>
         </Grid>
