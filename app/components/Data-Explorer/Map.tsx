@@ -41,6 +41,8 @@ type VariableKey = keyof typeof VARIABLES;
 
 const COLORMAPS = ["magma", "viridis", "inferno", "plasma", "cividis"] as const;
 
+const GWL_VALUES = ["1.5", "2.0", "2.5", "3.0"] as const;
+
 const MapboxMap = forwardRef<MapRef | null, MapProps>(
     ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
         const mapRef = useRef<MapRef | null>(null)
@@ -49,6 +51,7 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
         const [mounted, setMounted] = useState(false)
         const [colormap, setColormap] = useState<typeof COLORMAPS[number]>("magma")
         const [selectedVariable, setSelectedVariable] = useState<VariableKey>("TX99p")
+        const [selectedGwl, setSelectedGwl] = useState<typeof GWL_VALUES[number]>("3.0")
 
         const initialViewState = {
             longitude: -120,
@@ -74,7 +77,7 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                 const params = {
                     url: VARIABLES[selectedVariable].path,
                     variable: selectedVariable,
-                    datetime: "3.0",  // Hardcoded
+                    datetime: selectedGwl,
                     rescale: VARIABLES[selectedVariable].rescale,
                     colormap_name: colormap
                 };
@@ -100,7 +103,7 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
             };
 
             fetchTileJson();
-        }, [metricSelected, gwlSelected, colormap, selectedVariable]);
+        }, [metricSelected, selectedGwl, colormap, selectedVariable]);
 
         // Handle hydration mismatch
         useEffect(() => {
@@ -115,8 +118,8 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
         return (
             <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
                 <Box>
-                    <p>{metricSelected}</p>
-                    <p>{gwlSelected}</p>
+                    {/* <p>{metricSelected}</p>
+                    <p>{gwlSelected}</p> */}
                     <FormControl sx={{ m: 1, minWidth: 120 }}>
                         <InputLabel id="variable-select-label">Variable</InputLabel>
                         <Select
@@ -128,6 +131,21 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                             {Object.entries(VARIABLES).map(([key, value]) => (
                                 <MenuItem key={key} value={key}>
                                     {value.title}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }}>
+                        <InputLabel id="gwl-select-label">GWL</InputLabel>
+                        <Select
+                            labelId="gwl-select-label"
+                            value={selectedGwl}
+                            label="GWL"
+                            onChange={(e) => setSelectedGwl(e.target.value as typeof GWL_VALUES[number])}
+                        >
+                            {GWL_VALUES.map((gwl) => (
+                                <MenuItem key={gwl} value={gwl}>
+                                    {gwl}°C
                                 </MenuItem>
                             ))}
                         </Select>
