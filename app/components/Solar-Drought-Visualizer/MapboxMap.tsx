@@ -4,8 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import 'react-map-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
 import Typography from '@mui/material/Typography'
-import { Marker, Map, Layer, Source, MapMouseEvent, NavigationControl } from 'react-map-gl'
-import { Button } from '@mui/material'
+import { Marker, Map, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, MapRef } from 'react-map-gl'
 import GeocoderControl from './geocoder-control'
 import * as turf from '@turf/turf'
 
@@ -19,10 +18,10 @@ type MapboxMapProps = {
     mapMarker: [number, number] | null;
     setMapMarker: (marker: [number, number] | null) => void;
 }
-const MapboxMap = forwardRef<mapboxgl.Map | null, MapboxMapProps>(
+const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
     ({ locationSelected, setLocationSelected, mapMarker, setMapMarker }, ref) => {
 
-        const mapRef = useRef<mapboxgl.Map | null>(null) // Internal ref for the map instance
+        const mapRef = useRef<MapRef | null>(null)
         const [mapLoaded, setMapLoaded] = useState(false)
 
         const initialViewState = {
@@ -32,31 +31,31 @@ const MapboxMap = forwardRef<mapboxgl.Map | null, MapboxMapProps>(
         }
 
         // Forward the internal ref to the parent using useImperativeHandle
-        useImperativeHandle(ref, () => mapRef.current);
+        useImperativeHandle(ref, () => mapRef.current as MapRef);
 
-        const handleMapLoad = (e: mapboxgl.MapEvent) => {
-            mapRef.current = e.target as mapboxgl.Map;
+        const handleMapLoad = (e: any) => {
+            const map = e.target;
+            mapRef.current = map;
             setMapLoaded(true);
         };
 
-        const gridLayer: any = {
-            id: 'grid',
-            type: 'fill',
-            paint: {
-                'fill-color': 'transparent',
-                'fill-opacity': 0,
+        const handleMapClick = (e: MapMouseEvent) => {
+            const clickedPoint: [number, number] = [e.lngLat.lng, e.lngLat.lat];
+
+            if (mapRef.current) {
+                const features = mapRef.current.queryRenderedFeatures(e.point, {
+                    layers: ['grid'],
+                });
+
+                if (features && features.length > 0) {
+                    const selectedFeature = features[0];
+                    const centroid = turf.centroid(selectedFeature).geometry.coordinates;
+
+                    setMapMarker([centroid[0], centroid[1]]);
+                    setLocationSelected(centroid as [number, number]);
+                }
             }
         };
-
-        const handleMapClick = (e: MapMouseEvent) => {
-            if (e.features && e.features.length > 0) {
-                const selectedFeature = e.features[0];
-                const centroid = turf.centroid(selectedFeature).geometry.coordinates;
-
-                setMapMarker([centroid[0], centroid[1]]);
-                setLocationSelected(centroid as [number, number]);
-            }
-        }
 
         return (
             <div className="map-container">
@@ -66,19 +65,18 @@ const MapboxMap = forwardRef<mapboxgl.Map | null, MapboxMapProps>(
                         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
                         initialViewState={initialViewState}
                         style={{ width: 900, height: 412.5 }}
-                        mapStyle="mapbox://styles/mapbox/streets-v9"
-                        interactiveLayerIds={["grid"]}
+                        mapStyle="mapbox://styles/cal-adapt/cm4vhnvx7001601srckkbc5us"                        interactiveLayerIds={['grid']}
                         onClick={handleMapClick}
+                        scrollZoom={false}
+                        minZoom={3.5}
                     >
                         {mapMarker &&
                             <Marker longitude={mapMarker[0]} latitude={mapMarker[1]}>
                             </Marker>
                         }
 
-                        <Source id="grid" type="geojson" data="/data/wrf_3km_4326.geojson">
-                            <Layer {...gridLayer} />
-                        </Source>
                         <NavigationControl position="bottom-left" />
+                        <ScaleControl position="bottom-right" maxWidth={100} unit="metric" />
                         <GeocoderControl zoom={13} mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN || ''} position="top-left" />
                     </Map>
                 </div>
