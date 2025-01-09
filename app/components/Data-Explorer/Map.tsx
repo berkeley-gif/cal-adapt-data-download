@@ -6,6 +6,10 @@ import { Marker, Map, Layer, Source, MapMouseEvent, NavigationControl, MapRef, S
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
 import { MapLegend } from './MapLegend'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
 
 type MapProps = {
     metricSelected: number;
@@ -15,11 +19,14 @@ type MapProps = {
     setGwlSelected: (gwl: number) => void,
 }
 
+const COLORMAPS = ["magma", "viridis", "inferno", "plasma", "cividis"] as const;
+
 const MapboxMap = forwardRef<MapRef | null, MapProps>(
     ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
         const mapRef = useRef<MapRef | null>(null)
         const [mapLoaded, setMapLoaded] = useState(false)
         const [tileJson, setTileJson] = useState(null)
+        const [colormap, setColormap] = useState<typeof COLORMAPS[number]>("magma")
 
         const initialViewState = {
             longitude: -120,
@@ -38,7 +45,7 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
 
         useEffect(() => {
             const fetchTileJson = async () => {
-                const url = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/WebMercatorQuad/tilejson.json?url=s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/TX99p/d02/TX99p.zarr&variable=TX99p&datetime=3.0&rescale=1.18,35.19&colormap_name=magma`;
+                const url = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/WebMercatorQuad/tilejson.json?url=s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/TX99p/d02/TX99p.zarr&variable=TX99p&datetime=3.0&rescale=1.18,35.19&colormap_name=${colormap}`;
                 try {
                     const response = await fetch(url);
                     if (!response.ok) {
@@ -52,13 +59,27 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
             };
 
             fetchTileJson();
-        }, [metricSelected]);
+        }, [metricSelected, colormap]);
 
     return (
         <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
             <Box>
                 <p>{metricSelected}</p>
                 <p>{gwlSelected}</p>
+                <FormControl sx={{ m: 1, minWidth: 120 }}>
+                    <InputLabel>Colormap</InputLabel>
+                    <Select
+                        value={colormap}
+                        label="Colormap"
+                        onChange={(e) => setColormap(e.target.value as typeof COLORMAPS[number])}
+                    >
+                        {COLORMAPS.map((cm) => (
+                            <MenuItem key={cm} value={cm}>
+                                {cm.charAt(0).toUpperCase() + cm.slice(1)}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
             </Box>
                 <Box sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: "relative" }} id="map">
                     <Map
@@ -83,9 +104,10 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                             </Source>
                         )}
                         <MapLegend 
-                            colormap="magma"
+                            colormap={colormap}
                             min={1.18}
                             max={35.19}
+                            title="Temperature (°C)"
                         />
                     </Map>
                 </Box>
