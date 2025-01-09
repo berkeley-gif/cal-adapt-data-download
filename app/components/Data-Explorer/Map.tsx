@@ -1,8 +1,8 @@
 'use client'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
-import React, { useState, useEffect, useRef, useMemo, forwardRef, useImperativeHandle } from 'react'
-import { Marker, Map, Layer, Source, MapMouseEvent, NavigationControl, MapRef, ScaleControl } from 'react-map-gl'
+import React, { useState, useEffect, useRef, useMemo, forwardRef, useImperativeHandle, useCallback } from 'react'
+import { Marker, Map, Layer, Source, MapMouseEvent, NavigationControl, MapRef, ScaleControl, Popup } from 'react-map-gl'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
 import { MapLegend } from './MapLegend'
@@ -53,6 +53,11 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
         const [colormap, setColormap] = useState<typeof COLORMAPS[number]>("magma")
         const [selectedVariable, setSelectedVariable] = useState<VariableKey>("TX99p")
         const [selectedGwl, setSelectedGwl] = useState<typeof GWL_VALUES[number]>("3.0")
+        const [hoverInfo, setHoverInfo] = useState<{
+            longitude: number;
+            latitude: number;
+            value: number | null;
+        } | null>(null);
 
         const initialViewState = {
             longitude: -120,
@@ -68,6 +73,44 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
             mapRef.current = map;
             setMapLoaded(true);
         }
+
+        const handleHover = async (event: MapMouseEvent) => {
+            console.log('Hover event triggered');
+            const { lngLat: { lng, lat } } = event;
+            
+            if (!mapRef.current) {
+                console.log('No map ref');
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/${lng},${lat}?` + 
+                    `url=${encodeURIComponent(VARIABLES[selectedVariable].path)}&` +
+                    `variable=${selectedVariable}`
+                );
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Point data:', data);
+                    
+                    // Get the value from the data array based on the selected GWL
+                    const gwlIndex = GWL_VALUES.indexOf(selectedGwl);
+                    const value = data.data[gwlIndex];
+                    
+                    if (value !== undefined) {
+                        setHoverInfo({
+                            longitude: lng,
+                            latitude: lat,
+                            value: value
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching point data:', error);
+                setHoverInfo(null);
+            }
+        };
 
         useEffect(() => {
             const fetchTileJson = async () => {
@@ -174,6 +217,7 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                         <Map
                             ref={mapRef}
                             onLoad={handleMapLoad}
+                            onMouseMove={handleHover}
                             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
                             initialViewState={initialViewState}
                             mapStyle="mapbox://styles/mapbox/streets-v9"
@@ -183,7 +227,12 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                         >
                             <NavigationControl position="bottom-left" />
                             <ScaleControl position="bottom-right" maxWidth={100} unit="metric" />
-                            <Source type="raster" tiles={tileJson.tiles} tileSize={256}>
+                            <Source 
+                                id="raster-source"
+                                type="raster"
+                                tiles={tileJson.tiles}
+                                tileSize={256}
+                            >
                                 <Layer
                                     id="tile-layer"
                                     type="raster"
@@ -196,6 +245,16 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                                 max={parseFloat(VARIABLES[selectedVariable].rescale.split(',')[1])}
                                 title={VARIABLES[selectedVariable].title}
                             />
+                            {hoverInfo && (
+                                <Popup
+                                    longitude={hoverInfo.longitude}
+                                    latitude={hoverInfo.latitude}
+                                    closeButton={false}
+                                    className="county-info-popup"
+                                >
+                                    Value: {hoverInfo.value?.toFixed(2)}
+                                </Popup>
+                            )}
                         </Map>
                     )}
                 </Box>
