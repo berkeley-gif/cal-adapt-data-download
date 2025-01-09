@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography'
 import { Marker, Map, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, MapRef } from 'react-map-gl'
 import GeocoderControl from './geocoder-control'
 import * as turf from '@turf/turf'
+import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 
 import '@/app/styles/dashboard/mapbox-map.scss'
 
@@ -20,6 +21,7 @@ type MapboxMapProps = {
 }
 const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
     ({ locationSelected, setLocationSelected, mapMarker, setMapMarker }, ref) => {
+        const { photoConfigSelected } = usePhotoConfig();
 
         const mapRef = useRef<MapRef | null>(null)
         const [mapLoaded, setMapLoaded] = useState(false)
@@ -57,6 +59,22 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
             }
         };
 
+        // Update grid layer nodata cells based on photoConfigSelected
+        useEffect(() => {
+            if (mapRef.current && mapLoaded) {
+                const maskAttribute = photoConfigSelected === 'Utility Configuration' ? 'srdumask' : 'srddmask'
+                
+                if (mapRef.current) {
+                    mapRef.current.setPaintProperty('grid', 'fill-color', [
+                        'case',
+                        ['==', ['get', maskAttribute], 0],
+                        'rgba(128, 128, 128, 0.3)',
+                        'rgba(0, 0, 0, 0)'
+                    ]);
+                }
+            }
+        }, [photoConfigSelected, mapLoaded])
+        
         return (
             <div className="map-container">
                 <div id="map">
@@ -65,7 +83,8 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
                         initialViewState={initialViewState}
                         style={{ width: 900, height: 412.5 }}
-                        mapStyle="mapbox://styles/cal-adapt/cm4vhnvx7001601srckkbc5us"                        interactiveLayerIds={['grid']}
+                        mapStyle="mapbox://styles/cal-adapt/cm4vhnvx7001601srckkbc5us"
+                        interactiveLayerIds={['grid']}
                         onClick={handleMapClick}
                         scrollZoom={false}
                         minZoom={3.5}
@@ -79,6 +98,11 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                         <ScaleControl position="bottom-right" maxWidth={100} unit="metric" />
                         <GeocoderControl zoom={13} mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN || ''} position="top-left" />
                     </Map>
+                </div>
+                {/* Legend */}
+                <div className="map-container__legend">
+                    <div className="map-container__legend-color-box"></div>
+                    <span>No data</span>
                 </div>
             </div>
         )

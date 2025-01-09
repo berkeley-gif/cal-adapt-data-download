@@ -21,8 +21,9 @@ declare module '@mui/material/Alert' {
 }
 import Button from '@mui/material/Button'
 
-import SidePanel from '@/app/components/Dashboard/RightSidepanel'
+import SidePanel from '@/app/components/Dashboard/RightSidePanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
+import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 
 import { useDidMountEffect } from "@/app/utils/hooks"
 
@@ -45,13 +46,12 @@ type apiParams = {
 
 export default function SolarDroughtViz() {
     const { open, toggleOpen } = useSidepanel()
+    const { photoConfigSelected, setPhotoConfigSelected, photoConfigList } = usePhotoConfig()
 
     const heatmapSection = useRef<HTMLDivElement>(null)
 
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
     const globalWarmingList = ['2']
-    const [photoConfigSelected, setPhotoConfigSelected] = useState('Utility Configuration')
-    const photoConfigList = ['Utility Configuration', 'Distributed Configuration']
     const [configStr, setConfigStr] = useState<string>('')
     const [queriedData, setQueriedData] = useState(null)
     const [isLocationSet, setIsLocationSet] = useState<boolean>(false)
@@ -312,9 +312,6 @@ export default function SolarDroughtViz() {
                     </Tooltip>
                     <VizPrmsForm
                         onFormDataSubmit={onFormDataSubmit}
-                        photoConfigSelected={photoConfigSelected}
-                        setPhotoConfigSelected={setPhotoConfigSelected}
-                        photoConfigList={photoConfigList}
                         globalWarmingList={globalWarmingList}
                         globalWarmingSelected={globalWarmingSelected}
                         setGlobalWarmingSelected={setGlobalWarmingSelected}
