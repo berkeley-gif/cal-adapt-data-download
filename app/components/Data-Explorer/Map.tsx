@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef, useMemo, forwardRef, useImperativeH
 import { Marker, Map, Layer, Source, MapMouseEvent, NavigationControl, MapRef, ScaleControl } from 'react-map-gl'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
+import { MapLegend } from './MapLegend'
 
 type MapProps = {
     metricSelected: number;
@@ -81,6 +82,11 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                                 />
                             </Source>
                         )}
+                        <MapLegend 
+                            colormap="magma"
+                            min={1.18}
+                            max={35.19}
+                        />
                     </Map>
                 </Box>
         </Grid>
