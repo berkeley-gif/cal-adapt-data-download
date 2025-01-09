@@ -98,12 +98,15 @@ const MapboxMap = forwardRef<MapRef | null, MapProps>(
                     const gwlIndex = GWL_VALUES.indexOf(selectedGwl);
                     const value = data.data[gwlIndex];
                     
-                    if (value !== undefined) {
+                    // Only set hover info if we have a valid value
+                    if (value !== undefined && value !== null) {
                         setHoverInfo({
                             longitude: lng,
                             latitude: lat,
                             value: value
                         });
+                    } else {
+                        setHoverInfo(null);
                     }
                 }
             } catch (error) {
