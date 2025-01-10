@@ -5,13 +5,14 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import '@/app/styles/dashboard/mapbox-map.scss'
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { Map, MapRef, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, LngLatBoundsLike } from 'react-map-gl'
+import { throttle } from 'lodash'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
 import { MapLegend } from './MapLegend'
-import LoadingSpinner from '../Global/LoadingSpinner'
-import { throttle, debounce } from 'lodash'
-import GeocoderControl from '../Solar-Drought-Visualizer/geocoder-control'
 import { MapPopup } from './MapPopup'
+import LoadingSpinner from '../Global/LoadingSpinner'
+import GeocoderControl from '../Solar-Drought-Visualizer/geocoder-control'
+
 
 // remove me, for demo only v
 import Select from '@mui/material/Select'
@@ -207,6 +208,8 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             };
         }, []);
 
+        const isLoading = !mounted || !tileJson;
+
         if (!mounted) {
             return (
                 <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
@@ -229,7 +232,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         }
 
         return (
-            <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
+            <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: 'relative' }}>
                 {/* remove v */}
                 <Box>
                     {/* <p>{metricSelected}</p>
@@ -270,19 +273,25 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                     </FormControl>
                 </Box>
                 {/* remove ^ */}
+
                 <Box sx={{ height: '100%', position: 'relative' }} id="map">
-                    {!tileJson && (
-                        <Box sx={{ 
-                            position: 'absolute', 
-                            top: '50%', 
-                            left: '50%', 
-                            transform: 'translate(-50%, -50%)',
-                            zIndex: 3
-                        }}>
-                            <LoadingSpinner />
-                        </Box>
-                    )}
                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                        {isLoading && (
+                            <Box sx={{ 
+                                position: 'absolute', 
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                                zIndex: 9999
+                            }}>
+                                <LoadingSpinner />
+                            </Box>
+                        )}
                         <Map
                             ref={mapRef}
                             onLoad={handleMapLoad}
