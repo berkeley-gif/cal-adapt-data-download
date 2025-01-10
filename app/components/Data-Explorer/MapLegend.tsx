@@ -81,7 +81,7 @@ export const MapLegend = ({
             boxShadow: 0,
             borderRadius: 1
         }}>
-            <div style={{ position: 'relative' }}>
+            <Box style={{ position: 'relative' }}>
                 <canvas ref={canvasRef} width={boundsWidth + (2 * LABEL_MARGIN)} height={boundsHeight} />
                 <svg
                     width={boundsWidth + (2 * LABEL_MARGIN)}
@@ -90,7 +90,7 @@ export const MapLegend = ({
                 >
                     {allTicks}
                 </svg>
-            </div>
+            </Box>
             <Typography variant="subtitle2" sx={{ mt: 3, textAlign: 'center' }}>
                 {title}
             </Typography>

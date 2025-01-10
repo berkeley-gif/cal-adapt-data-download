@@ -4,12 +4,12 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import '@/app/styles/dashboard/mapbox-map.scss'
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
-import { Map, MapRef, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, Popup, LngLatBoundsLike } from 'react-map-gl'
+import { Map, MapRef, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, LngLatBoundsLike } from 'react-map-gl'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
 import { MapLegend } from './MapLegend'
 import LoadingSpinner from '../Global/LoadingSpinner'
-import { throttle } from 'lodash'
+import { throttle, debounce } from 'lodash'
 import GeocoderControl from '../Solar-Drought-Visualizer/geocoder-control'
 import { MapPopup } from './MapPopup'
 
@@ -76,6 +76,36 @@ type TileJson = {
     tileSize?: number;
 };
 
+const throttledFetchPoint = throttle(async (
+    lng: number, 
+    lat: number, 
+    path: string, 
+    variable: string,
+    gwl: string,
+    callback: (value: number | null) => void
+) => {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/point/${lng},${lat}?` + 
+            `url=${encodeURIComponent(path)}&` +
+            `variable=${variable}`
+        );
+        
+        if (response.ok) {
+            const data = await response.json();
+            const gwlIndex = GWL_VALUES.indexOf(gwl);
+            const value = data.data[gwlIndex];
+            callback(value ?? null);
+        }
+    } catch (error) {
+        console.error('Error fetching point data:', error);
+        callback(null);
+    }
+}, THROTTLE_DELAY, { 
+    leading: true,  // Execute on the leading edge (immediate first call)
+    trailing: true  // Execute on the trailing edge (final call)
+});
+
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
     ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
         
@@ -100,12 +130,6 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             setMounted(true)
         }, [])
 
-        useEffect(() => {
-            return () => {
-                throttledFetchPoint.cancel();
-            };
-        }, []);
-
         // Derived state
         const variableKeys = Object.keys(VARIABLES) as VariableKey[];
         const currentVariable = variableKeys[metricSelected] || variableKeys[0];
@@ -118,33 +142,6 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         }
 
         const currentColormap = currentVariableData.colormap;
-
-        const throttledFetchPoint = throttle(async (
-            lng: number, 
-            lat: number, 
-            path: string, 
-            variable: string,
-            gwl: string,
-            callback: (value: number | null) => void
-        ) => {
-            try {
-                const response = await fetch(
-                    `${BASE_URL}/point/${lng},${lat}?` + 
-                    `url=${encodeURIComponent(path)}&` +
-                    `variable=${variable}`
-                );
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    const gwlIndex = GWL_VALUES.indexOf(gwl);
-                    const value = data.data[gwlIndex];
-                    callback(value ?? null);
-                }
-            } catch (error) {
-                console.error('Error fetching point data:', error);
-                callback(null);
-            }
-        }, THROTTLE_DELAY);
 
         useEffect(() => {
             const fetchTileJson = async () => {
@@ -177,27 +174,6 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             fetchTileJson();
         }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl]);
 
-        if (!mounted) {
-            return (
-                <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
-                    <Box sx={{ 
-                        position: 'absolute', 
-                        top: '50%', 
-                        left: '50%', 
-                        transform: 'translate(-50%, -50%)'
-                    }}>
-                        <LoadingSpinner />
-                    </Box>
-                </Grid>
-            );
-        }
-
-        const handleMapLoad = (e: any) => {
-            const map = e.target;
-            mapRef.current = map;
-            setMapLoaded(true);
-        }
-
         const handleHover = (event: MapMouseEvent) => {
             if (!mapLoaded || !mapRef.current) {
                 return;
@@ -224,6 +200,33 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 }
             );
         };
+
+        useEffect(() => {
+            return () => {
+                throttledFetchPoint.cancel();
+            };
+        }, []);
+
+        if (!mounted) {
+            return (
+                <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
+                    <Box sx={{ 
+                        position: 'absolute', 
+                        top: '50%', 
+                        left: '50%', 
+                        transform: 'translate(-50%, -50%)'
+                    }}>
+                        <LoadingSpinner />
+                    </Box>
+                </Grid>
+            );
+        }
+
+        const handleMapLoad = (e: any) => {
+            const map = e.target;
+            mapRef.current = map;
+            setMapLoaded(true);
+        }
 
         return (
             <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
