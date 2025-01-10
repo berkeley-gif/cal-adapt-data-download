@@ -6,7 +6,6 @@ import { globalWarmingLevelsList } from '@/app/lib/data-explorer/global-warming-
 import { metricsList } from '@/app/lib/data-explorer/metrics'
 import MapboxMap from './Map'
 import Grid from '@mui/material/Unstable_Grid2'
-import Typography from '@mui/material/Typography'
 type DataExplorerProps = {
     data: any
 }
@@ -17,7 +16,6 @@ export default function DataExplorer({ data }: DataExplorerProps) {
 
     return (
         <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
-            {/* <Typography variant="body1">Data Explorer content</Typography> */}
             <MapboxMap gwlSelected={gwlSelected} setGwlSelected={setGwlSelected} metricSelected={metricSelected} setMetricSelected={setMetricSelected} data={data}></MapboxMap>
         </Grid>
     )

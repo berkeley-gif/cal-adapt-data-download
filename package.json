@@ -16,11 +16,13 @@
     "@mui/icons-material": "^5.15.6",
     "@mui/material": "^5.15.6",
     "@turf/turf": "^7.1.0",
+    "@types/lodash": "^4.17.14",
     "@types/mapbox-gl": "^3.4.0",
     "client-zip": "^2.4.4",
     "css-loader": "^6.9.0",
     "d3": "^7.9.0",
     "jszip": "^3.10.1",
+    "lodash": "^4.17.21",
     "mapbox-gl": "^3.5.2",
     "next": "14.0.1",
     "react": "^18",
@@ -30,8 +32,8 @@
     "url-loader": "^4.1.1"
   },
   "devDependencies": {
-    "@types/mapbox__mapbox-gl-geocoder": "^5.0.0",
     "@types/d3": "^7.4.3",
+    "@types/mapbox__mapbox-gl-geocoder": "^5.0.0",
     "@types/node": "^20",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18",
