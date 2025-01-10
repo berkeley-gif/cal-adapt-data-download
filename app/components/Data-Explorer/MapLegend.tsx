@@ -22,7 +22,8 @@ export const MapLegend = ({
     min,
     max,
     width = 440,
-    height = 124
+    height = 124,
+    title
 }: MapLegendProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -75,10 +76,6 @@ export const MapLegend = ({
 
     return (
         <Paper sx={{ 
-            position: 'absolute',
-            bottom: 40,
-            left: '50%',
-            transform: 'translateX(-50%)',
             backgroundColor: 'white',
             padding: 2,
             boxShadow: 0,
@@ -95,7 +92,7 @@ export const MapLegend = ({
                 </svg>
             </div>
             <Typography variant="subtitle2" sx={{ mt: 3, textAlign: 'center' }}>
-                Legend Title
+                {title}
             </Typography>
         </Paper>
     )

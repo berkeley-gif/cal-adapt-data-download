@@ -1,13 +1,17 @@
 'use client'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
+import '@/app/styles/dashboard/mapbox-map.scss'
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
-import { Map, MapRef, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, Popup } from 'react-map-gl'
+import { Map, MapRef, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, Popup, LngLatBoundsLike } from 'react-map-gl'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
 import { MapLegend } from './MapLegend'
 import LoadingSpinner from '../Global/LoadingSpinner'
 import { throttle } from 'lodash'
+import GeocoderControl from '../Solar-Drought-Visualizer/geocoder-control'
+import { MapPopup } from './MapPopup'
 
 // remove me, for demo only v
 import Select from '@mui/material/Select'
@@ -23,6 +27,11 @@ const INITIAL_VIEW_STATE = {
     latitude: 37.4,
     zoom: 5
 } as const;
+
+const MAP_BOUNDS: LngLatBoundsLike = [
+    [-140, 20], // Southwest coordinates [lng, lat]
+    [-100, 50]  // Northeast coordinates [lng, lat]
+];
 
 const THROTTLE_DELAY = 100 as const;
 const BASE_URL = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com' as const;
@@ -258,7 +267,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                     </FormControl>
                 </Box>
                 {/* remove ^ */}
-                <Box sx={{ height: '100%' }} id="map">
+                <Box sx={{ height: '100%', position: 'relative' }} id="map">
                     {!tileJson && (
                         <Box sx={{ 
                             position: 'absolute', 
@@ -270,7 +279,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                             <LoadingSpinner />
                         </Box>
                     )}
-                    <Box style={{ position: 'relative', width: '100%', height: '100%' }}>
+                    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                         <Map
                             ref={mapRef}
                             onLoad={handleMapLoad}
@@ -280,10 +289,9 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                             mapStyle="mapbox://styles/mapbox/light-v11"
                             scrollZoom={false}
                             minZoom={3.5}
+                            maxBounds={MAP_BOUNDS}
                             style={{ width: "100%", height: "100%" }}
                         >
-                            <NavigationControl position="top-right" />
-                            <ScaleControl position="bottom-right" maxWidth={100} unit="metric" />
                             {tileJson && (
                                 <Source 
                                     id="raster-source"
@@ -298,15 +306,40 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                     />
                                 </Source>
                             )}
+                            <GeocoderControl 
+                                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN || ''}
+                                zoom={13} 
+                                position="top-right"
+                                collapsed={true}
+                                clearOnBlur={true}
+                                onResult={(e: any) => {
+                                    const { result } = e;
+                                    const location = result && (
+                                        result.center || 
+                                        (result.geometry?.type === 'Point' && result.geometry.coordinates)
+                                    );
+                                    if (location && mapRef.current) {
+                                        mapRef.current.flyTo({
+                                            center: location,
+                                            zoom: 10
+                                        });
+                                    }
+                                }}
+                            />
+                            <NavigationControl position="top-right" />
+                            <ScaleControl position="bottom-right" maxWidth={100} unit="metric" />
+                            {hoverInfo && (
+                                <MapPopup
+                                    longitude={hoverInfo.longitude}
+                                    latitude={hoverInfo.latitude}
+                                    value={hoverInfo.value || 0}
+                                />
+                            )}
                         </Map>
-                        <Box sx={{ 
+                        <div style={{ 
                             position: 'absolute',
                             bottom: 40,
-                            left: 250,
-                            backgroundColor: 'white',
-                            padding: 2,
-                            boxShadow: 0,
-                            borderRadius: 1,
+                            left: 40,
                             zIndex: 2
                         }}>
                             <MapLegend 
@@ -315,8 +348,8 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                 max={parseFloat(currentVariableData.rescale.split(',')[1])}
                                 title={currentVariableData.title}
                             />
-                        </Box>
-                    </Box>
+                        </div>
+                    </div>
                 </Box>
             </Grid>
         )
