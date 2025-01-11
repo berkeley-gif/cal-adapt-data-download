@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import '@/app/styles/dashboard/mapbox-map.scss'
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
-import { Map, MapRef, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, LngLatBoundsLike } from 'react-map-gl'
+import { Map, MapRef, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, LngLatBoundsLike, ErrorEvent } from 'react-map-gl'
 import { throttle } from 'lodash'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -13,30 +13,29 @@ import { MapPopup } from './MapPopup'
 import LoadingSpinner from '../Global/LoadingSpinner'
 import GeocoderControl from '../Solar-Drought-Visualizer/geocoder-control'
 
-
 // remove me, for demo only v
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 
-const GWL_VALUES = ["1.5", "2.0", "2.5", "3.0"] as const;
+const GWL_VALUES = ["1.5", "2.0", "2.5", "3.0"] as const
 // remove me, for demo only ^
 
 const INITIAL_VIEW_STATE = {
     longitude: -120,
     latitude: 37.4,
     zoom: 5
-} as const;
+} as const
 
 const MAP_BOUNDS: LngLatBoundsLike = [
     [-140, 20], // Southwest coordinates [lng, lat]
     [-100, 50]  // Northeast coordinates [lng, lat]
-];
+]
 
-const THROTTLE_DELAY = 100 as const;
-const BASE_URL = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com' as const;
-const RASTER_TILE_LAYER_OPACITY = 0.8 as const;
+const THROTTLE_DELAY = 100 as const
+const BASE_URL = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com' as const
+const RASTER_TILE_LAYER_OPACITY = 0.8 as const
 
 // edit me v
 const VARIABLES = {
@@ -58,24 +57,31 @@ const VARIABLES = {
         rescale: '-197.96,92.158',
         colormap: 'reds'
     }
-} as const;
+} as const
 // edit me ^
 
-
 type MapProps = {
-    metricSelected: number;
-    gwlSelected: number;
-    data: any;
-    setMetricSelected: (metric: number) => void,
-    setGwlSelected: (gwl: number) => void,
+    metricSelected: number
+    gwlSelected: number
+    data: Record<string, unknown>
+    setMetricSelected: (metric: number) => void
+    setGwlSelected: (gwl: number) => void
 }
 
-type VariableKey = keyof typeof VARIABLES;
+type VariableKey = keyof typeof VARIABLES
 
 type TileJson = {
-    tiles: string[];
-    tileSize?: number;
-};
+    tiles: string[]
+    tileSize?: number
+}
+
+type GeocoderResult = {
+    center?: [number, number]
+    geometry?: {
+        type: string
+        coordinates: [number, number]
+    }
+}
 
 const throttledFetchPoint = throttle(async (
     lng: number, 
@@ -90,22 +96,22 @@ const throttledFetchPoint = throttle(async (
             `${BASE_URL}/point/${lng},${lat}?` + 
             `url=${encodeURIComponent(path)}&` +
             `variable=${variable}`
-        );
+        )
         
         if (response.ok) {
-            const data = await response.json();
-            const gwlIndex = GWL_VALUES.indexOf(gwl as typeof GWL_VALUES[number]);
-            const value = data.data[gwlIndex];
-            callback(value ?? null);
+            const data = await response.json()
+            const gwlIndex = GWL_VALUES.indexOf(gwl as typeof GWL_VALUES[number])
+            const value = data.data[gwlIndex]
+            callback(value ?? null)
         }
     } catch (error) {
-        console.error('Error fetching point data:', error);
-        callback(null);
+        console.error('Error fetching point data:', error)
+        callback(null)
     }
 }, THROTTLE_DELAY, { 
     leading: true,  // Execute on the leading edge (immediate first call)
     trailing: true  // Execute on the trailing edge (final call)
-});
+})
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
     ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
@@ -121,10 +127,10 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         const [mapLoaded, setMapLoaded] = useState(false)
         const [tileJson, setTileJson] = useState<TileJson | null>(null)
         const [hoverInfo, setHoverInfo] = useState<{
-            longitude: number;
-            latitude: number;
-            value: number | null;
-        } | null>(null);
+            longitude: number
+            latitude: number
+            value: number | null
+        } | null>(null)
 
         // Effects
         useEffect(() => {
@@ -132,17 +138,17 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         }, [])
 
         // Derived state
-        const variableKeys = Object.keys(VARIABLES) as VariableKey[];
-        const currentVariable = variableKeys[metricSelected] || variableKeys[0];
-        const currentGwl = GWL_VALUES[gwlSelected] || GWL_VALUES[0];
+        const variableKeys = Object.keys(VARIABLES) as VariableKey[]
+        const currentVariable = variableKeys[metricSelected] || variableKeys[0]
+        const currentGwl = GWL_VALUES[gwlSelected] || GWL_VALUES[0]
         
-        const currentVariableData = VARIABLES[currentVariable];
+        const currentVariableData = VARIABLES[currentVariable]
         if (!currentVariableData) {
-            console.error('Invalid variable selected:', currentVariable);
-            return null;
+            console.error('Invalid variable selected:', currentVariable)
+            return null
         }
 
-        const currentColormap = currentVariableData.colormap;
+        const currentColormap = currentVariableData.colormap
 
         useEffect(() => {
             const fetchTileJson = async () => {
@@ -152,35 +158,35 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                     datetime: currentGwl,
                     rescale: currentVariableData.rescale,
                     colormap_name: currentColormap
-                };
+                }
 
                 const queryString = Object.entries(params)
                     .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-                    .join('&');
+                    .join('&')
 
-                const url = `${BASE_URL}/WebMercatorQuad/tilejson.json?${queryString}`;
+                const url = `${BASE_URL}/WebMercatorQuad/tilejson.json?${queryString}`
 
                 try {
-                    const response = await fetch(url);
+                    const response = await fetch(url)
                     if (!response.ok) {
-                        throw new Error(`Error: ${response.status} ${response.statusText}`);
+                        throw new Error(`Error: ${response.status} ${response.statusText}`)
                     }
-                    const data = await response.json();
-                    setTileJson(data);
+                    const data = await response.json()
+                    setTileJson(data)
                 } catch (error) {
-                    console.error('Failed to fetch TileJSON:', error);
-                    console.error('Full URL:', url);
+                    console.error('Failed to fetch TileJSON:', error)
+                    console.error('Full URL:', url)
                 }
-            };
-            fetchTileJson();
-        }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl]);
+            }
+            fetchTileJson()
+        }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl, currentColormap])
 
         const handleHover = (event: MapMouseEvent) => {
             if (!mapLoaded || !mapRef.current) {
-                return;
+                return
             }
 
-            const { lngLat: { lng, lat } } = event;
+            const { lngLat: { lng, lat } } = event
             
             throttledFetchPoint(
                 lng, 
@@ -194,32 +200,59 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                             longitude: lng,
                             latitude: lat,
                             value
-                        });
+                        })
                     } else {
-                        setHoverInfo(null);
+                        setHoverInfo(null)
                     }
                 }
-            );
-        };
+            )
+        }
 
+        // Cleanup throttledFetchPoint
         useEffect(() => {
             return () => {
-                throttledFetchPoint.cancel();
-            };
-        }, []);
-
-        const isLoading = !mounted || !tileJson;
-
-        const handleMapError = (event: any) => {
-            // Prevent error from reaching console if it's a tile loading error
-            if (event.error?.status === 404 && event.error.url?.includes('WebMercatorQuad')) {
-                event.preventDefault();  // Stops the error from being logged
-                return;
+                throttledFetchPoint.cancel()
             }
-            
-            // Let other errors through to console
-            console.error(event.error);
-        };
+        }, [])
+
+        const isLoading = !mounted || !tileJson
+
+        const handleMapError = (e: ErrorEvent) => {
+            const error = e.error as { status?: number; url?: string }
+            if (error.status === 404 && error.url?.includes('WebMercatorQuad')) {
+                return
+            }
+            console.error('Map error:', error)
+        }
+
+        useEffect(() => {
+            if (mapRef.current) {
+                const map = mapRef.current.getMap()
+
+                const handleMapboxError = (e: any) => {
+                    const error = e.error
+
+                    // Suppress specific tile errors
+                    if (error && error.status === 404 && error.url?.includes('WebMercatorQuad')) {
+                        return
+                    }
+
+                    // Optionally, suppress all errors related to tiles
+                    if (error && error.message?.includes('tile')) {
+                        return
+                    }
+
+                    console.error('Map error:', error)
+                }
+
+                map.on('error', handleMapboxError)
+
+                // Cleanup the event listener on component unmount
+                return () => {
+                    map.off('error', handleMapboxError)
+                }
+            }
+        }, [mapRef])
 
         if (!mounted) {
             return (
@@ -233,18 +266,18 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                         <LoadingSpinner />
                     </Box>
                 </Grid>
-            );
+            )
         }
 
-        const handleMapLoad = (e: any) => {
-            const map = e.target;
-            mapRef.current = map;
-            setMapLoaded(true);
+        const handleMapLoad = (e: { target: import('mapbox-gl').Map }) => {
+            if (!e.target) return
+            mapRef.current = e.target as unknown as MapRef
+            setMapLoaded(true)
         }
 
         return (
             <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: 'relative' }}>
-                {/* remove v */}
+                {/* remove this Box v */}
                 <Box>
                     {/* <p>{metricSelected}</p>
                     <p>{gwlSelected}</p> */}
@@ -256,8 +289,8 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                             value={currentVariable}
                             label="Variable"
                             onChange={(e) => {
-                                const newIndex = variableKeys.indexOf(e.target.value as VariableKey);
-                                setMetricSelected(newIndex);
+                                const newIndex = variableKeys.indexOf(e.target.value as VariableKey)
+                                setMetricSelected(newIndex)
                             }}
                         >
                             {Object.entries(VARIABLES).map(([key, value]) => (
@@ -336,17 +369,17 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                 position="top-right"
                                 collapsed={true}
                                 clearOnBlur={true}
-                                onResult={(e: any) => {
-                                    const { result } = e;
+                                onResult={(e: { result: GeocoderResult }) => {
+                                    const { result } = e
                                     const location = result && (
                                         result.center || 
                                         (result.geometry?.type === 'Point' && result.geometry.coordinates)
-                                    );
+                                    )
                                     if (location && mapRef.current) {
                                         mapRef.current.flyTo({
                                             center: location,
                                             zoom: 10
-                                        });
+                                        })
                                     }
                                 }}
                             />
@@ -383,4 +416,5 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 MapboxMap.displayName = 'MapboxMap'
 
 export default MapboxMap
+
 

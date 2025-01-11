@@ -4,14 +4,13 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
 
-
 type MapLegendProps = {
-    colormap: string;
-    min: number;
-    max: number;
-    width?: number;
-    height?: number;
-    title?: string;
+    colormap: string
+    min: number
+    max: number
+    width?: number
+    height?: number
+    title?: string
 }
 
 const LEGEND_MARGIN = { top: 20, right: 0, bottom: 20, left: 0 }

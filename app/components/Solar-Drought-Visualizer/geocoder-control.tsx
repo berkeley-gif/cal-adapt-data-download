@@ -3,6 +3,14 @@ import {useState} from 'react';
 import {useControl, Marker, MarkerProps, ControlPosition} from 'react-map-gl';
 import MapboxGeocoder, {GeocoderOptions} from '@mapbox/mapbox-gl-geocoder';
 
+type GeocoderResult = {
+    center?: [number, number];
+    geometry?: {
+        type: string;
+        coordinates: [number, number];
+    };
+};
+
 type GeocoderControlProps = Omit<GeocoderOptions, 'accessToken' | 'mapboxgl' | 'marker'> & {
   mapboxAccessToken: string;
   marker?: boolean | Omit<MarkerProps, 'longitude' | 'latitude'>;
@@ -13,7 +21,7 @@ type GeocoderControlProps = Omit<GeocoderOptions, 'accessToken' | 'mapboxgl' | '
 
   onLoading?: (e: object) => void;
   onResults?: (e: object) => void;
-  onResult?: (e: object) => void;
+  onResult?: (e: { result: GeocoderResult }) => void;
   onError?: (e: object) => void;
 
 };

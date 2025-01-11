@@ -2,9 +2,9 @@ import { Popup } from 'react-map-gl'
 import Typography from '@mui/material/Typography'
 
 type MapPopupProps = {
-    longitude: number;
-    latitude: number;
-    value: number;
+    longitude: number
+    latitude: number
+    value: number
 }
 
 export const MapPopup = ({ longitude, latitude, value }: MapPopupProps) => {
