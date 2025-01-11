@@ -318,7 +318,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 </Box>
                 {/* remove ^ */}
 
-                <Box sx={{ height: '100%', position: 'relative' }} id="map">
+                <Box sx={{ height: '100%', position: 'relative' }} id="map" aria-label="Interactive map showing climate data">
                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                         {isLoading && (
                             <Box sx={{ 
@@ -332,7 +332,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                 justifyContent: 'center',
                                 backgroundColor: 'rgba(255, 255, 255, 0.5)',
                                 zIndex: 9999
-                            }}>
+                            }} aria-live="polite">
                                 <LoadingSpinner />
                             </Box>
                         )}
@@ -348,6 +348,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                             maxBounds={MAP_BOUNDS}
                             style={{ width: "100%", height: "100%" }}
                             onError={handleMapError}
+                            aria-label="Map"
                         >
                             {tileJson && (
                                 <Source 
@@ -382,14 +383,16 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                         })
                                     }
                                 }}
+                                aria-label="Search location"
                             />
-                            <NavigationControl position="top-right" />
-                            <ScaleControl position="bottom-right" maxWidth={100} unit="metric" />
+                            <NavigationControl position="top-right" aria-label="Navigation controls" />
+                            <ScaleControl position="bottom-right" maxWidth={100} unit="metric" aria-label="Scale control" />
                             {hoverInfo && (
                                 <MapPopup
                                     longitude={hoverInfo.longitude}
                                     latitude={hoverInfo.latitude}
                                     value={hoverInfo.value || 0}
+                                    aria-label={`Popup at longitude ${hoverInfo.longitude} and latitude ${hoverInfo.latitude}`}
                                 />
                             )}
                         </Map>
@@ -404,6 +407,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                 min={parseFloat(currentVariableData.rescale.split(',')[0])}
                                 max={parseFloat(currentVariableData.rescale.split(',')[1])}
                                 title={currentVariableData.title}
+                                aria-label="Map legend"
                             />
                         </div>
                     </div>
