@@ -94,7 +94,7 @@ const throttledFetchPoint = throttle(async (
         
         if (response.ok) {
             const data = await response.json();
-            const gwlIndex = GWL_VALUES.indexOf(gwl);
+            const gwlIndex = GWL_VALUES.indexOf(gwl as typeof GWL_VALUES[number]);
             const value = data.data[gwlIndex];
             callback(value ?? null);
         }
@@ -210,6 +210,17 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         const isLoading = !mounted || !tileJson;
 
+        const handleMapError = (event: any) => {
+            // Prevent error from reaching console if it's a tile loading error
+            if (event.error?.status === 404 && event.error.url?.includes('WebMercatorQuad')) {
+                event.preventDefault();  // Stops the error from being logged
+                return;
+            }
+            
+            // Let other errors through to console
+            console.error(event.error);
+        };
+
         if (!mounted) {
             return (
                 <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
@@ -303,6 +314,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                             minZoom={3.5}
                             maxBounds={MAP_BOUNDS}
                             style={{ width: "100%", height: "100%" }}
+                            onError={handleMapError}
                         >
                             {tileJson && (
                                 <Source 
