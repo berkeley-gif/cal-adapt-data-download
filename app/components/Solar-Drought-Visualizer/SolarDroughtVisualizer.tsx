@@ -209,6 +209,7 @@ export default function SolarDroughtViz() {
                 <Typography variant="body1"><a style={{ 'textDecoration': 'underline', 'display': 'inline-block' }} href="https://docs.google.com/document/d/1HRISAkRb0TafiCSCOq773iqt2TtT2A9adZqDTAShvhE/edit?usp=sharing" target="_blank">Read more in the documentation</a></Typography>
             </Box>
 
+            {/* Main viz content */}
             <Accordion
                 expanded={accordionExpanded}
                 onChange={() => setAccordionExpanded(!accordionExpanded)}
@@ -239,7 +240,7 @@ export default function SolarDroughtViz() {
             >
 
                 <Grid container xs={12}>
-                    <Grid xs={8.5}>
+                    <Grid xs={isLocationSet ? 8.5 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                         {queriedData && !isLoading && isPointValid &&
                         (<Box>
                             <Box className="flex-params">
@@ -269,6 +270,7 @@ export default function SolarDroughtViz() {
                             </Box>
                         )}
                     </Grid>
+                    
                     <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                         <AccordionSummary
                             expandIcon={<ExpandMoreIcon />}
