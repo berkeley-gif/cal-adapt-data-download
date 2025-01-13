@@ -1,3 +1,5 @@
+'use client'
+
 import * as d3 from 'd3'
 import React, { useEffect, useRef } from 'react'
 import Box from '@mui/material/Box'
