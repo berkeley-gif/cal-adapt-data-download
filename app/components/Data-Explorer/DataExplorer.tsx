@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 
-import { globalWarmingLevelsList } from '@/app/lib/data-explorer/global-warming-levels'
-import { metricsList } from '@/app/lib/data-explorer/metrics'
 import MapboxMap from './Map'
 import Grid from '@mui/material/Unstable_Grid2'
 import MapUI from './MapUI'

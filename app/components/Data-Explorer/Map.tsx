@@ -9,19 +9,14 @@ import { Map, MapRef, Layer, Source, MapMouseEvent, NavigationControl, ScaleCont
 import { throttle } from 'lodash'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
+
 import { MapLegend } from './MapLegend'
 import { MapPopup } from './MapPopup'
 import LoadingSpinner from '../Global/LoadingSpinner'
 import GeocoderControl from '../Solar-Drought-Visualizer/geocoder-control'
-
-// remove me, for demo only v
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
+import { useLeftDrawer } from '../../context/LeftDrawerContext'
 
 const GWL_VALUES = ["1.5", "2.0", "2.5", "3.0"] as const
-// remove me, for demo only ^
 
 const INITIAL_VIEW_STATE = {
     longitude: -120,
@@ -85,20 +80,20 @@ type GeocoderResult = {
 }
 
 const throttledFetchPoint = throttle(async (
-    lng: number, 
-    lat: number, 
-    path: string, 
+    lng: number,
+    lat: number,
+    path: string,
     variable: string,
     gwl: string,
     callback: (value: number | null) => void
 ) => {
     try {
         const response = await fetch(
-            `${BASE_URL}/point/${lng},${lat}?` + 
+            `${BASE_URL}/point/${lng},${lat}?` +
             `url=${encodeURIComponent(path)}&` +
             `variable=${variable}`
         )
-        
+
         if (response.ok) {
             const data = await response.json()
             const gwlIndex = GWL_VALUES.indexOf(gwl as typeof GWL_VALUES[number])
@@ -109,14 +104,15 @@ const throttledFetchPoint = throttle(async (
         console.error('Error fetching point data:', error)
         callback(null)
     }
-}, THROTTLE_DELAY, { 
+}, THROTTLE_DELAY, {
     leading: true,  // Execute on the leading edge (immediate first call)
     trailing: true  // Execute on the trailing edge (final call)
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
     ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
-        
+        const { open } = useLeftDrawer()
+
         // Refs
         const mapRef = useRef<MapRef | null>(null)
 
@@ -142,7 +138,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         const variableKeys = Object.keys(VARIABLES) as VariableKey[]
         const currentVariable = variableKeys[metricSelected] || variableKeys[0]
         const currentGwl = GWL_VALUES[gwlSelected] || GWL_VALUES[0]
-        
+
         const currentVariableData = VARIABLES[currentVariable]
         if (!currentVariableData) {
             console.error('Invalid variable selected:', currentVariable)
@@ -188,10 +184,10 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             }
 
             const { lngLat: { lng, lat } } = event
-            
+
             throttledFetchPoint(
-                lng, 
-                lat, 
+                lng,
+                lat,
                 VARIABLES[currentVariable].path,
                 currentVariable,
                 currentGwl,
@@ -258,10 +254,10 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         if (!mounted) {
             return (
                 <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
-                    <Box sx={{ 
-                        position: 'absolute', 
-                        top: '50%', 
-                        left: '50%', 
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
                         transform: 'translate(-50%, -50%)'
                     }}>
                         <LoadingSpinner />
@@ -277,14 +273,12 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         }
 
         return (
-            
-            <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: 'relative' }}>                
-
+            <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: 'relative' }}>
                 <Box sx={{ height: '100%', position: 'relative' }} id="map" aria-label="Interactive map showing climate data">
                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                         {isLoading && (
-                            <Box sx={{ 
-                                position: 'absolute', 
+                            <Box sx={{
+                                position: 'absolute',
                                 top: 0,
                                 left: 0,
                                 right: 0,
@@ -308,12 +302,12 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                             scrollZoom={false}
                             minZoom={3.5}
                             maxBounds={MAP_BOUNDS}
-                            style={{ width: "100%", height: "100%" }}
+                            style={{ width: '100%', height: "100%" }}
                             onError={handleMapError}
                             aria-label="Map"
                         >
                             {tileJson && (
-                                <Source 
+                                <Source
                                     id="raster-source"
                                     type="raster"
                                     tiles={tileJson.tiles}
@@ -326,16 +320,16 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                     />
                                 </Source>
                             )}
-                            <GeocoderControl 
+                            <GeocoderControl
                                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN || ''}
-                                zoom={13} 
+                                zoom={13}
                                 position="top-right"
                                 collapsed={true}
                                 clearOnBlur={true}
                                 onResult={(e: { result: GeocoderResult }) => {
                                     const { result } = e
                                     const location = result && (
-                                        result.center || 
+                                        result.center ||
                                         (result.geometry?.type === 'Point' && result.geometry.coordinates)
                                     )
                                     if (location && mapRef.current) {
@@ -358,13 +352,13 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                 />
                             )}
                         </Map>
-                        <div style={{ 
+                        <div style={{
                             position: 'absolute',
                             bottom: 40,
                             left: 40,
                             zIndex: 2
                         }}>
-                            <MapLegend 
+                            <MapLegend
                                 colormap={currentColormap}
                                 min={parseFloat(currentVariableData.rescale.split(',')[0])}
                                 max={parseFloat(currentVariableData.rescale.split(',')[1])}

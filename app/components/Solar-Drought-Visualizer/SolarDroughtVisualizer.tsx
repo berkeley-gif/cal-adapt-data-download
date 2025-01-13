@@ -192,7 +192,7 @@ export default function SolarDroughtViz() {
     }
 
     return (
-        <div className="solar-drought-tool" style={{ 'width': `${TOOL_WIDTH}px` }}>
+        <div className="solar-drought-tool tool-container tool-container--padded" style={{ 'width': `${TOOL_WIDTH}px` }}>
             <div className="solar-drought-tool__intro"><Typography variant="h4">Solar Drought Visualizer</Typography>
                 <Typography variant="body1">This tool shows when there are likely to be significant reductions in solar energy availability in the future. To be more specific, it shows the number of solar resource drought days (less than 40% average generation) per month throughout a representative 30-year period. </Typography>
                 <a style={{ 'textDecoration': 'underline' }} href="https://docs.google.com/document/d/1HRISAkRb0TafiCSCOq773iqt2TtT2A9adZqDTAShvhE/edit?usp=sharing" target="_blank">Read more in the documentation</a>

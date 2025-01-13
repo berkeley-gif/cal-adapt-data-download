@@ -92,3 +92,9 @@
     text-align: center;
   }
 }
+
+.tool-container {
+  &--padded {
+    padding: 30px;
+  }
+}

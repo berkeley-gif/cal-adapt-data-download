@@ -1,7 +1,7 @@
 .map-ui {
   z-index: 2;
   position: absolute; 
-  width: calc(100% - 212px); // acount for grid margins/paddings as well as sidebar 
+  width: calc(100% - 212px); // acount for left drawer 
   height: auto; 
   padding: 10px 35px;
   pointer-events: none;
