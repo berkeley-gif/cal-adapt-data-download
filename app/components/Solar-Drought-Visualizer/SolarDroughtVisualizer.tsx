@@ -211,6 +211,40 @@ export default function SolarDroughtViz() {
             </Box>
 
             {/* Main viz content */}
+            <Grid container xs={12}>
+                {/* Heatmap parameters section */}
+                <Grid xs={isLocationSet ? 12 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                    {queriedData && !isLoading && isPointValid &&
+                    (<Box>
+                        <Box className="flex-params">
+                            <Box className="flex-params__item">
+                                <Typography className="option-group__title" variant="body2" aria-label="Global Warming Level">Global Warming Level</Typography>
+                                <Typography variant="body1" aria-label={`Selected Global Warming Level: ${globalWarmingSelected}`}>{globalWarmingSelected}°</Typography>
+                            </Box>
+                            <Box className="flex-params__item">
+                                <Typography className="option-group__title" variant="body2" aria-label="Photovoltaic Configuration">Photovoltaic Configuration</Typography>
+                                <Typography variant="body1" aria-label={`Selected Photovoltaic Configuration: ${photoConfigSelected}`}>{photoConfigSelected}</Typography>
+                            </Box>
+                            <Box className="flex-params__item">
+                                <Typography className='inline' variant="subtitle1" aria-label="Edit parameters">Edit parameters</Typography>
+                                <IconButton className='inline' onClick={toggleOpen} aria-label="Open settings">
+                                    <SettingsOutlinedIcon />
+                                </IconButton>
+                            </Box>
+                        </Box>
+
+                        {/* Global warming level information */}
+                        <Box className="alerts" sx={{ maxWidth: '100%' }}>
+                            <Alert variant="purple" severity="info" aria-label="Global models estimate information">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
+                                <Box className="cta">
+                                    <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels" aria-label="Learn more about GWL">Learn more about GWL</Button>
+                                </Box>
+                                </Alert>
+                            </Box>
+                        </Box>
+                    )}
+                </Grid>
+            </Grid>
             <Accordion
                 expanded={accordionExpanded}
                 onChange={() => setAccordionExpanded(!accordionExpanded)}
@@ -242,37 +276,9 @@ export default function SolarDroughtViz() {
 
                 <Grid container xs={12}>
 
-                    {/* Heatmap parameters section */}
+                    {/* Empty section for spacing */}
                     <Grid xs={isLocationSet ? 8.5 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
-                        {queriedData && !isLoading && isPointValid &&
-                        (<Box>
-                            <Box className="flex-params">
-                                <Box className="flex-params__item">
-                                    <Typography className="option-group__title" variant="body2" aria-label="Global Warming Level">Global Warming Level</Typography>
-                                    <Typography variant="body1" aria-label={`Selected Global Warming Level: ${globalWarmingSelected}`}>{globalWarmingSelected}°</Typography>
-                                </Box>
-                                <Box className="flex-params__item">
-                                    <Typography className="option-group__title" variant="body2" aria-label="Photovoltaic Configuration">Photovoltaic Configuration</Typography>
-                                    <Typography variant="body1" aria-label={`Selected Photovoltaic Configuration: ${photoConfigSelected}`}>{photoConfigSelected}</Typography>
-                                </Box>
-                                <Box className="flex-params__item">
-                                    <Typography className='inline' variant="subtitle1" aria-label="Edit parameters">Edit parameters</Typography>
-                                    <IconButton className='inline' onClick={toggleOpen} aria-label="Open settings">
-                                        <SettingsOutlinedIcon />
-                                    </IconButton>
-                                </Box>
-                            </Box>
 
-                            {/* Global warming level information */}
-                            <Box className="alerts">
-                                <Alert variant="purple" severity="info" aria-label="Global models estimate information">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
-                                    <Box className="cta">
-                                        <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels" aria-label="Learn more about GWL">Learn more about GWL</Button>
-                                    </Box>
-                                    </Alert>
-                                </Box>
-                            </Box>
-                        )}
                     </Grid>
                     
                     {/* Locator map instruction section */}
