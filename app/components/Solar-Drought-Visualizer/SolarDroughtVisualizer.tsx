@@ -239,31 +239,6 @@ export default function SolarDroughtViz() {
             >
 
                 <Grid container xs={12}>
-                    <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                        <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1-content"
-                            id="panel1-header"
-                            sx={{
-                                '& .MuiAccordionSummary-content': {
-                                    marginTop: '20px', // Override the default margin to keep the Accordion Summary from vertically shifting when expanding
-                                    marginBottom: '20px',
-                                },
-                            }}
-                        >
-                            <EditLocationOutlinedIcon />
-                            <Typography 
-                                className="inline" 
-                                variant="h5" 
-                                style={{ 
-                                    'marginLeft': '10px',
-                                    'textDecoration': !accordionExpanded ? 'underline' : 'none',
-                                }}
-                            >
-                                { isLocationSet ? "Change your location" : "Select your location" }
-                            </Typography>
-                        </AccordionSummary>
-                    </Grid>
                     <Grid xs={8.5}>
                         {queriedData && !isLoading && isPointValid &&
                         (<Box>
@@ -294,25 +269,30 @@ export default function SolarDroughtViz() {
                             </Box>
                         )}
                     </Grid>
-
-                    {/* Map section */}
-                    <Grid xs={3.5} > 
-                        <AccordionDetails
+                    <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="panel1-content"
+                            id="panel1-header"
                             sx={{
-                                paddingTop: '0px',
+                                '& .MuiAccordionSummary-content': {
+                                    marginTop: '20px', // Override the default margin to keep the Accordion Summary from vertically shifting when expanding
+                                    marginBottom: '20px',
+                                },
                             }}
                         >
-                            <Box className="solar-drought-tool__map" style={{ width: '100%' }}>
-                                <MapboxMap 
-                                    mapMarker={mapMarker} 
-                                    setMapMarker={setMapMarker} 
-                                    ref={mapRef} 
-                                    locationSelected={apiParams.point} 
-                                    setLocationSelected={setLocationSelected}
-                                    height={MAP_HEIGHT}
-                                />
-                            </Box>
-                        </AccordionDetails>
+                            <EditLocationOutlinedIcon />
+                            <Typography 
+                                className="inline" 
+                                variant="h5" 
+                                style={{ 
+                                    'marginLeft': '10px',
+                                    'textDecoration': !accordionExpanded ? 'underline' : 'none',
+                                }}
+                            >
+                                { isLocationSet ? "Change your location" : "Select your location" }
+                            </Typography>
+                        </AccordionSummary>
                     </Grid>
 
                     {/* Heatmap section */}
@@ -360,6 +340,25 @@ export default function SolarDroughtViz() {
                                 )
                             }
                         </Box>
+                    </Grid>
+                    {/* Map section */}
+                    <Grid xs={3.5} > 
+                        <AccordionDetails
+                            sx={{
+                                paddingTop: '0px',
+                            }}
+                        >
+                            <Box className="solar-drought-tool__map" style={{ width: '100%' }}>
+                                <MapboxMap 
+                                    mapMarker={mapMarker} 
+                                    setMapMarker={setMapMarker} 
+                                    ref={mapRef} 
+                                    locationSelected={apiParams.point} 
+                                    setLocationSelected={setLocationSelected}
+                                    height={MAP_HEIGHT}
+                                />
+                            </Box>
+                        </AccordionDetails>
                     </Grid>
                 </Grid>
             </Accordion>
