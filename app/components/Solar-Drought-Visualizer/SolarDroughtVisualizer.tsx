@@ -200,13 +200,15 @@ export default function SolarDroughtViz() {
     }, [])
 
     return (
-        <Box className="solar-drought-tool">
+        <Box className="solar-drought-tool" aria-label="Solar Drought Visualizer" role="region">
 
             {/* Intro section */}
             <Box className="solar-drought-tool__intro" style={{ 'maxWidth': '860px' }}>
-                <Typography variant="h4">Solar Drought Visualizer</Typography>
-                <Typography variant="body1">This tool shows when there are likely to be significant reductions in solar energy availability in the future. To be more specific, it shows the number of solar resource drought days (less than 40% average generation) per month throughout a representative 30-year period. </Typography>
-                <Typography variant="body1"><a style={{ 'textDecoration': 'underline', 'display': 'inline-block' }} href="https://docs.google.com/document/d/1HRISAkRb0TafiCSCOq773iqt2TtT2A9adZqDTAShvhE/edit?usp=sharing" target="_blank">Read more in the documentation</a></Typography>
+                <Typography variant="h4" aria-label="Solar Drought Visualizer Title">Solar Drought Visualizer</Typography>
+                <Typography variant="body1" aria-label="Description of the tool">This tool shows when there are likely to be significant reductions in solar energy availability in the future. To be more specific, it shows the number of solar resource drought days (less than 40% average generation) per month throughout a representative 30-year period. </Typography>
+                <Typography variant="body1">
+                    <a style={{ 'textDecoration': 'underline', 'display': 'inline-block' }} href="https://docs.google.com/document/d/1HRISAkRb0TafiCSCOq773iqt2TtT2A9adZqDTAShvhE/edit?usp=sharing" target="_blank" aria-label="Read more in the documentation">Read more in the documentation</a>
+                </Typography>
             </Box>
 
             {/* Main viz content */}
@@ -245,25 +247,25 @@ export default function SolarDroughtViz() {
                         (<Box>
                             <Box className="flex-params">
                                 <Box className="flex-params__item">
-                                    <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
-                                    <Typography variant="body1">{globalWarmingSelected}°</Typography>
+                                    <Typography className="option-group__title" variant="body2" aria-label="Global Warming Level">Global Warming Level</Typography>
+                                    <Typography variant="body1" aria-label={`Selected Global Warming Level: ${globalWarmingSelected}`}>{globalWarmingSelected}°</Typography>
                                 </Box>
                                 <Box className="flex-params__item">
-                                    <Typography className="option-group__title" variant="body2">Photovoltaic Configuration</Typography>
-                                    <Typography variant="body1">{photoConfigSelected}</Typography>
+                                    <Typography className="option-group__title" variant="body2" aria-label="Photovoltaic Configuration">Photovoltaic Configuration</Typography>
+                                    <Typography variant="body1" aria-label={`Selected Photovoltaic Configuration: ${photoConfigSelected}`}>{photoConfigSelected}</Typography>
                                 </Box>
                                 <Box className="flex-params__item">
-                                    <Typography className='inline' variant="subtitle1">Edit parameters</Typography>
-                                    <IconButton className='inline' onClick={toggleOpen}>
+                                    <Typography className='inline' variant="subtitle1" aria-label="Edit parameters">Edit parameters</Typography>
+                                    <IconButton className='inline' onClick={toggleOpen} aria-label="Open settings">
                                         <SettingsOutlinedIcon />
                                     </IconButton>
                                 </Box>
                             </Box>
 
                             <Box className="alerts">
-                                <Alert variant="purple" severity="info">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
+                                <Alert variant="purple" severity="info" aria-label="Global models estimate information">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
                                     <Box className="cta">
-                                        <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels">Learn more about GWL</Button>
+                                        <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels" aria-label="Learn more about GWL">Learn more about GWL</Button>
                                     </Box>
                                     </Alert>
                                 </Box>
@@ -273,7 +275,7 @@ export default function SolarDroughtViz() {
                     
                     <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                         <AccordionSummary
-                            expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} />}
+                            expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} aria-label="Expand or collapse the section" />}
                             aria-controls="panel1-content"
                             id="panel1-header"
                             sx={{
@@ -283,7 +285,7 @@ export default function SolarDroughtViz() {
                                 },
                             }}
                         >
-                            <EditLocationOutlinedIcon />
+                            <EditLocationOutlinedIcon aria-label="Edit location" />
                             <Typography 
                                 className="inline" 
                                 variant="h5" 
@@ -291,6 +293,7 @@ export default function SolarDroughtViz() {
                                     'marginLeft': '10px',
                                     'textDecoration': !accordionExpanded ? 'underline' : 'none',
                                 }}
+                                aria-label={isLocationSet ? "Change your location" : "Select your location"}
                             >
                                 { isLocationSet ? "Change your location" : "Select your location" }
                             </Typography>
@@ -309,10 +312,11 @@ export default function SolarDroughtViz() {
                         {!isLoading && !isPointValid && isLocationSet &&
                             (
                                 <Box>
-                                    <Alert variant="grey" severity="info">You have selected a location with land use or land cover restrictions. No data will be returned. 
+                                    <Alert variant="grey" severity="info" aria-label="Location with restrictions alert">You have selected a location with land use or land cover restrictions. No data will be returned. 
                                         <span 
                                             className={accordionExpanded ? '' : 'underline'} 
                                             onClick={accordionExpanded ? undefined : expandMap}
+                                            aria-label="Select another location"
                                         >
                                             <strong>Select another location </strong>
                                         </span> 
@@ -331,13 +335,14 @@ export default function SolarDroughtViz() {
                                         width={heatmapWidth}
                                         height={HEATMAP_HEIGHT} 
                                         data={queriedData && queriedData} 
+                                        aria-label="Heatmap visualization"
                                     />
                                 )
                             }
                             {isLoading &&
                                 (
                                     <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                        <LoadingSpinner />
+                                        <LoadingSpinner aria-label="Loading heatmap data" />
                                     </Box>
                                 )
                             }
@@ -358,6 +363,7 @@ export default function SolarDroughtViz() {
                                     locationSelected={apiParams.point} 
                                     setLocationSelected={setLocationSelected}
                                     height={MAP_HEIGHT}
+                                    aria-label="Map for selecting location of heatmap data"
                                 />
                             </Box>
                         </AccordionDetails>
@@ -372,13 +378,14 @@ export default function SolarDroughtViz() {
                     variant="temporary"
                     open={open}
                     onClose={toggleOpen}
+                    aria-label="Settings side panel"
                 >
                     <Tooltip
                         TransitionComponent={Fade}
                         TransitionProps={{ timeout: 600 }}
                         title="Close the sidebar"
                     >
-                        <IconButton onClick={toggleOpen}>
+                        <IconButton onClick={toggleOpen} aria-label="Close settings sidebar">
                             <CloseIcon />
                         </IconButton>
                     </Tooltip>
@@ -387,7 +394,9 @@ export default function SolarDroughtViz() {
                         globalWarmingList={globalWarmingList}
                         globalWarmingSelected={globalWarmingSelected}
                         setGlobalWarmingSelected={setGlobalWarmingSelected}
-                        toggleOpen={toggleOpen}>
+                        toggleOpen={toggleOpen}
+                        aria-label="Visualization parameters form"
+                    >
                     </VizPrmsForm>
                 </SidePanel>
             </Box>
