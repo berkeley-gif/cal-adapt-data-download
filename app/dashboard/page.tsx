@@ -2,6 +2,6 @@ import { ReactNode } from 'react'
 
 export default function Dashboard(): ReactNode {
     return (
-        <div>Getting Started</div>
+        <div className="tool-container tool-container--padded">Getting Started</div>
     )
 }
