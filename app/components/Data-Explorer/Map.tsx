@@ -2,6 +2,7 @@
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
+import '@/app/styles/dashboard/data-explorer.scss'
 import '@/app/styles/dashboard/mapbox-map.scss'
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { Map, MapRef, Layer, Source, MapMouseEvent, NavigationControl, ScaleControl, LngLatBoundsLike, ErrorEvent } from 'react-map-gl'
@@ -276,47 +277,8 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         }
 
         return (
-            <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: 'relative' }}>
-                {/* remove this Box v */}
-                <Box>
-                    {/* <p>{metricSelected}</p>
-                    <p>{gwlSelected}</p> */}
-
-                    <FormControl sx={{ m: 1, minWidth: 120 }}>
-                        <InputLabel id="variable-select-label">Variable</InputLabel>
-                        <Select
-                            labelId="variable-select-label"
-                            value={currentVariable}
-                            label="Variable"
-                            onChange={(e) => {
-                                const newIndex = variableKeys.indexOf(e.target.value as VariableKey)
-                                setMetricSelected(newIndex)
-                            }}
-                        >
-                            {Object.entries(VARIABLES).map(([key, value]) => (
-                                <MenuItem key={key} value={key}>
-                                    {value.title}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <FormControl sx={{ m: 1, minWidth: 120 }}>
-                        <InputLabel id="gwl-select-label">GWL</InputLabel>
-                        <Select
-                            labelId="gwl-select-label"
-                            value={gwlSelected}
-                            label="GWL"
-                            onChange={(e) => setGwlSelected(Number(e.target.value))}
-                        >
-                            {GWL_VALUES.map((gwl, index) => (
-                                <MenuItem key={gwl} value={index}>
-                                    {gwl}°C
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Box>
-                {/* remove ^ */}
+            
+            <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: 'relative' }}>                
 
                 <Box sx={{ height: '100%', position: 'relative' }} id="map" aria-label="Interactive map showing climate data">
                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>

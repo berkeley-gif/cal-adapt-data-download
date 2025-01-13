@@ -18,6 +18,7 @@ import HelpIcon from '@mui/icons-material/Help'
 
 import { metricsList } from '@/app/lib/data-explorer/metrics'
 import { globalWarmingLevelsList } from '@/app/lib/data-explorer/global-warming-levels'
+import { useLeftDrawer } from '../../context/LeftDrawerContext'
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -25,8 +26,8 @@ const ITEM_PADDING_TOP = 8;
 type MapUIProps = {
     metricSelected: number;
     gwlSelected: number;
-    setMetricSelected: (metric: number) => void,
-    setGwlSelected: (gwl: number) => void,
+    setMetricSelected: (metric: number) => void;
+    setGwlSelected: (gwl: number) => void;
 }
 
 const MenuProps: any = {
@@ -49,7 +50,9 @@ const MenuProps: any = {
 }
 
 
-export default function Map({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected }: MapUIProps) {
+export default function Map({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected, sidebarOpen }: MapUIProps) {
+    const { open } = useLeftDrawer()
+
     const [helpAnchorEl, setHelpAnchorEl] = React.useState<HTMLButtonElement | null>(null)
 
     const handleHelpClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -64,14 +67,17 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
     const id = helpOpen ? 'simple-popover' : undefined;
 
     return (
-        <div className="map-ui">
+        <div className="map-ui" style={{
+            width: open ? 'calc(100% - 212px)' : '100%',
+            transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1)',
+        }}>
             <Box sx={{ height: '80vh', display: 'flex', flexDirection: 'column' }}>
                 <Grid container direction="column" sx={{ height: '100%' }}>
                     {/* Top Columns */}
                     <Grid container spacing={2}>
                         <Grid item xs={4}>
                             <div className='map-ui__parameter-selection'>
-                                <div className="container container--white">
+                                <div className="container container--white container--map-ui">
                                     <div className="option-group option-group--vertical">
                                         <div className="option-group__title">
                                             <Typography variant="body2">Global Warming Level</Typography>
@@ -88,7 +94,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                             />
                                         </div>
 
-                                        <FormControl >
+                                        <FormControl variant="standard">
                                             <Select
                                                 value={gwlSelected}
                                                 onChange={(event: any) => {
@@ -124,7 +130,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                             />
                                         </div>
 
-                                        <FormControl>
+                                        <FormControl variant="standard">
                                             <Select
                                                 value={metricSelected}
                                                 onChange={(event: any) => {
@@ -154,7 +160,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                     <Grid container item justifyContent="center">
                         <Grid item xs={10}></Grid>
                         <Grid item xs={2}>
-                            <IconButton sx={{ float: 'right', mr: '20px' }} aria-label="help" size="large" onClick={handleHelpClick}>
+                            <IconButton className="map-ui__help-button" sx={{ float: 'right', mr: '60px' }} aria-label="help" size="large" onClick={handleHelpClick}>
                                 <HelpIcon />
                             </IconButton>
                             <Popover
@@ -183,7 +189,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                     Explore climate trends, visualize environmental data, and make informed decisions about California's future. Here's a quick guide to help you navigate the tool:
                                 </Typography>
 
-                                <Typography variant="h6" sx={{mt: '15px'}}>
+                                <Typography variant="h6" sx={{ mt: '15px' }}>
                                     Global Warming Level Selector
                                 </Typography>
 
@@ -191,14 +197,14 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                     Use the dropdown menu to select a global warming scenario (e.g., 1.5°C, 2.0°C).
                                     This will adjust the data overlays to reflect projected changes under the selected warming level.
                                 </Typography>
-                                <Typography variant="h6" sx={{mt: '15px'}}>
+                                <Typography variant="h6" sx={{ mt: '15px' }}>
                                     Metric Selector
                                 </Typography>
                                 <Typography variant="body1">
                                     Choose a climate metric to display on the map (e.g., temperature, precipitation, sea level rise).
                                     Each metric provides a unique perspective on how climate change impacts various regions.
                                 </Typography>
-                                <Typography variant="h6" sx={{mt: '15px'}}>
+                                <Typography variant="h6" sx={{ mt: '15px' }}>
                                     Interactive Map Features
                                 </Typography>
                                 <Typography variant="body1">

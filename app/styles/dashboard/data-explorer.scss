@@ -1,6 +1,21 @@
 .map-ui {
+  z-index: 2;
+  position: absolute; 
+  width: calc(100% - 212px); // acount for grid margins/paddings as well as sidebar 
+  height: auto; 
+  padding: 10px 35px;
+  pointer-events: none;
+  max-width: 100%; 
+  overflow: hidden;
+
   &__parameter-selection {
     display: flex;
     gap: 15px;
+    pointer-events: auto;
+  }
+
+  &__help-button {
+    pointer-events: auto;
   }
 }
+
