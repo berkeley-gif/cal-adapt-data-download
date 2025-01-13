@@ -273,7 +273,7 @@ export default function SolarDroughtViz() {
                     
                     <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                         <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
+                            expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} />}
                             aria-controls="panel1-content"
                             id="panel1-header"
                             sx={{
