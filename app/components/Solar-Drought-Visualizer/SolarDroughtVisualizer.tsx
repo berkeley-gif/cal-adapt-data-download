@@ -13,6 +13,9 @@ import Fade from '@mui/material/Fade'
 import CloseIcon from '@mui/icons-material/Close'
 import EditLocationOutlinedIcon from '@mui/icons-material/EditLocationOutlined'
 import Alert from '@mui/material/Alert'
+import FormGroup from '@mui/material/FormGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
         purple: true;
@@ -22,7 +25,7 @@ declare module '@mui/material/Alert' {
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
-
+import Typography from '@mui/material/Typography'
 import SidePanel from '@/app/components/Dashboard/RightSidePanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
 import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
@@ -31,7 +34,6 @@ import { useDidMountEffect } from "@/app/utils/hooks"
 
 import MapboxMap from '@/app/components/Solar-Drought-Visualizer/MapboxMap'
 import Heatmap from '@/app/components/Heatmap/Heatmap'
-import { Typography } from '@mui/material'
 import VizPrmsForm from './VisualizationParamsForm'
 import { ApiResponse } from './DataType'
 import '@/app/styles/dashboard/solar-drought-visualizer.scss'
@@ -64,6 +66,7 @@ export default function SolarDroughtViz() {
     const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [isPointValid, setIsPointValid] = useState<boolean>(false)
+    const [useAltColor, setUseAltColor] = useState(false)
 
     // ACCORDION
     const expandMap = () => {
@@ -198,6 +201,10 @@ export default function SolarDroughtViz() {
         }
     }, [])
 
+    const handleColorChange = () => {
+        setUseAltColor((prev) => !prev);
+    };
+
     return (
         <Box className="solar-drought-tool" aria-label="Solar Drought Visualizer" role="region">
 
@@ -276,9 +283,16 @@ export default function SolarDroughtViz() {
 
                 <Grid container xs={12}>
 
-                    {/* Empty section for spacing */}
+                    {/* Colormap toggle for heatmap */}
                     <Grid xs={isLocationSet ? 8.5 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
-
+                        <div className="color-scale-toggle">
+                            <FormGroup>
+                                <FormControlLabel 
+                                    control={<Switch onChange={handleColorChange} color="secondary" />} 
+                                    label="Alternative color palette" 
+                                />
+                            </FormGroup>
+                        </div>
                     </Grid>
                     
                     {/* Locator map instruction section */}
@@ -344,6 +358,7 @@ export default function SolarDroughtViz() {
                                         width={heatmapWidth}
                                         height={HEATMAP_HEIGHT} 
                                         data={queriedData && queriedData} 
+                                        useAltColor={useAltColor}
                                         aria-label="Heatmap visualization"
                                     />
                                 )
