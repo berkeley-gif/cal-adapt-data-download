@@ -37,7 +37,6 @@ import { ApiResponse } from './DataType'
 import '@/app/styles/dashboard/solar-drought-visualizer.scss'
 import LoadingSpinner from '../Global/LoadingSpinner'
 
-const TOOL_WIDTH = '100%'
 const MAP_HEIGHT = 615
 const HEATMAP_HEIGHT = 500
 
@@ -242,6 +241,8 @@ export default function SolarDroughtViz() {
             >
 
                 <Grid container xs={12}>
+
+                    {/* Heatmap parameters section */}
                     <Grid xs={isLocationSet ? 8.5 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                         {queriedData && !isLoading && isPointValid &&
                         (<Box>
@@ -262,6 +263,7 @@ export default function SolarDroughtViz() {
                                 </Box>
                             </Box>
 
+                            {/* Global warming level information */}
                             <Box className="alerts">
                                 <Alert variant="purple" severity="info" aria-label="Global models estimate information">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
                                     <Box className="cta">
@@ -273,6 +275,7 @@ export default function SolarDroughtViz() {
                         )}
                     </Grid>
                     
+                    {/* Locator map instruction section */}
                     <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                         <AccordionSummary
                             expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} aria-label="Expand or collapse the section" />}
@@ -348,7 +351,8 @@ export default function SolarDroughtViz() {
                             }
                         </Box>
                     </Grid>
-                    {/* Map section */}
+
+                    {/* Locator map section */}
                     <Grid xs={3.5} > 
                         <AccordionDetails
                             sx={{
