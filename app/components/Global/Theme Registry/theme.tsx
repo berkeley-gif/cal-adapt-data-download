@@ -9,7 +9,25 @@ type CustomIconButtonProps = IconButtonProps & {
   variant?: 'customVariant';
 }
 
-const theme = createTheme({
+// Augment the palette to include a second palette color
+declare module '@mui/material/styles' {
+  interface Palette {
+    secondaryOnWhite: Palette['primary'];
+  }
+
+  interface PaletteOptions {
+    secondaryOnWhite?: PaletteOptions['primary'];
+  }
+}
+
+// Update the Button's color options to include an ochre option
+declare module '@mui/material/Fab' {
+  interface FabPropsColorOverrides {
+    secondaryOnWhite: true;
+  }
+}
+
+let theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
@@ -24,7 +42,8 @@ const theme = createTheme({
     },
     info: {
       main: '#C6C7F8',
-    }
+    },
+
   },
   typography: {
     fontFamily: 'inherit',
@@ -65,13 +84,6 @@ const theme = createTheme({
     borderRadius: 16,
   },
   components: {
-    MuiPopover: {
-      styleOverrides: {
-        paper: {
-          boxShadow: 'none', // Remove the drop shadow
-        },
-      },
-    },
     MuiAlert: {
       variants: [
         {
@@ -145,7 +157,19 @@ const theme = createTheme({
       }
     }
   }
-});
+})
+
+theme = createTheme(theme, {
+  palette: {
+    secondaryOnWhite: theme.palette.augmentColor({
+      color: {
+        main: '#fff',
+        contrastText: '#000000'
+      },
+      name: 'primaryOnWhite',
+    }),
+  }
+})
 
 export default theme
 

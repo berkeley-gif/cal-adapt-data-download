@@ -2,22 +2,26 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 
+const DRAWER_WIDTH = 212
+
 type LeftDrawerContextType = {
     open: boolean;
     toggleLeftDrawer: () => void;
+    drawerWidth: number;
 }
 
 const LeftDrawerContext = createContext<LeftDrawerContextType | undefined>(undefined)
 
 export const LeftDrawerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [open, setOpen] = useState(true)
+    const drawerWidth = DRAWER_WIDTH
 
     const toggleLeftDrawer = () => {
         setOpen(prev => !prev)
     }
 
     return (
-        <LeftDrawerContext.Provider value={{ open, toggleLeftDrawer }}>
+        <LeftDrawerContext.Provider value={{ open, toggleLeftDrawer, drawerWidth}}>
             {children}
         </LeftDrawerContext.Provider>
     )

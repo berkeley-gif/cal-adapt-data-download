@@ -14,7 +14,6 @@ import { MapLegend } from './MapLegend'
 import { MapPopup } from './MapPopup'
 import LoadingSpinner from '../Global/LoadingSpinner'
 import GeocoderControl from '../Solar-Drought-Visualizer/geocoder-control'
-import { useLeftDrawer } from '../../context/LeftDrawerContext'
 
 const GWL_VALUES = ["1.5", "2.0", "2.5", "3.0"] as const
 
@@ -110,9 +109,7 @@ const throttledFetchPoint = throttle(async (
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
-    ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
-        const { open } = useLeftDrawer()
-
+    ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {    
         // Refs
         const mapRef = useRef<MapRef | null>(null)
 
@@ -269,6 +266,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         const handleMapLoad = (e: { target: import('mapbox-gl').Map }) => {
             if (!e.target) return
             mapRef.current = e.target as unknown as MapRef
+            mapRef.current.resize() // Resize map to fit container after UI changes
             setMapLoaded(true)
         }
 

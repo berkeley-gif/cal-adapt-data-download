@@ -13,8 +13,8 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import Fade from '@mui/material/Fade'
-import IconButton from '@mui/material/IconButton'
-import HelpIcon from '@mui/icons-material/Help'
+import Fab from '@mui/material/Fab'
+import QuestionMarkOutlinedIcon from '@mui/icons-material/QuestionMarkOutlined';
 
 import { metricsList } from '@/app/lib/data-explorer/metrics'
 import { globalWarmingLevelsList } from '@/app/lib/data-explorer/global-warming-levels'
@@ -50,8 +50,8 @@ const MenuProps: any = {
 }
 
 
-export default function Map({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected, sidebarOpen }: MapUIProps) {
-    const { open } = useLeftDrawer()
+export default function Map({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected}: MapUIProps) {
+    const { open, drawerWidth } = useLeftDrawer()
 
     const [helpAnchorEl, setHelpAnchorEl] = React.useState<HTMLButtonElement | null>(null)
 
@@ -68,7 +68,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
 
     return (
         <div className="map-ui" style={{
-            width: open ? 'calc(100% - 212px)' : '100%',
+            width: open ? `calc(100% - ${drawerWidth}px + 72px` : '100%',
             transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1)',
         }}>
             <Box sx={{ height: '80vh', display: 'flex', flexDirection: 'column' }}>
@@ -160,9 +160,9 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                     <Grid container item justifyContent="center">
                         <Grid item xs={10}></Grid>
                         <Grid item xs={2}>
-                            <IconButton className="map-ui__help-button" sx={{ float: 'right', mr: '60px' }} aria-label="help" size="large" onClick={handleHelpClick}>
-                                <HelpIcon />
-                            </IconButton>
+                            <Fab className="map-ui__help-button" color="secondaryOnWhite" sx={{ float: 'right', mr: '50px' }} aria-label="Help toggle" size="medium" onClick={handleHelpClick}>
+                                <QuestionMarkOutlinedIcon />
+                            </Fab>
                             <Popover
                                 id={id}
                                 className="help-popover"
@@ -181,7 +181,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                     '& .MuiPaper-root': {
                                         width: '400px', // Set width
                                         height: '500px', // Set height
-                                        padding: '25px'
+                                        padding: '30px'
                                     },
                                 }}
                             >
