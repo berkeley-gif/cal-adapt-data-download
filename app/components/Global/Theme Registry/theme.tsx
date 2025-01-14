@@ -12,11 +12,13 @@ type CustomIconButtonProps = IconButtonProps & {
 // Augment the palette to include a second palette color
 declare module '@mui/material/styles' {
   interface Palette {
-    secondaryOnWhite: Palette['primary'];
+    primaryBlue: Palette['primary'];
+    secondaryOnWhite: Palette['secondary'];
   }
 
   interface PaletteOptions {
-    secondaryOnWhite?: PaletteOptions['primary'];
+    primaryBlue?: PaletteOptions['primary'];
+    secondaryOnWhite?: PaletteOptions['secondary'];
   }
 }
 
@@ -26,6 +28,7 @@ declare module '@mui/material/Fab' {
     secondaryOnWhite: true;
   }
 }
+
 
 let theme = createTheme({
   palette: {
@@ -159,6 +162,7 @@ let theme = createTheme({
   }
 })
 
+// Create custom palettes
 theme = createTheme(theme, {
   palette: {
     secondaryOnWhite: theme.palette.augmentColor({
@@ -166,8 +170,37 @@ theme = createTheme(theme, {
         main: '#fff',
         contrastText: '#000000'
       },
-      name: 'primaryOnWhite',
+      name: 'secondaryOnWhite',
     }),
+    primaryBlue: theme.palette.augmentColor({
+      color: {
+        main: '#57AEF3',
+      },
+      name: 'primaryBlue',
+    }),
+  },
+})
+
+// Override components after creating custom palettes
+theme = createTheme(theme, {
+  components: {
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          color: theme.palette.secondary.main, // Default unselected state
+          '&.Mui-checked': {
+            color: theme.palette.primaryBlue.main, // Checked state
+          },
+        },
+      },
+    },
+    MuiTooltip: {
+
+      tooltip: {
+        color: theme.palette.primaryBlue.main, // Default unselected state
+      },
+
+    }
   }
 })
 
