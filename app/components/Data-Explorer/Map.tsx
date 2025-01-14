@@ -35,19 +35,19 @@ const RASTER_TILE_LAYER_OPACITY = 0.8 as const
 // edit me v
 const VARIABLES = {
     'TX99p': {
-        title: 'Maximum air temperature days exceeding 99th percentile',
+        title: 'Mean annual change in extreme heat days',
         path: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/TX99p/d02/TX99p.zarr',
         rescale: '1.18,35.19',
         colormap: 'oranges' // case sensitive
     },
     'R99p': {
-        title: 'Absolute change in 99th percentile precipitation',
+        title: 'Absolute change in 99th percentile 1-day accumulated precipitation',
         path: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/R99p/d02/R99p.zarr',
         rescale: '-4.866,39.417',
         colormap: 'blues'
     },
     'ffwige50': {
-        title: 'Number of days with FFWI greater than 50',
+        title: 'Change in median annual number of days with (FFWI) value greater than 50',
         path: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/ffwige50/d02/ffwige50.zarr',
         rescale: '-197.96,92.158',
         colormap: 'reds'
@@ -109,9 +109,10 @@ const throttledFetchPoint = throttle(async (
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
-    ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {    
+    ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
         // Refs
         const mapRef = useRef<MapRef | null>(null)
+        const mapContainerRef = useRef<HTMLDivElement | null>(null) // Reference to the map container
 
         // Forward the internal ref to the parent
         useImperativeHandle(ref, () => mapRef.current || undefined)
@@ -266,13 +267,23 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         const handleMapLoad = (e: { target: import('mapbox-gl').Map }) => {
             if (!e.target) return
             mapRef.current = e.target as unknown as MapRef
-            mapRef.current.resize() // Resize map to fit container after UI changes
             setMapLoaded(true)
+
+            const mapContainer = document.getElementById('map')
+
+            if (mapContainer) {
+                const resizeObserver = new ResizeObserver(() => {
+                    if (mapRef.current) {
+                        mapRef.current.resize() // Resize the map when the container changes
+                    }
+                })
+                resizeObserver.observe(mapContainer)
+            }
         }
 
         return (
             <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: 'relative' }}>
-                <Box sx={{ height: '100%', position: 'relative' }} id="map" aria-label="Interactive map showing climate data">
+                <Box sx={{ height: '100%', position: 'relative' }} id="map" aria-label="Interactive map showing climate data" ref={mapContainerRef} >
                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                         {isLoading && (
                             <Box sx={{

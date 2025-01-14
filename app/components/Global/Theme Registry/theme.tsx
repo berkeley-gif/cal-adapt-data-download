@@ -195,11 +195,21 @@ theme = createTheme(theme, {
       },
     },
     MuiTooltip: {
-
       tooltip: {
         color: theme.palette.primaryBlue.main, // Default unselected state
       },
-
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        option: {
+          '&[aria-selected="true"]': {
+            color: theme.palette.primaryBlue.main, 
+          },
+          '&[data-focus="true"]': {
+            color: theme.palette.primaryBlue.main,
+          },
+        }
+      }
     }
   }
 })
