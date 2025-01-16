@@ -94,7 +94,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                             />
                                         </div>
 
-                                        <FormControl variant="standard">
+                                        <FormControl>
                                             <Select
                                                 value={gwlSelected}
                                                 onChange={(event: any) => {
@@ -130,7 +130,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                             />
                                         </div>
 
-                                        <FormControl variant="standard">
+                                        <FormControl>
                                             <Select
                                                 value={metricSelected}
                                                 onChange={(event: any) => {
