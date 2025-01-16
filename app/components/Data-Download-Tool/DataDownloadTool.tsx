@@ -397,7 +397,7 @@ export default function DataDownload({ data }: DataDownloadProps) {
     }, [])
 
     return (
-        <div>
+        <div className="tool-container tool-container--padded">
             {/** Alerts */}
             <div className="alerts alerts-50">
                 <Alert variant="purple" severity="info">Looking for the full LOCA2 scientific data at daily resolution for the entire state of California?

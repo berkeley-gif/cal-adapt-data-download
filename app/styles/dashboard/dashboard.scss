@@ -35,6 +35,12 @@
     padding: 25px;
   }
 
+
+  &--white {
+    background-color: white;
+    margin-top: 16px;
+  }
+
   & > div:nth-child(n + 2) {
     padding-top: 20px;
   }
@@ -48,11 +54,7 @@
 
 .option-group {
   &__title {
-    display: inline-block;
-  }
-
-  .inline-tooltip {
-    display: inline-block;
+    display: flex;
   }
 
   svg {
@@ -60,6 +62,11 @@
     margin-left: 5px;
     height: 15px;
     margin-bottom: -2px;
+  }
+
+  &--vertical {
+    display: flex;
+    flex-direction: column;
   }
 }
 
@@ -83,5 +90,11 @@
     flex-direction: column;
     justify-content: center; /* Horizontal centering */
     text-align: center;
+  }
+}
+
+.tool-container {
+  &--padded {
+    padding: 30px;
   }
 }

@@ -9,7 +9,28 @@ type CustomIconButtonProps = IconButtonProps & {
   variant?: 'customVariant';
 }
 
-const theme = createTheme({
+// Augment the palette to include a second palette color
+declare module '@mui/material/styles' {
+  interface Palette {
+    primaryBlue: Palette['primary'];
+    secondaryOnWhite: Palette['secondary'];
+  }
+
+  interface PaletteOptions {
+    primaryBlue?: PaletteOptions['primary'];
+    secondaryOnWhite?: PaletteOptions['secondary'];
+  }
+}
+
+// Update the Button's color options to include an ochre option
+declare module '@mui/material/Fab' {
+  interface FabPropsColorOverrides {
+    secondaryOnWhite: true;
+  }
+}
+
+
+let theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
@@ -24,7 +45,8 @@ const theme = createTheme({
     },
     info: {
       main: '#C6C7F8',
-    }
+    },
+
   },
   typography: {
     fontFamily: 'inherit',
@@ -99,7 +121,7 @@ const theme = createTheme({
           '&:before': {
             display: 'none',
           },
-          borderBottom: '1px solid var(--black-10, rgba(28, 28, 28, 0.10))',  
+          borderBottom: '1px solid var(--black-10, rgba(28, 28, 28, 0.10))',
         },
       },
     },
@@ -138,7 +160,59 @@ const theme = createTheme({
       }
     }
   }
-});
+})
+
+// Create custom palettes
+theme = createTheme(theme, {
+  palette: {
+    secondaryOnWhite: theme.palette.augmentColor({
+      color: {
+        main: '#fff',
+        contrastText: '#000000'
+      },
+      name: 'secondaryOnWhite',
+    }),
+    primaryBlue: theme.palette.augmentColor({
+      color: {
+        main: '#57AEF3',
+      },
+      name: 'primaryBlue',
+    }),
+  },
+})
+
+// Override components after creating custom palettes
+theme = createTheme(theme, {
+  components: {
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          color: theme.palette.secondary.main, // Default unselected state
+          '&.Mui-checked': {
+            color: theme.palette.primaryBlue.main, // Checked state
+          },
+        },
+      },
+    },
+    MuiTooltip: {
+      tooltip: {
+        color: theme.palette.primaryBlue.main, // Default unselected state
+      },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        option: {
+          '&[aria-selected="true"]': {
+            color: theme.palette.primaryBlue.main, 
+          },
+          '&[data-focus="true"]': {
+            color: theme.palette.primaryBlue.main,
+          },
+        }
+      }
+    }
+  }
+})
 
 export default theme
 

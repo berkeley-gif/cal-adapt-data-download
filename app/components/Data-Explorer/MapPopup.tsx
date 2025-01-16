@@ -1,3 +1,5 @@
+'use client'
+
 import { Popup } from 'react-map-gl'
 import Typography from '@mui/material/Typography'
 
