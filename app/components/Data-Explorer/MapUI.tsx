@@ -77,7 +77,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                     <Grid container spacing={2}>
                         <Grid item xs={4}>
                             <div className='map-ui__parameter-selection'>
-                                <div className="container container--white container--map-ui">
+                                <div className="container container--transparent">
                                     <div className="option-group option-group--vertical">
                                         <div className="option-group__title">
                                             <Typography variant="body2">Global Warming Level</Typography>
@@ -113,7 +113,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                         </FormControl>
                                     </div>
                                 </div>
-                                <div className="container container--white">
+                                <div className="container container--transparent">
                                     <div className="option-group option-group--vertical">
                                         <div className="option-group__title">
                                             <Typography variant="body2">Metric</Typography>
