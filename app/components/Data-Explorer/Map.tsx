@@ -315,8 +315,9 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                             onError={handleMapError}
                             aria-label="Map"
                         >
-                            {tileJson && (
-                                <Source
+
+                            {mapLoaded && tileJson && (
+                                <Source 
                                     id="raster-source"
                                     type="raster"
                                     tiles={tileJson.tiles}
