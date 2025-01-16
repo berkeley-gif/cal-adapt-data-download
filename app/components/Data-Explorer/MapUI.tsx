@@ -68,7 +68,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
 
     return (
         <div className="map-ui" style={{
-            width: open ? `calc(100% - ${drawerWidth}px + 72px` : '100%',
+            width: open ? `calc(100% - ${drawerWidth}px + 72px)` : '100%',
             transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1)',
         }}>
             <Box sx={{ height: '80vh', display: 'flex', flexDirection: 'column' }}>
