@@ -37,7 +37,6 @@ const MenuProps: any = {
             width: 250,
         },
     },
-    getContentAnchorEl: null,
     anchorOrigin: {
         vertical: "bottom",
         horizontal: "center"
