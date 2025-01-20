@@ -278,17 +278,6 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             if (!e.target) return
             mapRef.current = e.target as unknown as MapRef
             setMapLoaded(true)
-
-            const mapContainer = document.getElementById('map')
-
-            if (mapContainer) {
-                const resizeObserver = new ResizeObserver(() => {
-                    if (mapRef.current) {
-                        mapRef.current.resize() // Resize the map when the container changes
-                    }
-                })
-                resizeObserver.observe(mapContainer)
-            }
         }
 
         return (
