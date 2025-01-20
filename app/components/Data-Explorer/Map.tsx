@@ -160,6 +160,10 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                     .join('&')
 
                 const url = `${BASE_URL}/WebMercatorQuad/tilejson.json?${queryString}`
+                
+
+                // debug: log the request url
+                console.log('Fetching TileJSON with url:', url)
 
                 try {
                     const response = await fetch(url)
