@@ -113,6 +113,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         // Refs
         const mapRef = useRef<MapRef | null>(null)
         const mapContainerRef = useRef<HTMLDivElement | null>(null) // Reference to the map container
+        const initialLoadRef = useRef(true)
 
         // Forward the internal ref to the parent
         useImperativeHandle(ref, () => mapRef.current || undefined)
@@ -146,6 +147,11 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         const currentColormap = currentVariableData.colormap
 
         useEffect(() => {
+            if (initialLoadRef.current) {
+                initialLoadRef.current = false;
+                return; // Skip the first execution
+            }
+
             const fetchTileJson = async () => {
                 const params = {
                     url: currentVariableData.path,
