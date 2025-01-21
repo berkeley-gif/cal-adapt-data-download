@@ -281,6 +281,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 resizeObserver.observe(mapContainer)
             }
         }
+        
 
         return (
             <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1, position: 'relative' }}>
