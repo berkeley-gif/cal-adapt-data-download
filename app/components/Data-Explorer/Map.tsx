@@ -248,6 +248,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 }
             }
         }, [mapRef])
+        
 
         if (!mounted) {
             return (
