@@ -1,22 +1,24 @@
-.map-container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 100%;
-
-  #map {
-    width: 100%;
-  }
-
-  &__legend {
+.map {
+  &-container {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
 
-    &-color-box {
-      width: 16px;
-      height: 16px;
-      background-color: rgba(128, 128, 128, 0.3);
-      margin-right: 10px;
+    #map {
+      width: 100%;
+    }
+
+    &__legend {
+      display: flex;
+      align-items: center;
+
+      &-color-box {
+        width: 16px;
+        height: 16px;
+        background-color: rgba(128, 128, 128, 0.3);
+        margin-right: 10px;
+      }
     }
   }
 }

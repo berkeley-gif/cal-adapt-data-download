@@ -335,7 +335,7 @@ export default function SolarDroughtViz() {
                         {!isLoading && !isPointValid && isLocationSet &&
                             (
                                 <Box>
-                                    <Alert variant="grey" severity="info" aria-label="Location with restrictions alert">You have selected a location with land use or land cover restrictions. No data will be returned. 
+                                    <Alert variant="grey" severity="info" aria-label="Location with restrictions alert">You have selected a location with land use or land cover restrictions. No data will be returned.&nbsp; 
                                         <span 
                                             className={accordionExpanded ? '' : 'underline'} 
                                             onClick={accordionExpanded ? undefined : expandMap}

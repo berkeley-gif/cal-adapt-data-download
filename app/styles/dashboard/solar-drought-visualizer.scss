@@ -6,6 +6,10 @@
     gap: 15px;
   }
 
+  &__heatmap {
+    transition: width 1s ease;
+  }
+
   .loading-screen,
   .invalid-point-screen {
     display: flex;
@@ -33,9 +37,4 @@
   gap: 40px;
   margin: 0 0 35px 0;
   justify-content: flex-end;
-}
-
-.solar-drought-tool__heatmap {
-    transition: width 1s ease;
-    transform-origin: right;
 }
