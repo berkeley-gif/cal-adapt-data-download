@@ -16,13 +16,13 @@ type MapLegendProps = {
 }
 
 const LEGEND_MARGIN = { top: 20, right: 0, bottom: 20, left: 0 }
-const LABEL_MARGIN = 16
+const LABEL_MARGIN = 40 // adjust this value to make more space for the tick text
 
 export const MapLegend = ({
     colormap,
     min,
     max,
-    width = 440,
+    width = 520, // adjust this value to make more space for the legend label
     height = 124,
     title
 }: MapLegendProps) => {
@@ -41,7 +41,8 @@ export const MapLegend = ({
         .domain([min, max])
         .interpolator(interpolator)
 
-    const allTicks = [min, ...xScale.ticks(4), max].map((tick, idx) => {
+    const ticks = [min, ...xScale.ticks(4), max]
+    const allTicks = ticks.map((tick, idx) => {
         return (
             <React.Fragment key={`tick-${idx}`}>
                 <line
@@ -55,7 +56,8 @@ export const MapLegend = ({
                     x={xScale(tick)}
                     y={boundsHeight + 20}
                     fontSize={12}
-                    textAnchor='middle'
+                    textAnchor="middle"
+                    dx={0}
                 >
                     {tick}
                 </text>
@@ -80,9 +82,10 @@ export const MapLegend = ({
             backgroundColor: 'white',
             padding: 2,
             boxShadow: 0,
-            borderRadius: 1
+            borderRadius: 1,
+            margin: '0 auto' // Center the Paper component
         }}>
-            <Box style={{ position: 'relative' }}>
+            <Box style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
                 <canvas ref={canvasRef} width={boundsWidth + (2 * LABEL_MARGIN)} height={boundsHeight} />
                 <svg
                     width={boundsWidth + (2 * LABEL_MARGIN)}
