@@ -61,6 +61,7 @@ type MapProps = {
     data: Record<string, unknown>
     setMetricSelected: (metric: number) => void
     setGwlSelected: (gwl: number) => void
+    globalWarmingLevels: { id: number; title: string }[]
 }
 
 type VariableKey = keyof typeof VARIABLES
@@ -109,7 +110,7 @@ const throttledFetchPoint = throttle(async (
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
-    ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
+    ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected, globalWarmingLevels }, ref) => {
         // Refs
         const mapRef = useRef<MapRef | null>(null)
         const mapContainerRef = useRef<HTMLDivElement | null>(null) // Reference to the map container

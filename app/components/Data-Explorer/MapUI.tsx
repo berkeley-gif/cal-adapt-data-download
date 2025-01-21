@@ -17,7 +17,6 @@ import Fab from '@mui/material/Fab'
 import QuestionMarkOutlinedIcon from '@mui/icons-material/QuestionMarkOutlined';
 
 import { metricsList } from '@/app/lib/data-explorer/metrics'
-import { globalWarmingLevelsList } from '@/app/lib/data-explorer/global-warming-levels'
 import { useLeftDrawer } from '../../context/LeftDrawerContext'
 
 const ITEM_HEIGHT = 48;
@@ -28,6 +27,7 @@ type MapUIProps = {
     gwlSelected: number;
     setMetricSelected: (metric: number) => void;
     setGwlSelected: (gwl: number) => void;
+    globalWarmingLevels: { id: number; title: string }[];
 }
 
 const MenuProps: any = {
@@ -49,7 +49,7 @@ const MenuProps: any = {
 }
 
 
-export default function Map({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected}: MapUIProps) {
+export default function Map({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected, globalWarmingLevels }: MapUIProps) {
     const { open, drawerWidth } = useLeftDrawer()
 
     const [helpAnchorEl, setHelpAnchorEl] = React.useState<HTMLButtonElement | null>(null)
@@ -64,6 +64,9 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
 
     const helpOpen = Boolean(helpAnchorEl);
     const id = helpOpen ? 'simple-popover' : undefined;
+
+    // Use globalWarmingLevels as needed in MapUI
+    console.log('globalWarmingLevels in MapUI:', globalWarmingLevels);
 
     return (
         <div className="map-ui" style={{
@@ -103,7 +106,7 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                                 sx={{ mt: '15px', width: '200px' }}
 
                                             >
-                                                {globalWarmingLevelsList.map((gwl) => (
+                                                {globalWarmingLevels.map((gwl) => (
                                                     <MenuItem key={gwl.id} value={gwl.id}>
                                                         <ListItemText primary={gwl.title} />
                                                     </MenuItem>

@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import MapboxMap from './Map'
 import Grid from '@mui/material/Unstable_Grid2'
 import MapUI from './MapUI'
 
 import { useLeftDrawer } from '../../context/LeftDrawerContext'
+import { globalWarmingLevelsList } from '@/app/lib/data-explorer/global-warming-levels'
 
 type DataExplorerProps = {
     data: any;
@@ -28,8 +29,20 @@ export default function DataExplorer({ data }: DataExplorerProps) {
 
     return (
         <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
-            <MapUI metricSelected={metricSelected} gwlSelected={gwlSelected} setMetricSelected={setMetricSelected} setGwlSelected={setGwlSelected}></MapUI>
-            <MapboxMap gwlSelected={gwlSelected} setGwlSelected={setGwlSelected} metricSelected={metricSelected} setMetricSelected={setMetricSelected} data={data}></MapboxMap>
+            <MapUI
+                metricSelected={metricSelected}
+                gwlSelected={gwlSelected}
+                setMetricSelected={setMetricSelected}
+                setGwlSelected={setGwlSelected}
+                globalWarmingLevels={globalWarmingLevelsList}
+            />
+            <MapboxMap
+                gwlSelected={gwlSelected}
+                setGwlSelected={setGwlSelected}
+                metricSelected={metricSelected}
+                setMetricSelected={setMetricSelected}
+                globalWarmingLevels={globalWarmingLevelsList}
+            />
         </Grid>
     )
 }
