@@ -65,9 +65,6 @@ export default function MapUI({ metricSelected, gwlSelected, setMetricSelected, 
     const helpOpen = Boolean(helpAnchorEl);
     const id = helpOpen ? 'simple-popover' : undefined;
 
-    // Use globalWarmingLevels as needed in MapUI
-    console.log('globalWarmingLevels in MapUI:', globalWarmingLevels);
-
     return (
         <div className="map-ui" style={{
             width: open ? `calc(100% - ${drawerWidth}px + 72px)` : '100%',

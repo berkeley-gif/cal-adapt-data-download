@@ -33,7 +33,6 @@ const RASTER_TILE_LAYER_OPACITY = 0.8 as const
 type MapProps = {
     metricSelected: number
     gwlSelected: number
-    data: Record<string, unknown>
     setMetricSelected: (metric: number) => void
     setGwlSelected: (gwl: number) => void
     globalWarmingLevels: { id: number; value: string }[]
@@ -144,7 +143,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 
 
                 // debug: log the request url
-                console.log('Fetching TileJSON with url:', url)
+                // console.log('Fetching TileJSON with url:', url)
 
                 try {
                     const response = await fetch(url)
