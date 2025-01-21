@@ -16,8 +16,6 @@ import Fade from '@mui/material/Fade'
 import Fab from '@mui/material/Fab'
 import QuestionMarkOutlinedIcon from '@mui/icons-material/QuestionMarkOutlined';
 
-import { metricsList } from '@/app/lib/data-explorer/metrics'
-import { globalWarmingLevelsList } from '@/app/lib/data-explorer/global-warming-levels'
 import { useLeftDrawer } from '../../context/LeftDrawerContext'
 
 const ITEM_HEIGHT = 48;
@@ -28,6 +26,8 @@ type MapUIProps = {
     gwlSelected: number;
     setMetricSelected: (metric: number) => void;
     setGwlSelected: (gwl: number) => void;
+    globalWarmingLevels: { id: number; value: string }[];
+    metrics: { id: number; title: string; variable: string; description: string; path: string; rescale: string; colormap: string }[];
 }
 
 const MenuProps: any = {
@@ -37,7 +37,6 @@ const MenuProps: any = {
             width: 250,
         },
     },
-    getContentAnchorEl: null,
     anchorOrigin: {
         vertical: "bottom",
         horizontal: "center"
@@ -50,7 +49,7 @@ const MenuProps: any = {
 }
 
 
-export default function Map({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected}: MapUIProps) {
+export default function MapUI({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }: MapUIProps) {
     const { open, drawerWidth } = useLeftDrawer()
 
     const [helpAnchorEl, setHelpAnchorEl] = React.useState<HTMLButtonElement | null>(null)
@@ -102,11 +101,10 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                                 }}
                                                 MenuProps={MenuProps}
                                                 sx={{ mt: '15px', width: '200px' }}
-
                                             >
-                                                {globalWarmingLevelsList.map((gwl) => (
+                                                {globalWarmingLevels.map((gwl) => (
                                                     <MenuItem key={gwl.id} value={gwl.id}>
-                                                        <ListItemText primary={gwl.title} />
+                                                        <ListItemText primary={`${gwl.value}°`} />
                                                     </MenuItem>
                                                 ))}
                                             </Select>
@@ -138,9 +136,8 @@ export default function Map({ metricSelected, gwlSelected, setMetricSelected, se
                                                 }}
                                                 MenuProps={MenuProps}
                                                 sx={{ mt: '15px', width: '220px' }}
-
                                             >
-                                                {metricsList.map((metric) => (
+                                                {metrics.map((metric) => (
                                                     <MenuItem key={metric.id} value={metric.id}>
                                                         <ListItemText primary={metric.title} />
                                                     </MenuItem>

@@ -15,8 +15,6 @@ import { MapPopup } from './MapPopup'
 import LoadingSpinner from '../Global/LoadingSpinner'
 import GeocoderControl from '../Solar-Drought-Visualizer/geocoder-control'
 
-const GWL_VALUES = ["1.5", "2.0", "2.5", "3.0"] as const
-
 const INITIAL_VIEW_STATE = {
     longitude: -120,
     latitude: 37.4,
@@ -32,38 +30,14 @@ const THROTTLE_DELAY = 100 as const
 const BASE_URL = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com' as const
 const RASTER_TILE_LAYER_OPACITY = 0.8 as const
 
-// edit me v
-const VARIABLES = {
-    'TX99p': {
-        title: 'Mean annual change in extreme heat days',
-        path: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/TX99p/d02/TX99p.zarr',
-        rescale: '1.18,35.19',
-        colormap: 'oranges' // case sensitive
-    },
-    'R99p': {
-        title: 'Absolute change in 99th percentile 1-day accumulated precipitation',
-        path: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/R99p/d02/R99p.zarr',
-        rescale: '-4.866,39.417',
-        colormap: 'blues'
-    },
-    'ffwige50': {
-        title: 'Change in median annual number of days with (FFWI) value greater than 50',
-        path: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/ffwige50/d02/ffwige50.zarr',
-        rescale: '-197.96,92.158',
-        colormap: 'reds'
-    }
-} as const
-// edit me ^
-
 type MapProps = {
     metricSelected: number
     gwlSelected: number
-    data: Record<string, unknown>
     setMetricSelected: (metric: number) => void
     setGwlSelected: (gwl: number) => void
+    globalWarmingLevels: { id: number; value: string }[]
+    metrics: { id: number; title: string; variable: string; description: string; path: string; rescale: string; colormap: string }[]
 }
-
-type VariableKey = keyof typeof VARIABLES
 
 type TileJson = {
     tiles: string[]
@@ -84,6 +58,7 @@ const throttledFetchPoint = throttle(async (
     path: string,
     variable: string,
     gwl: string,
+    globalWarmingLevels: { id: number; value: string }[],
     callback: (value: number | null) => void
 ) => {
     try {
@@ -95,7 +70,7 @@ const throttledFetchPoint = throttle(async (
 
         if (response.ok) {
             const data = await response.json()
-            const gwlIndex = GWL_VALUES.indexOf(gwl as typeof GWL_VALUES[number])
+            const gwlIndex = globalWarmingLevels.findIndex(level => level.value === gwl)
             const value = data.data[gwlIndex]
             callback(value ?? null)
         }
@@ -109,10 +84,11 @@ const throttledFetchPoint = throttle(async (
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
-    ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected }, ref) => {
+    ({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }, ref) => {
         // Refs
         const mapRef = useRef<MapRef | null>(null)
         const mapContainerRef = useRef<HTMLDivElement | null>(null) // Reference to the map container
+        const initialLoadRef = useRef(true)
 
         // Forward the internal ref to the parent
         useImperativeHandle(ref, () => mapRef.current || undefined)
@@ -133,19 +109,23 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         }, [])
 
         // Derived state
-        const variableKeys = Object.keys(VARIABLES) as VariableKey[]
-        const currentVariable = variableKeys[metricSelected] || variableKeys[0]
-        const currentGwl = GWL_VALUES[gwlSelected] || GWL_VALUES[0]
+        const currentVariableData = metrics[metricSelected]
 
-        const currentVariableData = VARIABLES[currentVariable]
         if (!currentVariableData) {
-            console.error('Invalid variable selected:', currentVariable)
+            console.error('Invalid metric selected:', metricSelected)
             return null
         }
 
+        const currentVariable = currentVariableData.variable
         const currentColormap = currentVariableData.colormap
+        const currentGwl = globalWarmingLevels[gwlSelected]?.value || globalWarmingLevels[0].value
 
         useEffect(() => {
+            if (initialLoadRef.current) {
+                initialLoadRef.current = false;
+                return; // Skip the first execution
+            }
+
             const fetchTileJson = async () => {
                 const params = {
                     url: currentVariableData.path,
@@ -160,6 +140,10 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                     .join('&')
 
                 const url = `${BASE_URL}/WebMercatorQuad/tilejson.json?${queryString}`
+                
+
+                // debug: log the request url
+                // console.log('Fetching TileJSON with url:', url)
 
                 try {
                     const response = await fetch(url)
@@ -186,9 +170,10 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             throttledFetchPoint(
                 lng,
                 lat,
-                VARIABLES[currentVariable].path,
+                currentVariableData.path,
                 currentVariable,
                 currentGwl,
+                globalWarmingLevels,
                 (value) => {
                     if (value !== null) {
                         setHoverInfo({
@@ -268,17 +253,6 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             if (!e.target) return
             mapRef.current = e.target as unknown as MapRef
             setMapLoaded(true)
-
-            const mapContainer = document.getElementById('map')
-
-            if (mapContainer) {
-                const resizeObserver = new ResizeObserver(() => {
-                    if (mapRef.current) {
-                        mapRef.current.resize() // Resize the map when the container changes
-                    }
-                })
-                resizeObserver.observe(mapContainer)
-            }
         }
 
         return (
@@ -386,5 +360,3 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 MapboxMap.displayName = 'MapboxMap'
 
 export default MapboxMap
-
-
