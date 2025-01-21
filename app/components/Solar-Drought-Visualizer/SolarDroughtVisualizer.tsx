@@ -285,14 +285,16 @@ export default function SolarDroughtViz() {
 
                     {/* Colormap toggle for heatmap */}
                     <Grid xs={isLocationSet ? 8.5 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
-                        <div className="color-scale-toggle">
-                            <FormGroup>
-                                <FormControlLabel 
-                                    control={<Switch onChange={handleColorChange} color="secondary" />} 
-                                    label="Alternative color palette" 
-                                />
-                            </FormGroup>
-                        </div>
+                        {isPointValid && (
+                            <div className="color-scale-toggle">
+                                <FormGroup>
+                                    <FormControlLabel 
+                                        control={<Switch onChange={handleColorChange} color="secondary" />} 
+                                        label="Alternative color palette" 
+                                    />
+                                </FormGroup>
+                            </div>
+                        )}
                     </Grid>
                     
                     {/* Locator map instruction section */}
