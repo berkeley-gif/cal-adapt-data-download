@@ -24,7 +24,7 @@ export default function DataExplorer({ data }: DataExplorerProps) {
     const [customColorRamp, setCustomColorRamp] = useState<string>('')
 
     const customColorRampList: string[] = [
-        'inferno', 'BuPu', 'viridis', 'coolwarm', 'berlin'
+        'Inferno', 'BuPu', 'Viridis', 'Cividis', 'Cool', 'Plasma', 'CubehelixDefault'
     ]
 
     useEffect(() => {
@@ -52,6 +52,7 @@ export default function DataExplorer({ data }: DataExplorerProps) {
                 gwlSelected={gwlSelected}
                 setGwlSelected={setGwlSelected}
                 metricSelected={metricSelected}
+                customColorRamp={customColorRamp}
                 setMetricSelected={setMetricSelected}
                 globalWarmingLevels={globalWarmingLevelsList}
                 metrics={metricsList}
