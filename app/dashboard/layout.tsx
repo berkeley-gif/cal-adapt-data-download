@@ -1,12 +1,13 @@
 'use client'
 
-import React, { ReactNode, useState } from 'react'
+import React, { ReactElement, ReactNode, useState } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { SidepanelProvider } from '@/app/context/SidepanelContext';
+import { useLeftDrawer } from '../context/LeftDrawerContext'
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
         purple: true;
@@ -86,13 +87,11 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-    const [open, setOpen] = useState(true);
+    const { open, toggleLeftDrawer } = useLeftDrawer()
     const pathname = usePathname()
     const selectedPage: string | null = extractSegment(pathname, 'dashboard/', '/')
     const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-    const toggleDrawer = () => setOpen((prev) => !prev);
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
     const renderCalDashToolBar = (): ReactNode => {
         switch (selectedPage) {
@@ -110,7 +109,6 @@ export default function Layout({ children }: LayoutProps) {
     return (
         <SidepanelProvider>
             {!isMobile ? <Box sx={{ display: 'flex', flexDirection: 'row', minHeight: '100vh', height: '100%' }}>
-
                 <CssBaseline />
                 <ResponsiveSidebar theme={theme} open={open}>
                     <DrawerHeader>
@@ -118,7 +116,7 @@ export default function Layout({ children }: LayoutProps) {
                             <Image src={logo} alt="Cal Adapt California state logo" style={{ height: '40px' }} />
                         )}
 
-                        <IconButton onClick={toggleDrawer} aria-label="toggle drawer">
+                        <IconButton onClick={toggleLeftDrawer} aria-label="toggle drawer">
                             {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                         </IconButton>
                     </DrawerHeader>
@@ -145,7 +143,7 @@ export default function Layout({ children }: LayoutProps) {
                     sx={{
                         flexGrow: 1,
                         bgColor: 'background.default',
-                        p: 3,
+                        p: 0,
                         mt: "64px",
                         transition: 'margin 225ms cubic-bezier(0.4, 0, 0.6, 1)',
                         overflowY: 'auto',

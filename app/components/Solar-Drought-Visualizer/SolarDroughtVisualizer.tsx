@@ -184,7 +184,7 @@ export default function SolarDroughtViz() {
         }
 
     }
-
+    
     // RESPONSIVE HEATMAP WIDTH (D3 requires a width specification)
     useEffect(() => {
         if (!heatmapContainerRef.current) return

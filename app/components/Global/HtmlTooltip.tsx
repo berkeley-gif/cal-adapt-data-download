@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
-import { styled } from '@mui/material/styles'
+import { styled, useTheme } from '@mui/material/styles'
 import PropTypes from 'prop-types';
 
 const HtmlTooltipContent = styled(({ className, ...props }: TooltipProps) => (
@@ -22,10 +22,17 @@ type HtmlTooltipProps = Omit<TooltipProps, 'title' | 'children'> & {
 }
 
 const HtmlTooltip: React.FC<HtmlTooltipProps> = ({ textFragment, iconFragment, ...props }) => {
+    const theme = useTheme()
+    const primaryBlue = theme.palette.primaryBlue.main
+
+    const styledIconFragment = React.cloneElement(iconFragment, {
+        style: { color: primaryBlue },
+    })
+    
     return (
         <div className='inline-tooltip'>
             <HtmlTooltipContent title={textFragment} {...props}>
-                {iconFragment}
+                {styledIconFragment}
             </HtmlTooltipContent>
         </div >
     )

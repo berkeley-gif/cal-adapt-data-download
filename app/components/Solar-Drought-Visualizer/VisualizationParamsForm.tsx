@@ -75,20 +75,22 @@ const VizPrmsForm: React.FC<VizFormProps> = ({
         <div className="viz-prms-form">
             <div className="package-contents">
                 <Typography className="inline" variant="h5">Visualization Parameters</Typography>
-                <div className="container container--package-setting">
+                <div className="container container--white">
                     <div className="option-group">
-                        <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
-                        <HtmlTooltip
-                            textFragment={
-                                <React.Fragment>
-                                    <p>A &quot;global warming level&quot; refers to the increase in global-mean temperature with respect to preindustrial conditions.</p>
-                                </React.Fragment>
-                            }
-                            iconFragment={<InfoOutlinedIcon />}
-                            TransitionComponent={Fade}
-                            TransitionProps={{ timeout: 600 }}
-                            placement="right-end"
-                        />
+                        <div className="option-group__title">
+                            <Typography variant="body2">Global Warming Level</Typography>
+                            <HtmlTooltip
+                                textFragment={
+                                    <React.Fragment>
+                                        <p>A &quot;global warming level&quot; refers to the increase in global-mean temperature with respect to preindustrial conditions.</p>
+                                    </React.Fragment>
+                                }
+                                iconFragment={<InfoOutlinedIcon />}
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 600 }}
+                                placement="right-end"
+                            />
+                        </div>
 
                         <FormControl>
                             <Select
@@ -111,21 +113,23 @@ const VizPrmsForm: React.FC<VizFormProps> = ({
 
                     </div>
                 </div>
-                <div className="container container--package-setting">
+                <div className="container container--white">
                     <div className="option-group">
-                        <Typography className="option-group__title" variant="body2">Photovoltaic Configuration</Typography>
-                        <HtmlTooltip
-                            textFragment={
-                                <React.Fragment>
-                                    <p>The set of photovoltaic system design parameters. &quot;Utility&quot; is based on typical installations maintained by utility companies, while &quot;Distributed&quot; corresponds to a residential rooftop installation.
-                                    </p>
-                                </React.Fragment>
-                            }
-                            iconFragment={<InfoOutlinedIcon />}
-                            TransitionComponent={Fade}
-                            TransitionProps={{ timeout: 600 }}
-                            placement="right-end"
-                        />
+                        <div className="option-group__title">
+                            <Typography className="option-group__title" variant="body2">Photovoltaic Configuration</Typography>
+                            <HtmlTooltip
+                                textFragment={
+                                    <React.Fragment>
+                                        <p>The set of photovoltaic system design parameters. &quot;Utility&quot; is based on typical installations maintained by utility companies, while &quot;Distributed&quot; corresponds to a residential rooftop installation.
+                                        </p>
+                                    </React.Fragment>
+                                }
+                                iconFragment={<InfoOutlinedIcon />}
+                                TransitionComponent={Fade}
+                                TransitionProps={{ timeout: 600 }}
+                                placement="right-end"
+                            />
+                        </div>
 
                         <FormControl>
                             <FormLabel id="demo-controlled-radio-buttons-group"></FormLabel>
