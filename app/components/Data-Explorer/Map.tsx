@@ -382,7 +382,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                 colormap={currentColorMap}
                                 min={parseFloat(currentVariableData.rescale.split(',')[0])}
                                 max={parseFloat(currentVariableData.rescale.split(',')[1])}
-                                title={currentVariableData.title}
+                                title={currentVariableData.description}
                                 aria-label="Map legend"
                             />
                         </div>
