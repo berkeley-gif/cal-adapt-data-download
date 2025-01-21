@@ -15,8 +15,6 @@ import { MapPopup } from './MapPopup'
 import LoadingSpinner from '../Global/LoadingSpinner'
 import GeocoderControl from '../Solar-Drought-Visualizer/geocoder-control'
 
-const GWL_VALUES = ["1.5", "2.0", "2.5", "3.0"] as const
-
 const INITIAL_VIEW_STATE = {
     longitude: -120,
     latitude: 37.4,
@@ -61,7 +59,7 @@ type MapProps = {
     data: Record<string, unknown>
     setMetricSelected: (metric: number) => void
     setGwlSelected: (gwl: number) => void
-    globalWarmingLevels: { id: number; title: string }[]
+    globalWarmingLevels: { id: number; value: string }[]
 }
 
 type VariableKey = keyof typeof VARIABLES
@@ -85,6 +83,7 @@ const throttledFetchPoint = throttle(async (
     path: string,
     variable: string,
     gwl: string,
+    globalWarmingLevels: { id: number; value: string }[],
     callback: (value: number | null) => void
 ) => {
     try {
@@ -96,7 +95,7 @@ const throttledFetchPoint = throttle(async (
 
         if (response.ok) {
             const data = await response.json()
-            const gwlIndex = GWL_VALUES.indexOf(gwl as typeof GWL_VALUES[number])
+            const gwlIndex = globalWarmingLevels.findIndex(level => level.value === gwl)
             const value = data.data[gwlIndex]
             callback(value ?? null)
         }
@@ -137,7 +136,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         // Derived state
         const variableKeys = Object.keys(VARIABLES) as VariableKey[]
         const currentVariable = variableKeys[metricSelected] || variableKeys[0]
-        const currentGwl = GWL_VALUES[gwlSelected] || GWL_VALUES[0]
+        const currentGwl = globalWarmingLevels[gwlSelected]?.value || globalWarmingLevels[0].value
 
         const currentVariableData = VARIABLES[currentVariable]
         if (!currentVariableData) {
@@ -200,6 +199,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 VARIABLES[currentVariable].path,
                 currentVariable,
                 currentGwl,
+                globalWarmingLevels,
                 (value) => {
                     if (value !== null) {
                         setHoverInfo({
