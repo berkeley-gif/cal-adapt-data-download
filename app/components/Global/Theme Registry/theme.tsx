@@ -121,7 +121,6 @@ let theme = createTheme({
           '&:before': {
             display: 'none',
           },
-          borderBottom: '1px solid var(--black-10, rgba(28, 28, 28, 0.10))',
         },
       },
     },

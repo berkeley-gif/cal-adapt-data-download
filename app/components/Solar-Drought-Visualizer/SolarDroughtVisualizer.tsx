@@ -11,8 +11,11 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Fade from '@mui/material/Fade'
 import CloseIcon from '@mui/icons-material/Close'
-import EditLocationOutlinedIcon from '@mui/icons-material/EditLocationOutlined';
+import EditLocationOutlinedIcon from '@mui/icons-material/EditLocationOutlined'
 import Alert from '@mui/material/Alert'
+import FormGroup from '@mui/material/FormGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
         purple: true;
@@ -20,21 +23,24 @@ declare module '@mui/material/Alert' {
     }
 }
 import Button from '@mui/material/Button'
-
-import SidePanel from '@/app/components/Dashboard/RightSidepanel'
+import Grid from '@mui/material/Unstable_Grid2'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import SidePanel from '@/app/components/Dashboard/RightSidePanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
+import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 
 import { useDidMountEffect } from "@/app/utils/hooks"
 
 import MapboxMap from '@/app/components/Solar-Drought-Visualizer/MapboxMap'
 import Heatmap from '@/app/components/Heatmap/Heatmap'
-import { Typography } from '@mui/material'
 import VizPrmsForm from './VisualizationParamsForm'
 import { ApiResponse } from './DataType'
 import '@/app/styles/dashboard/solar-drought-visualizer.scss'
 import LoadingSpinner from '../Global/LoadingSpinner'
 
-const TOOL_WIDTH = 1000
+const MAP_HEIGHT = 615
+const HEATMAP_HEIGHT = 500
 
 type Location = [number, number]
 
@@ -45,36 +51,26 @@ type apiParams = {
 
 export default function SolarDroughtViz() {
     const { open, toggleOpen } = useSidepanel()
+    const { photoConfigSelected, setPhotoConfigSelected, photoConfigList } = usePhotoConfig()
 
-    const heatmapSection = useRef<HTMLDivElement>(null)
+    const heatmapContainerRef = useRef<HTMLBoxElement>(null)
+    const [heatmapWidth, setHeatmapWidth] = useState(0)
 
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
     const globalWarmingList = ['2']
-    const [photoConfigSelected, setPhotoConfigSelected] = useState('Utility Configuration')
-    const photoConfigList = ['Utility Configuration', 'Distributed Configuration']
     const [configStr, setConfigStr] = useState<string>('')
     const [queriedData, setQueriedData] = useState(null)
     const [isLocationSet, setIsLocationSet] = useState<boolean>(false)
-    const [accordionExpanded, setAccordionExpanded] = useState(false)
-    const mapRef = useRef<any>(null); // Ref for the Mapbox component
+    const [accordionExpanded, setAccordionExpanded] = useState(true)
+    const mapRef = useRef<any>(null) // Ref for the Mapbox component
     const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [isPointValid, setIsPointValid] = useState<boolean>(false)
+    const [useAltColor, setUseAltColor] = useState(false)
 
     // ACCORDION
     const expandMap = () => {
         setAccordionExpanded((prevExpanded: boolean) => !prevExpanded)
-    }
-
-    // SCROLL TO MAP
-    const scrollToMap = () => {
-        if (heatmapSection.current) {
-            const top = heatmapSection.current.scrollTop
-            heatmapSection.current.scroll({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
     }
 
     // API PARAMS
@@ -126,7 +122,6 @@ export default function SolarDroughtViz() {
             if (queriedData.data[0][0]) {
                 // Point is valid
                 setIsPointValid(true)
-                scrollToMap()
             } else {
                 // Point is Invalid
                 setIsPointValid(false)
@@ -147,10 +142,10 @@ export default function SolarDroughtViz() {
     useEffect(() => {
         if (accordionExpanded && mapRef.current) {
             setTimeout(() => {
-                mapRef.current?.resize(); // Force map resize after expansion
-            }, 300); // Delay to allow the accordion transition to complete
+                mapRef.current?.resize() // Force map resize after expansion
+            }, 300) // Delay to allow the accordion transition to complete
         }
-    }, [accordionExpanded]);
+    }, [accordionExpanded])
 
     function updateApiParams(newParams: Partial<apiParams>) {
         setApiParams(prevParams => ({
@@ -165,7 +160,6 @@ export default function SolarDroughtViz() {
         }
 
         setIsLoading(true)
-        setAccordionExpanded(false)
 
         const [long, lat] = apiParams.point
         const apiUrl = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/${long},${lat}`
@@ -190,138 +184,249 @@ export default function SolarDroughtViz() {
         }
 
     }
+    
+    // RESPONSIVE HEATMAP WIDTH (D3 requires a width specification)
+    useEffect(() => {
+        if (!heatmapContainerRef.current) return
+        const resizeObserver = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                setHeatmapWidth(entry.contentRect.width)
+            }
+        })
+
+        resizeObserver.observe(heatmapContainerRef.current)
+
+        return () => {
+            resizeObserver.disconnect()
+        }
+    }, [])
+
+    const handleColorChange = () => {
+        setUseAltColor((prev) => !prev);
+    };
 
     return (
-        <div className="solar-drought-tool tool-container tool-container--padded" style={{ 'width': `${TOOL_WIDTH}px` }}>
-            <div className="solar-drought-tool__intro"><Typography variant="h4">Solar Drought Visualizer</Typography>
-                <Typography variant="body1">This tool shows when there are likely to be significant reductions in solar energy availability in the future. To be more specific, it shows the number of solar resource drought days (less than 40% average generation) per month throughout a representative 30-year period. </Typography>
-                <a style={{ 'textDecoration': 'underline' }} href="https://docs.google.com/document/d/1HRISAkRb0TafiCSCOq773iqt2TtT2A9adZqDTAShvhE/edit?usp=sharing" target="_blank">Read more in the documentation</a>
-            </div>
+        <Box className="solar-drought-tool" aria-label="Solar Drought Visualizer" role="region">
 
-            {!isLocationSet &&
-                <div className="solar-drought-tool__initial-map">
-                    <Typography className="inline" variant="h5">Select a location to generate your visualization</Typography>
-                    <div className="solar-drought-tool__map" style={{ 'marginTop': '10px' }}>
-                        <MapboxMap mapMarker={mapMarker} setMapMarker={setMapMarker} ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
-                    </div>
-                </div>
-            }
-            {isLocationSet &&
-                <div ref={heatmapSection}>
-                    <Accordion
-                        expanded={accordionExpanded}
-                        onChange={expandMap}
-                        slots={{ transition: Fade as AccordionSlots['transition'] }}
-                        slotProps={{ transition: { timeout: 400 } }}
-                        sx={[
-                            accordionExpanded
-                                ? {
-                                    '& .MuiAccordion-region': {
-                                        height: 'auto',
-                                    },
-                                    '& .MuiAccordionDetails-root': {
-                                        display: 'block',
-                                    },
-                                }
-                                : {
-                                    '& .MuiAccordion-region': {
-                                        height: 0,
-                                    },
-                                    '& .MuiAccordionDetails-root': {
-                                        display: 'none',
-                                    },
-                                },
-                        ]}
-                    >
-                        <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1-content"
-                            id="panel1-header"
-                        >
-                            <EditLocationOutlinedIcon />
-                            <Typography className="inline" variant="h5" style={{ 'marginLeft': '10px' }}>Change your location</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div className="solar-drought-tool__map">
-                                <MapboxMap mapMarker={mapMarker} setMapMarker={setMapMarker} ref={mapRef} locationSelected={apiParams.point} setLocationSelected={setLocationSelected}></MapboxMap>
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
-                </div>}
+            {/* Intro section */}
+            <Box className="solar-drought-tool__intro" style={{ 'maxWidth': '860px' }}>
+                <Typography variant="h4" aria-label="Solar Drought Visualizer Title">Solar Drought Visualizer</Typography>
+                <Typography variant="body1" aria-label="Description of the tool">This tool shows when there are likely to be significant reductions in solar energy availability in the future. To be more specific, it shows the number of solar resource drought days (less than 40% average generation) per month throughout a representative 30-year period. </Typography>
+                <Typography variant="body1">
+                    <a style={{ 'textDecoration': 'underline', 'display': 'inline-block' }} href="https://docs.google.com/document/d/1HRISAkRb0TafiCSCOq773iqt2TtT2A9adZqDTAShvhE/edit?usp=sharing" target="_blank" aria-label="Read more in the documentation">Read more in the documentation</a>
+                </Typography>
+            </Box>
 
-            <div className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '') + (!isLoading && !isPointValid ? ' invalid-point-screen' : '')} style={{ 'width': `${TOOL_WIDTH}px` }}>
-                {queriedData && !isLoading && isPointValid &&
-                    (<div>
-                        <div className="flex-params">
-                            <div className="flex-params__item">
-                                <Typography className="option-group__title" variant="body2">Global Warming Level</Typography>
-                                <Typography variant="body1">{globalWarmingSelected}°</Typography>
-                            </div>
-                            <div className="flex-params__item">
-                                <Typography className="option-group__title" variant="body2">Photovoltaic Configuration</Typography>
-                                <Typography variant="body1">{photoConfigSelected}</Typography>
-                            </div>
-                            <div className="flex-params__item">
-                                <Typography className='inline' variant="subtitle1">Edit parameters</Typography>
-                                <IconButton className='inline' onClick={toggleOpen}>
+            {/* Main viz content */}
+            <Grid container xs={12}>
+                {/* Heatmap parameters section */}
+                <Grid xs={isLocationSet ? 12 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                    {queriedData && !isLoading && isPointValid &&
+                    (<Box>
+                        <Box className="flex-params">
+                            <Box className="flex-params__item">
+                                <Typography className="option-group__title" variant="body2" aria-label="Global Warming Level">Global Warming Level</Typography>
+                                <Typography variant="body1" aria-label={`Selected Global Warming Level: ${globalWarmingSelected}`}>{globalWarmingSelected}°</Typography>
+                            </Box>
+                            <Box className="flex-params__item">
+                                <Typography className="option-group__title" variant="body2" aria-label="Photovoltaic Configuration">Photovoltaic Configuration</Typography>
+                                <Typography variant="body1" aria-label={`Selected Photovoltaic Configuration: ${photoConfigSelected}`}>{photoConfigSelected}</Typography>
+                            </Box>
+                            <Box className="flex-params__item">
+                                <Typography className='inline' variant="subtitle1" aria-label="Edit parameters">Edit parameters</Typography>
+                                <IconButton className='inline' onClick={toggleOpen} aria-label="Open settings">
                                     <SettingsOutlinedIcon />
                                 </IconButton>
-                            </div>
-                        </div>
-                        <div className="alerts">
-                            <Alert variant="purple" severity="info">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
-                                <div className="cta">
-                                    <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels">Learn more about GWL</Button>
-                                </div>
-                            </Alert>
-                        </div>
+                            </Box>
+                        </Box>
 
-                        <Heatmap width={TOOL_WIDTH} height={500} data={queriedData && queriedData} />
-                    </div>)}
-                {isLoading &&
-                    (
-                        <LoadingSpinner />
-                    )
-                }
-                {!isLoading && !isPointValid && isLocationSet &&
-                    (
-                        <div>
-                            <Alert variant="grey" severity="info">You have selected a location with land use or land cover restrictions. No data will be returned. <span className="underline" onClick={expandMap}><strong>Select another location</strong></span> to try again
-                            </Alert>
-                        </div>
-                    )
-                }
-            </div>
-            <div className="solar-drought-tool__sidepanel">
-                {/** Sidepanel */}
+                        {/* Global warming level information */}
+                        <Box className="alerts" sx={{ maxWidth: '100%' }}>
+                            <Alert variant="purple" severity="info" aria-label="Global models estimate information">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
+                                <Box className="cta">
+                                    <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels" aria-label="Learn more about GWL">Learn more about GWL</Button>
+                                </Box>
+                                </Alert>
+                            </Box>
+                        </Box>
+                    )}
+                </Grid>
+            </Grid>
+            <Accordion
+                expanded={accordionExpanded}
+                onChange={() => setAccordionExpanded(!accordionExpanded)}
+                slots={{ transition: Fade as AccordionSlots['transition'] }}
+                slotProps={{ transition: { timeout: 400 } }}
+                sx={[
+                    accordionExpanded
+                        ? {
+                            '& .MuiAccordion-region': {
+                                height: 'auto',
+                            },
+                            '& .MuiAccordionDetails-root': {
+                                display: 'block',
+                            },
+                            '&.Mui-expanded': {
+                                margin: 0,
+                            },
+                        }
+                        : {
+                            '& .MuiAccordion-region': {
+                                height: 0,
+                            },
+                            '& .MuiAccordionDetails-root': {
+                                display: 'none',
+                            },
+                        },
+                ]}
+            >
+
+                <Grid container xs={12}>
+
+                    {/* Colormap toggle for heatmap */}
+                    <Grid xs={isLocationSet ? 8.5 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                        {isPointValid && (
+                            <div className="color-scale-toggle">
+                                <FormGroup>
+                                    <FormControlLabel 
+                                        control={<Switch onChange={handleColorChange} color="secondary" />} 
+                                        label="Alternative color palette" 
+                                    />
+                                </FormGroup>
+                            </div>
+                        )}
+                    </Grid>
+                    
+                    {/* Locator map instruction section */}
+                    <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} aria-label="Expand or collapse the section" />}
+                            aria-controls="panel1-content"
+                            id="panel1-header"
+                            sx={{
+                                '& .MuiAccordionSummary-content': {
+                                    marginTop: '20px', // Override the default margin to keep the Accordion Summary from vertically shifting when expanding
+                                    marginBottom: '20px',
+                                },
+                            }}
+                        >
+                            <EditLocationOutlinedIcon aria-label="Edit location" />
+                            <Typography 
+                                className="inline" 
+                                variant="h5" 
+                                style={{ 
+                                    'marginLeft': '10px',
+                                    'textDecoration': !accordionExpanded ? 'underline' : 'none',
+                                }}
+                                aria-label={isLocationSet ? "Change your location" : "Select your location"}
+                            >
+                                { isLocationSet ? "Change your location" : "Select your location" }
+                            </Typography>
+                        </AccordionSummary>
+                    </Grid>
+
+                    {/* Heatmap section */}
+                    <Grid xs={accordionExpanded ? 8.5 : 12}
+                        sx={{ 
+                            maxWidth: '100%', 
+                            pr: 4,
+                            marginLeft: 'auto',
+                            paddingRight: 0,
+                        }}
+                    >
+                        {!isLoading && !isPointValid && isLocationSet &&
+                            (
+                                <Box>
+                                    <Alert variant="grey" severity="info" aria-label="Location with restrictions alert">You have selected a location with land use or land cover restrictions. No data will be returned.&nbsp; 
+                                        <span 
+                                            className={accordionExpanded ? '' : 'underline'} 
+                                            onClick={accordionExpanded ? undefined : expandMap}
+                                            aria-label="Select another location"
+                                        >
+                                            <strong>Select another location </strong>
+                                        </span> 
+                                         to try again
+                                    </Alert>
+                                </Box>
+                            )
+                        }
+                        <Box
+                            ref={heatmapContainerRef}
+                            className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '') + (!isLoading && !isPointValid ? ' invalid-point-screen' : '')}
+                        >
+                            {!isLoading && isPointValid &&
+                                (
+                                    <Heatmap 
+                                        width={heatmapWidth}
+                                        height={HEATMAP_HEIGHT} 
+                                        data={queriedData && queriedData} 
+                                        useAltColor={useAltColor}
+                                        aria-label="Heatmap visualization"
+                                    />
+                                )
+                            }
+                            {isLoading &&
+                                (
+                                    <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                        <LoadingSpinner aria-label="Loading heatmap data" />
+                                    </Box>
+                                )
+                            }
+                        </Box>
+                    </Grid>
+
+                    {/* Locator map section */}
+                    <Grid xs={3.5} > 
+                        <AccordionDetails
+                            sx={{
+                                paddingTop: '0px',
+                            }}
+                        >
+                            <Box className="solar-drought-tool__map" style={{ width: '100%' }}>
+                                <MapboxMap 
+                                    mapMarker={mapMarker} 
+                                    setMapMarker={setMapMarker} 
+                                    ref={mapRef} 
+                                    locationSelected={apiParams.point} 
+                                    setLocationSelected={setLocationSelected}
+                                    height={MAP_HEIGHT}
+                                    aria-label="Map for selecting location of heatmap data"
+                                />
+                            </Box>
+                        </AccordionDetails>
+                    </Grid>
+                </Grid>
+            </Accordion>
+
+            {/** Sidepanel */}
+            <Box className="solar-drought-tool__sidepanel">
                 <SidePanel
                     anchor="right"
                     variant="temporary"
                     open={open}
                     onClose={toggleOpen}
+                    aria-label="Settings side panel"
                 >
                     <Tooltip
                         TransitionComponent={Fade}
                         TransitionProps={{ timeout: 600 }}
                         title="Close the sidebar"
                     >
-                        <IconButton onClick={toggleOpen}>
+                        <IconButton onClick={toggleOpen} aria-label="Close settings sidebar">
                             <CloseIcon />
                         </IconButton>
                     </Tooltip>
                     <VizPrmsForm
                         onFormDataSubmit={onFormDataSubmit}
-                        photoConfigSelected={photoConfigSelected}
-                        setPhotoConfigSelected={setPhotoConfigSelected}
-                        photoConfigList={photoConfigList}
                         globalWarmingList={globalWarmingList}
                         globalWarmingSelected={globalWarmingSelected}
                         setGlobalWarmingSelected={setGlobalWarmingSelected}
-                        toggleOpen={toggleOpen}>
+                        toggleOpen={toggleOpen}
+                        aria-label="Visualization parameters form"
+                    >
                     </VizPrmsForm>
                 </SidePanel>
-            </div>
-
-        </div >
+            </Box>
+        </Box >
     )
 }

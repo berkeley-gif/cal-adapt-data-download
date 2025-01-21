@@ -1,13 +1,13 @@
 .solar-drought-tool {
-  &__heatmap {
-    width: 1000px;
-  }
-
   &__intro {
     margin-bottom: 30px;
     display: flex;
     flex-direction: column;
     gap: 15px;
+  }
+
+  &__heatmap {
+    transition: width 1s ease;
   }
 
   .loading-screen,
@@ -35,6 +35,6 @@
 .flex-params {
   display: flex;
   gap: 40px;
-  margin: 35px 0;
-  justify-content: end;
+  margin: 0 0 35px 0;
+  justify-content: flex-end;
 }

@@ -1,3 +1,28 @@
+.map {
+  &-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+
+    #map {
+      width: 100%;
+    }
+
+    &__legend {
+      display: flex;
+      align-items: center;
+
+      &-color-box {
+        width: 16px;
+        height: 16px;
+        background-color: rgba(128, 128, 128, 0.3);
+        margin-right: 10px;
+      }
+    }
+  }
+}
+
 .mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
     // so geocoder component has same styling as navigation component
     box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 2px;

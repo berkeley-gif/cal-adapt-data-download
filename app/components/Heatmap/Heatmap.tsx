@@ -3,9 +3,6 @@
 import * as d3 from 'd3'
 import { ScaleSequential } from 'd3-scale';
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import Switch from '@mui/material/Switch'
-import FormGroup from '@mui/material/FormGroup'
-import FormControlLabel from '@mui/material/FormControlLabel'
 
 import Renderer from '@/app/components/Heatmap/Rendererer'
 import MapTooltip from '@/app/components/Heatmap/MapTooltip'
@@ -21,6 +18,7 @@ type HeatmapProps = {
     width: number;
     height: number;
     data: any;
+    useAltColor: boolean;
 }
 
 export type InteractionData = {
@@ -31,12 +29,13 @@ export type InteractionData = {
     value: number;
 }
 
-export default function Heatmap({ width, height, data }: HeatmapProps) {
+export default function Heatmap({ width, height, data, useAltColor }: HeatmapProps) {
     // cell that is being hovered, for tooltips
     const [hoveredCell, setHoveredCell] = useState<InteractionData | null>(null)
 
-    // alternative color for colorblind people
-    const [useAltColor, setUseAltColor] = useState(false)
+    if (!data) {
+        return null;
+    }
 
     // Flatten data and filter out undefined values
     const flatData: number[] = data.data.flat().filter((d: number | undefined): d is number => d !== undefined)
@@ -60,10 +59,6 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
     // Dynamically select color scale
     const colorScale = useMemo(() => (useAltColor ? altColorScale : defColorScale), [useAltColor, defColorScale, altColorScale]);
 
-    const handleColorChange = () => {
-        setUseAltColor((prev) => !prev);
-    };
-
     // **Fallback to prevent colorScale errors**
     if (!colorScale) {
         return <div>Loading...</div>;
@@ -71,10 +66,6 @@ export default function Heatmap({ width, height, data }: HeatmapProps) {
 
     return (
         <div style={{ position: 'relative' }}>
-            <div className="color-scale-toggle">
-                <FormGroup>
-                    <FormControlLabel control={<Switch onChange={handleColorChange} color="secondary" {...colorSwitchLabel} />} label="Alternative color palette" />
-                </FormGroup></div>
             <Renderer
                 width={width}
                 height={height}

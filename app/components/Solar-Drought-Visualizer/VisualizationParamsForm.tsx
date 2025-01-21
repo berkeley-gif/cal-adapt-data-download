@@ -14,6 +14,8 @@ import FormLabel from '@mui/material/FormLabel'
 
 import HtmlTooltip from '../Global/HtmlTooltip'
 
+import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
@@ -47,9 +49,6 @@ interface VizFormProps {
     globalWarmingSelected: string,
     setGlobalWarmingSelected: (val: string) => void,
     globalWarmingList: string[],
-    photoConfigSelected: string,
-    setPhotoConfigSelected: (val: string) => void,
-    photoConfigList: string[],
     onFormDataSubmit: () => unknown,
     toggleOpen: () => void
 }
@@ -57,13 +56,11 @@ interface VizFormProps {
 const VizPrmsForm: React.FC<VizFormProps> = ({
     globalWarmingSelected,
     setGlobalWarmingSelected,
-    photoConfigSelected,
-    setPhotoConfigSelected,
-    photoConfigList,
     globalWarmingList,
     onFormDataSubmit,
     toggleOpen
 }) => {
+    const { photoConfigSelected, setPhotoConfigSelected, photoConfigList } = usePhotoConfig()
     const [formErrorState, setFormErrorState] = useState<FormFieldErrorStates>({
         globalWarming: false,
         photoConfig: false
