@@ -8,6 +8,7 @@ import MapUI from './MapUI'
 
 import { useLeftDrawer } from '../../context/LeftDrawerContext'
 import { globalWarmingLevelsList } from '@/app/lib/data-explorer/global-warming-levels'
+import { metricsList } from '@/app/lib/data-explorer/metrics'
 
 type DataExplorerProps = {
     data: any;
@@ -35,6 +36,7 @@ export default function DataExplorer({ data }: DataExplorerProps) {
                 setMetricSelected={setMetricSelected}
                 setGwlSelected={setGwlSelected}
                 globalWarmingLevels={globalWarmingLevelsList}
+                metrics={metricsList}
             />
             <MapboxMap
                 gwlSelected={gwlSelected}
@@ -42,6 +44,7 @@ export default function DataExplorer({ data }: DataExplorerProps) {
                 metricSelected={metricSelected}
                 setMetricSelected={setMetricSelected}
                 globalWarmingLevels={globalWarmingLevelsList}
+                metrics={metricsList}
             />
         </Grid>
     )

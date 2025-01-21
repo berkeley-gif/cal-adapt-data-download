@@ -30,29 +30,6 @@ const THROTTLE_DELAY = 100 as const
 const BASE_URL = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com' as const
 const RASTER_TILE_LAYER_OPACITY = 0.8 as const
 
-// edit me v
-const VARIABLES = {
-    'TX99p': {
-        title: 'Mean annual change in extreme heat days',
-        path: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/TX99p/d02/TX99p.zarr',
-        rescale: '1.18,35.19',
-        colormap: 'oranges' // case sensitive
-    },
-    'R99p': {
-        title: 'Absolute change in 99th percentile 1-day accumulated precipitation',
-        path: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/R99p/d02/R99p.zarr',
-        rescale: '-4.866,39.417',
-        colormap: 'blues'
-    },
-    'ffwige50': {
-        title: 'Change in median annual number of days with (FFWI) value greater than 50',
-        path: 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/ffwige50/d02/ffwige50.zarr',
-        rescale: '-197.96,92.158',
-        colormap: 'reds'
-    }
-} as const
-// edit me ^
-
 type MapProps = {
     metricSelected: number
     gwlSelected: number
@@ -60,9 +37,8 @@ type MapProps = {
     setMetricSelected: (metric: number) => void
     setGwlSelected: (gwl: number) => void
     globalWarmingLevels: { id: number; value: string }[]
+    metrics: { id: number; title: string; variable: string; description: string; path: string; rescale: string; colormap: string }[]
 }
-
-type VariableKey = keyof typeof VARIABLES
 
 type TileJson = {
     tiles: string[]
@@ -109,7 +85,7 @@ const throttledFetchPoint = throttle(async (
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
-    ({ metricSelected, gwlSelected, data, setMetricSelected, setGwlSelected, globalWarmingLevels }, ref) => {
+    ({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }, ref) => {
         // Refs
         const mapRef = useRef<MapRef | null>(null)
         const mapContainerRef = useRef<HTMLDivElement | null>(null) // Reference to the map container
@@ -134,17 +110,16 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         }, [])
 
         // Derived state
-        const variableKeys = Object.keys(VARIABLES) as VariableKey[]
-        const currentVariable = variableKeys[metricSelected] || variableKeys[0]
-        const currentGwl = globalWarmingLevels[gwlSelected]?.value || globalWarmingLevels[0].value
+        const currentVariableData = metrics[metricSelected]
 
-        const currentVariableData = VARIABLES[currentVariable]
         if (!currentVariableData) {
-            console.error('Invalid variable selected:', currentVariable)
+            console.error('Invalid metric selected:', metricSelected)
             return null
         }
 
+        const currentVariable = currentVariableData.variable
         const currentColormap = currentVariableData.colormap
+        const currentGwl = globalWarmingLevels[gwlSelected]?.value || globalWarmingLevels[0].value
 
         useEffect(() => {
             if (initialLoadRef.current) {
@@ -196,7 +171,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             throttledFetchPoint(
                 lng,
                 lat,
-                VARIABLES[currentVariable].path,
+                currentVariableData.path,
                 currentVariable,
                 currentGwl,
                 globalWarmingLevels,
@@ -386,5 +361,3 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 MapboxMap.displayName = 'MapboxMap'
 
 export default MapboxMap
-
-
