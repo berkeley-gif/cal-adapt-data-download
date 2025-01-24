@@ -26,7 +26,7 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import SidePanel from '@/app/components/Dashboard/RightSidePanel'
+import SidePanel from '@/app/components/Dashboard/RightSidepanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
 import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 

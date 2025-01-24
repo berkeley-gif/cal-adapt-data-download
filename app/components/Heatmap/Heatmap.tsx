@@ -33,14 +33,10 @@ export default function Heatmap({ width, height, data, useAltColor }: HeatmapPro
     // cell that is being hovered, for tooltips
     const [hoveredCell, setHoveredCell] = useState<InteractionData | null>(null)
 
-    if (!data) {
-        return null;
-    }
-
     // Flatten data and filter out undefined values
-    const flatData: number[] = data.data.flat().filter((d: number | undefined): d is number => d !== undefined)
-    const min = d3.min(flatData) as number | null
-    const max = d3.max(flatData) as number | null
+    const flatData: number[] = data?.data?.flat().filter((d: number | undefined): d is number => d !== undefined)
+    const min = d3.min(flatData) as number | null ?? 0
+    const max = d3.max(flatData) as number | null ?? 1
 
     const defColorScale = useMemo(() => {
         return d3
@@ -60,7 +56,8 @@ export default function Heatmap({ width, height, data, useAltColor }: HeatmapPro
     const colorScale = useMemo(() => (useAltColor ? altColorScale : defColorScale), [useAltColor, defColorScale, altColorScale]);
 
     // **Fallback to prevent colorScale errors**
-    if (!colorScale) {
+    // **Fallback to prevent rendering errors**
+    if (!data) {
         return <div>Loading...</div>;
     }
 

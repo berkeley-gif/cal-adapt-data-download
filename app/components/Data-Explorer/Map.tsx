@@ -112,7 +112,6 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         if (!currentVariableData) {
             console.error('Invalid metric selected:', metricSelected)
-            return null
         }
 
         const currentVariable = currentVariableData.variable

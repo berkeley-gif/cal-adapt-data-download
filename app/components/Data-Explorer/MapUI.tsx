@@ -223,7 +223,7 @@ export default function MapUI({ metricSelected, gwlSelected, customColorRamp, cu
                                 }}
                             >
                                 <Typography variant="body1">
-                                    Explore climate trends, visualize environmental data, and make informed decisions about California's future. Here's a quick guide to help you navigate the tool:
+                                    Explore climate trends, visualize environmental data, and make informed decisions about California&#x27s future. Here&#x27s a quick guide to help you navigate the tool:
                                 </Typography>
 
                                 <Typography variant="h6" sx={{ mt: '15px' }}>
