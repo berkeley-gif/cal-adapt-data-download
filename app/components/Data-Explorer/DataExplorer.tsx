@@ -24,7 +24,8 @@ export default function DataExplorer({ data }: DataExplorerProps) {
     const [customColorRamp, setCustomColorRamp] = useState<string>('')
 
     const customColorRampList: string[] = [
-        'Inferno', 'BuPu', 'Viridis', 'Cividis', 'Cool', 'Plasma', 'CubehelixDefault'
+        'Inferno', 'BuPu', 'Viridis', 'Cividis', 'Cool', 'Plasma', 'CubehelixDefault', 'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
+        'RdYlBu', 'RdYlGn'
     ]
 
     useEffect(() => {

@@ -36,7 +36,7 @@ export const MapLegend = ({
         .domain([min, max])
 
     const interpolatorKey = `interpolate${colormap.charAt(0).toUpperCase() + colormap.slice(1)}` as keyof typeof d3
-    const interpolator = d3[interpolatorKey] as (t: number) => string
+    const interpolator = (d3[interpolatorKey] as (t: number) => string) || d3.interpolateInferno
     const colorScale = d3.scaleSequential<string>()
         .domain([min, max])
         .interpolator(interpolator)
