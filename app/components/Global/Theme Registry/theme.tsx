@@ -34,14 +34,20 @@ let theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#E3F5FF',
+      main: '#D3F1F8',
+      dark: '#93a8ad',
+      light: '#dbf3f9',
       contrastText: '#333538',
     },
     secondary: {
-      main: '#000000',
+      main: '#95A8AF',
+      dark: '#68757a',
+      light: '#aab9bf',
     },
     success: {
       main: '#76cba9',
+      dark: '#528e76',
+      light: '#91d5ba'
     },
     info: {
       main: '#C6C7F8',
@@ -88,20 +94,6 @@ let theme = createTheme({
   },
   components: {
     MuiAlert: {
-      variants: [
-        {
-          props: { variant: 'purple' },
-          style: {
-            backgroundColor: '#C7C6F8', // Customize the background color
-          },
-        },
-        {
-          props: { variant: 'grey' },
-          style: {
-            backgroundColor: '#E5ECF6', // Customize the background color
-          },
-        }
-      ],
       styleOverrides: {
         root: {
           borderRadius: 8,
@@ -129,7 +121,6 @@ let theme = createTheme({
         root: ({ ownerState }) => ({
           ...(ownerState.variant === 'contained' &&
             ownerState.color === 'primary' && {
-            backgroundColor: '#D3F1F8',
             color: '#333538',
             boxShadow: 'none',
             textTransform: 'capitalize',
@@ -177,12 +168,34 @@ theme = createTheme(theme, {
       },
       name: 'primaryBlue',
     }),
+    surfaceGray: theme.palette.augmentColor({
+      color: {
+        main: '#F7F9FB',
+      },
+      name: 'surfaceGray',
+    }),
   },
 })
 
 // Override components after creating custom palettes
 theme = createTheme(theme, {
   components: {
+    MuiAlert: {
+      variants: [
+        {
+          props: { variant: 'purple' },
+          style: {
+            backgroundColor: theme.palette.info.main
+          }
+        },
+        {
+          props: { variant: 'grey' },
+          style: {
+            backgroundColor: '#E5ECF6', // Customize the background color
+          },
+        }
+      ]
+    },
     MuiRadio: {
       styleOverrides: {
         root: {
@@ -202,7 +215,7 @@ theme = createTheme(theme, {
       styleOverrides: {
         option: {
           '&[aria-selected="true"]': {
-            color: theme.palette.primaryBlue.main, 
+            color: theme.palette.primaryBlue.main,
           },
           '&[data-focus="true"]': {
             color: theme.palette.primaryBlue.main,
