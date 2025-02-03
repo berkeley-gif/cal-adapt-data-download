@@ -400,7 +400,7 @@ export default function DataDownload({ data }: DataDownloadProps) {
         <div className="tool-container tool-container--padded">
             {/** Alerts */}
             <div className="alerts alerts-50">
-                <Alert variant="purple" severity="info">Looking for the full LOCA2 scientific data at daily resolution for the entire state of California?
+                <Alert variant="filled" severity="info" color="info">Looking for the full LOCA2 scientific data at daily resolution for the entire state of California?
                     <div className="cta">
                         <Button variant="contained" target="_blank" href="https://docs.google.com/document/d/1HRISAkRb0TafiCSCOq773iqt2TtT2A9adZqDTAShvhE/edit?usp=sharing">Click Here for the How-To-Guide</Button>
                     </div>
@@ -419,7 +419,7 @@ export default function DataDownload({ data }: DataDownloadProps) {
                 </Alert>
             </div>
 
-            <Alert className="alerts alerts-100" sx={{ mb: "26px" }} variant="filled" severity="info">The size of data packages might be very large. In that case, you may be asked for an email address to notify you when your package is ready for download. </Alert>
+            <Alert className="alerts alerts-100" sx={{ mb: "26px" }} variant="standard" severity="info">The size of data packages might be very large. In that case, you may be asked for an email address to notify you when your package is ready for download. </Alert>
 
             {/** Packages container */}
             <div className="container container--full">

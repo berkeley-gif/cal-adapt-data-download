@@ -38,7 +38,7 @@ let theme = createTheme({
       contrastText: '#333538',
     },
     secondary: {
-      main: '#000000',
+      main: '#333538',
     },
     success: {
       main: '#76cba9',
@@ -90,12 +90,6 @@ let theme = createTheme({
     MuiAlert: {
       variants: [
         {
-          props: { variant: 'purple' },
-          style: {
-            backgroundColor: '#C7C6F8', // Customize the background color
-          },
-        },
-        {
           props: { variant: 'grey' },
           style: {
             backgroundColor: '#E5ECF6', // Customize the background color
@@ -107,10 +101,6 @@ let theme = createTheme({
           borderRadius: 8,
           color: 'inherit',
           padding: '25px'
-        },
-        filledInfo: {
-          backgroundColor: '#E3F5FF',
-          color: 'inherit',
         },
       },
     },
@@ -174,6 +164,8 @@ theme = createTheme(theme, {
     primaryBlue: theme.palette.augmentColor({
       color: {
         main: '#57AEF3',
+        light: '#78BEF5',
+        dark: '#3C79AA'
       },
       name: 'primaryBlue',
     }),
@@ -202,14 +194,26 @@ theme = createTheme(theme, {
       styleOverrides: {
         option: {
           '&[aria-selected="true"]': {
-            color: theme.palette.primaryBlue.main, 
+            color: theme.palette.primaryBlue.main,
           },
           '&[data-focus="true"]': {
             color: theme.palette.primaryBlue.main,
           },
         }
       }
-    }
+    },
+    MuiAlert: {
+      styleOverrides: {
+        standardInfo: {
+          backgroundColor: theme.palette.primary.main
+        },
+        icon: {
+          "&.MuiAlert-icon": {
+            color: theme.palette.primaryBlue.main
+          }
+        }
+      },
+    },
   }
 })
 
