@@ -19,6 +19,11 @@ export default function DataExplorer({ data }: DataExplorerProps) {
 
     const [gwlSelected, setGwlSelected] = useState<number>(0)
     const [metricSelected, setMetricSelected] = useState<number>(0)
+   
+    // Temp: For reverse color options switch
+    const switchLabel = { inputProps: { 'aria-label': 'Switch color options' } }
+    const [isColorRev, setIsColorRev] = useState<boolean>(false)
+
 
     // TEMP: for color ramp options
     const [customColorRamp, setCustomColorRamp] = useState<string>('')
@@ -48,6 +53,8 @@ export default function DataExplorer({ data }: DataExplorerProps) {
                 globalWarmingLevels={globalWarmingLevelsList}
                 metrics={metricsList}
                 customColorRampList={customColorRampList}
+                isColorRev={isColorRev}
+                setIsColorRev={setIsColorRev}
             />
             <MapboxMap
                 gwlSelected={gwlSelected}
