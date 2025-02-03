@@ -124,7 +124,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         // Fetch tiles function
         const fetchTileJson = async () => {
             // TEMP: For color wheel options
-            let colormap = currentColorMap.toLowerCase()
+            let colormap = isColorRev ? currentColorMap.toLowerCase() + '_r' : currentColorMap.toLowerCase()
 
             const params = {
                 url: currentVariableData.path,
@@ -174,12 +174,12 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         useEffect(() => {
             if (initialLoadRef.current) {
-                initialLoadRef.current = false;
-                return; // Skip the first execution
+                initialLoadRef.current = false
+                return // Skip the first execution
             }
 
             fetchTileJson()
-        }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl, currentColorMap])
+        }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl, currentColorMap, isColorRev])
 
         useEffect(() => {
             if (mapRef.current) {
