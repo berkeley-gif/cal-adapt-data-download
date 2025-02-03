@@ -33,6 +33,7 @@ const RASTER_TILE_LAYER_OPACITY = 0.8 as const
 type MapProps = {
     metricSelected: number
     gwlSelected: number
+    customColorRamp: string
     setMetricSelected: (metric: number) => void
     setGwlSelected: (gwl: number) => void
     globalWarmingLevels: { id: number; value: string }[]
@@ -84,7 +85,7 @@ const throttledFetchPoint = throttle(async (
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
-    ({ metricSelected, gwlSelected, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }, ref) => {
+    ({ metricSelected, gwlSelected, customColorRamp, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }, ref) => {
         // Refs
         const mapRef = useRef<MapRef | null>(null)
         const mapContainerRef = useRef<HTMLDivElement | null>(null) // Reference to the map container
@@ -92,6 +93,9 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         // Forward the internal ref to the parent
         useImperativeHandle(ref, () => mapRef.current || undefined)
+
+        // TEMP: To try out different color maps
+        const [currentColorMap, setCurrentColorMap] = useState<string>('')
 
         // State
         const [mounted, setMounted] = useState(false)
@@ -103,22 +107,72 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             value: number | null
         } | null>(null)
 
+        // Derived state variables 
+        const currentVariableData = metrics[metricSelected]
+
+        if (!currentVariableData) {
+            console.error('Invalid metric selected:', metricSelected)
+        }
+
+        const currentVariable = currentVariableData.variable
+
+        const currentGwl = globalWarmingLevels[gwlSelected]?.value || globalWarmingLevels[0].value
+
+        const isLoading = !mounted || !tileJson
+
+        // Fetch tiles function
+        const fetchTileJson = async () => {
+            // TEMP: For color wheel options
+            let colormap = currentColorMap.toLowerCase()
+
+            if (colormap == 'CubehelixDefault')
+                colormap = 'cubehelix'
+
+            const params = {
+                url: currentVariableData.path,
+                variable: currentVariable,
+                datetime: currentGwl,
+                rescale: currentVariableData.rescale,
+                // TEMP: Change for color wheel options. Set to currentColorMap.toLowerCase()
+                colormap_name: colormap
+            }
+
+            console.log('fetchTileJson called with params', params)
+            const queryString = Object.entries(params)
+                .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+                .join('&')
+
+            const url = `${BASE_URL}/WebMercatorQuad/tilejson.json?${queryString}`
+
+
+            // debug: log the request url
+            // console.log('Fetching TileJSON with url:', url)
+
+            try {
+                const response = await fetch(url)
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`)
+                }
+                const data = await response.json()
+                setTileJson(data)
+            } catch (error) {
+                console.error('Failed to fetch TileJSON:', error)
+                console.error('Full URL:', url)
+            }
+        }
+
         // Effects
         useEffect(() => {
             setMounted(true)
         }, [])
 
-        // Derived state
-        const currentVariableData = metrics[metricSelected]
+        // TEMP: For custom color ramp selector
+        useEffect(() => {
+            if (customColorRamp !== currentVariableData.colormap) {
+                setCurrentColorMap(customColorRamp)
+            }
 
-        if (!currentVariableData) {
-            console.error('Invalid metric selected:', metricSelected)
-            return null
-        }
-
-        const currentVariable = currentVariableData.variable
-        const currentColormap = currentVariableData.colormap
-        const currentGwl = globalWarmingLevels[gwlSelected]?.value || globalWarmingLevels[0].value
+        }, [customColorRamp])
 
         useEffect(() => {
             if (initialLoadRef.current) {
@@ -126,84 +180,8 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 return; // Skip the first execution
             }
 
-            const fetchTileJson = async () => {
-                const params = {
-                    url: currentVariableData.path,
-                    variable: currentVariable,
-                    datetime: currentGwl,
-                    rescale: currentVariableData.rescale,
-                    colormap_name: currentColormap
-                }
-
-                const queryString = Object.entries(params)
-                    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-                    .join('&')
-
-                const url = `${BASE_URL}/WebMercatorQuad/tilejson.json?${queryString}`
-                
-
-                // debug: log the request url
-                // console.log('Fetching TileJSON with url:', url)
-
-                try {
-                    const response = await fetch(url)
-                    if (!response.ok) {
-                        throw new Error(`Error: ${response.status} ${response.statusText}`)
-                    }
-                    const data = await response.json()
-                    setTileJson(data)
-                } catch (error) {
-                    console.error('Failed to fetch TileJSON:', error)
-                    console.error('Full URL:', url)
-                }
-            }
             fetchTileJson()
-        }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl, currentColormap])
-
-        const handleHover = (event: MapMouseEvent) => {
-            if (!mapLoaded || !mapRef.current) {
-                return
-            }
-
-            const { lngLat: { lng, lat } } = event
-
-            throttledFetchPoint(
-                lng,
-                lat,
-                currentVariableData.path,
-                currentVariable,
-                currentGwl,
-                globalWarmingLevels,
-                (value) => {
-                    if (value !== null) {
-                        setHoverInfo({
-                            longitude: lng,
-                            latitude: lat,
-                            value
-                        })
-                    } else {
-                        setHoverInfo(null)
-                    }
-                }
-            )
-        }
-
-        // Cleanup throttledFetchPoint
-        useEffect(() => {
-            return () => {
-                throttledFetchPoint.cancel()
-            }
-        }, [])
-
-        const isLoading = !mounted || !tileJson
-
-        const handleMapError = (e: ErrorEvent) => {
-            const error = e.error as { status?: number; url?: string }
-            if (error.status === 404 && error.url?.includes('WebMercatorQuad')) {
-                return
-            }
-            console.error('Map error:', error)
-        }
+        }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl, currentColorMap])
 
         useEffect(() => {
             if (mapRef.current) {
@@ -234,19 +212,49 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             }
         }, [mapRef])
 
-        if (!mounted) {
-            return (
-                <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
-                    <Box sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)'
-                    }}>
-                        <LoadingSpinner />
-                    </Box>
-                </Grid>
+        // Map functions 
+        const handleHover = (event: MapMouseEvent) => {
+            if (!mapLoaded || !mapRef.current) {
+                return
+            }
+
+            const { lngLat: { lng, lat } } = event
+
+            throttledFetchPoint(
+                lng,
+                lat,
+                currentVariableData.path,
+                currentVariable,
+                currentGwl,
+                globalWarmingLevels,
+                (value) => {
+                    if (value !== null) {
+                        setHoverInfo({
+                            longitude: lng,
+                            latitude: lat,
+                            value
+                        })
+                    } else {
+                        setHoverInfo(null)
+                    }
+                }
             )
+        }
+
+        // Cleanup throttledFetchPoint
+        useEffect(() => {
+            setCurrentColorMap(currentVariableData.colormap)
+            return () => {
+                throttledFetchPoint.cancel()
+            }
+        }, [])
+
+        const handleMapError = (e: ErrorEvent) => {
+            const error = e.error as { status?: number; url?: string }
+            if (error.status === 404 && error.url?.includes('WebMercatorQuad')) {
+                return
+            }
+            console.error('Map error:', error)
         }
 
         const handleMapLoad = (e: { target: import('mapbox-gl').Map }) => {
@@ -264,6 +272,22 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 })
                 resizeObserver.observe(mapContainer)
             }
+        }
+
+        // Loading spinner
+        if (!mounted) {
+            return (
+                <Grid container sx={{ height: '100%', flexDirection: "column", flexWrap: "nowrap", flexGrow: 1 }}>
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)'
+                    }}>
+                        <LoadingSpinner />
+                    </Box>
+                </Grid>
+            )
         }
 
         return (
@@ -302,7 +326,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                         >
 
                             {mapLoaded && tileJson && (
-                                <Source 
+                                <Source
                                     id="raster-source"
                                     type="raster"
                                     tiles={tileJson.tiles}
@@ -354,10 +378,10 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                             zIndex: 2
                         }}>
                             <MapLegend
-                                colormap={currentColormap}
+                                colormap={currentColorMap}
                                 min={parseFloat(currentVariableData.rescale.split(',')[0])}
                                 max={parseFloat(currentVariableData.rescale.split(',')[1])}
-                                title={currentVariableData.title}
+                                title={currentVariableData.description}
                                 aria-label="Map legend"
                             />
                         </div>

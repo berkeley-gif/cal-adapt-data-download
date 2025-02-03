@@ -20,6 +20,14 @@ export default function DataExplorer({ data }: DataExplorerProps) {
     const [gwlSelected, setGwlSelected] = useState<number>(0)
     const [metricSelected, setMetricSelected] = useState<number>(0)
 
+    // TEMP: for color ramp options
+    const [customColorRamp, setCustomColorRamp] = useState<string>('')
+
+    const customColorRampList: string[] = [
+        'Inferno', 'BuPu', 'Viridis', 'Cividis', 'Cool', 'Plasma', 'CubehelixDefault', 'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
+        'RdYlBu', 'RdYlGn'
+    ]
+
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             toggleLeftDrawer()
@@ -33,15 +41,19 @@ export default function DataExplorer({ data }: DataExplorerProps) {
             <MapUI
                 metricSelected={metricSelected}
                 gwlSelected={gwlSelected}
+                customColorRamp={customColorRamp}
+                setCustomColorRamp={setCustomColorRamp}
                 setMetricSelected={setMetricSelected}
                 setGwlSelected={setGwlSelected}
                 globalWarmingLevels={globalWarmingLevelsList}
                 metrics={metricsList}
+                customColorRampList={customColorRampList}
             />
             <MapboxMap
                 gwlSelected={gwlSelected}
                 setGwlSelected={setGwlSelected}
                 metricSelected={metricSelected}
+                customColorRamp={customColorRamp}
                 setMetricSelected={setMetricSelected}
                 globalWarmingLevels={globalWarmingLevelsList}
                 metrics={metricsList}
