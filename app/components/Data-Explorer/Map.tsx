@@ -121,6 +121,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         // Fetch tiles function
         const fetchTileJson = async () => {
+
             // TEMP: For color wheel options
             let colormap = isColorRev ? currentColorMap.toLowerCase() + '_r' : currentColorMap.toLowerCase()
 
@@ -164,7 +165,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         // TEMP: For custom color ramp selector
         useEffect(() => {
-            if (customColorRamp !== '' && customColorRamp !== currentVariableData.colormap) {
+            if (customColorRamp.length > 0 && customColorRamp !== currentVariableData.colormap) {
                 setCurrentColorMap(customColorRamp)
             }
 
@@ -179,6 +180,10 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
             fetchTileJson()
         }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl, currentColorMap, isColorRev])
 
+        useEffect(() => {
+            setCurrentColorMap(currentVariableData.colormap)
+        }, [metricSelected])
+        
         useEffect(() => {
             if (mapRef.current) {
                 const map = mapRef.current.getMap()
@@ -236,6 +241,11 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 }
             )
         }
+
+        // Cleanup throttledFetchPoint
+        useEffect(() => {
+            console.log('currentColorMap changed to: ', currentColorMap)
+        }, [currentColorMap])
 
         // Cleanup throttledFetchPoint
         useEffect(() => {

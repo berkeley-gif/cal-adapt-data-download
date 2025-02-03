@@ -69,8 +69,7 @@ export default function Heatmap({ width, height, data, useAltColor, currentColor
         .domain([min, max])
         .interpolator(isColorRev ? (t) => interpolator(1-t): interpolator)
 
-    // **Fallback to prevent colorScale errors**
-    // **Fallback to prevent rendering errors**
+    // Fallback to prevent colorScale errors**
     if (!data) {
         return <div>Loading...</div>;
     }

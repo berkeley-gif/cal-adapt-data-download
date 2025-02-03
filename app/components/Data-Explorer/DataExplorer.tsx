@@ -24,7 +24,6 @@ export default function DataExplorer({ data }: DataExplorerProps) {
     const switchLabel = { inputProps: { 'aria-label': 'Switch color options' } }
     const [isColorRev, setIsColorRev] = useState<boolean>(false)
 
-
     // TEMP: for color ramp options
     const [customColorRamp, setCustomColorRamp] = useState<string>('')
 
