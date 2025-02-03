@@ -183,7 +183,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         useEffect(() => {
             setCurrentColorMap(currentVariableData.colormap)
         }, [metricSelected])
-        
+
         useEffect(() => {
             if (mapRef.current) {
                 const map = mapRef.current.getMap()
