@@ -244,7 +244,7 @@ export default function SolarDroughtViz() {
 
                         {/* Global warming level information */}
                         <Box className="alerts" sx={{ maxWidth: '100%' }}>
-                            <Alert variant="purple" severity="info" aria-label="Global models estimate information">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
+                            <Alert variant="filled" severity="info" color="info" aria-label="Global models estimate information">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
                                 <Box className="cta">
                                     <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels" aria-label="Learn more about GWL">Learn more about GWL</Button>
                                 </Box>

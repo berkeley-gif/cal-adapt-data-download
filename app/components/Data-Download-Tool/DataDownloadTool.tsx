@@ -400,7 +400,7 @@ export default function DataDownload({ data }: DataDownloadProps) {
         <div className="tool-container tool-container--padded">
             {/** Alerts */}
             <div className="alerts alerts-50">
-                <Alert variant="filled" severity="info" color="info">Looking for the full LOCA2 scientific data at daily resolution for the entire state of California?
+                <Alert variant="filled" severity="info" color="info" aria-label="Where to go for full LOCA2 scientific data">Looking for the full LOCA2 scientific data at daily resolution for the entire state of California?
                     <div className="cta">
                         <Button variant="contained" target="_blank" href="https://docs.google.com/document/d/1HRISAkRb0TafiCSCOq773iqt2TtT2A9adZqDTAShvhE/edit?usp=sharing">Click Here for the How-To-Guide</Button>
                     </div>
