@@ -15,7 +15,6 @@ import MenuItem from '@mui/material/MenuItem'
 import Fade from '@mui/material/Fade'
 import Fab from '@mui/material/Fab'
 import QuestionMarkOutlinedIcon from '@mui/icons-material/QuestionMarkOutlined'
-import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 
 import { useLeftDrawer } from '../../context/LeftDrawerContext'
