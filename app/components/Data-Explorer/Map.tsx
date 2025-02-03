@@ -35,8 +35,6 @@ type MapProps = {
     metricSelected: number
     gwlSelected: number
     customColorRamp: string
-    setMetricSelected: (metric: number) => void
-    setGwlSelected: (gwl: number) => void
     globalWarmingLevels: { id: number; value: string }[]
     metrics: { id: number; title: string; variable: string; description: string; path: string; rescale: string; colormap: string }[]
 }
@@ -86,7 +84,7 @@ const throttledFetchPoint = throttle(async (
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
-    ({ isColorRev, metricSelected, gwlSelected, customColorRamp, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }, ref) => {
+    ({ isColorRev, metricSelected, gwlSelected, customColorRamp, globalWarmingLevels, metrics }, ref) => {
         // Refs
         const mapRef = useRef<MapRef | null>(null)
         const mapContainerRef = useRef<HTMLDivElement | null>(null) // Reference to the map container
@@ -166,7 +164,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         // TEMP: For custom color ramp selector
         useEffect(() => {
-            if (customColorRamp !== currentVariableData.colormap) {
+            if (customColorRamp !== '' && customColorRamp !== currentVariableData.colormap) {
                 setCurrentColorMap(customColorRamp)
             }
 

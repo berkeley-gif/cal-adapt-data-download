@@ -58,10 +58,8 @@ export default function DataExplorer({ data }: DataExplorerProps) {
             />
             <MapboxMap
                 gwlSelected={gwlSelected}
-                setGwlSelected={setGwlSelected}
                 metricSelected={metricSelected}
                 customColorRamp={customColorRamp}
-                setMetricSelected={setMetricSelected}
                 globalWarmingLevels={globalWarmingLevelsList}
                 metrics={metricsList}
                 isColorRev={isColorRev}
