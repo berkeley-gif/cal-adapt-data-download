@@ -31,6 +31,7 @@ const BASE_URL = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com' as con
 const RASTER_TILE_LAYER_OPACITY = 0.8 as const
 
 type MapProps = {
+    isColorRev: boolean
     metricSelected: number
     gwlSelected: number
     customColorRamp: string
@@ -85,7 +86,7 @@ const throttledFetchPoint = throttle(async (
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
-    ({ metricSelected, gwlSelected, customColorRamp, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }, ref) => {
+    ({ isColorRev, metricSelected, gwlSelected, customColorRamp, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }, ref) => {
         // Refs
         const mapRef = useRef<MapRef | null>(null)
         const mapContainerRef = useRef<HTMLDivElement | null>(null) // Reference to the map container
@@ -124,9 +125,6 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
         const fetchTileJson = async () => {
             // TEMP: For color wheel options
             let colormap = currentColorMap.toLowerCase()
-
-            if (colormap == 'CubehelixDefault')
-                colormap = 'cubehelix'
 
             const params = {
                 url: currentVariableData.path,
@@ -383,6 +381,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                 max={parseFloat(currentVariableData.rescale.split(',')[1])}
                                 title={currentVariableData.description}
                                 aria-label="Map legend"
+                                isColorRev={isColorRev}
                             />
                         </div>
                     </div>

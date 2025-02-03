@@ -29,7 +29,7 @@ export default function DataExplorer({ data }: DataExplorerProps) {
     const [customColorRamp, setCustomColorRamp] = useState<string>('')
 
     const customColorRampList: string[] = [
-        'Inferno', 'BuPu', 'Viridis', 'Cividis', 'Cool', 'Plasma', 'CubehelixDefault', 'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
+        'Inferno', 'BuPu', 'Viridis', 'Cividis', 'Cool', 'Plasma', 'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
         'RdYlBu', 'RdYlGn'
     ]
 
@@ -64,6 +64,7 @@ export default function DataExplorer({ data }: DataExplorerProps) {
                 setMetricSelected={setMetricSelected}
                 globalWarmingLevels={globalWarmingLevelsList}
                 metrics={metricsList}
+                isColorRev={isColorRev}
             />
         </Grid>
     )
