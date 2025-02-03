@@ -16,6 +16,7 @@ import Alert from '@mui/material/Alert'
 import FormGroup from '@mui/material/FormGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
+
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
         purple: true;
@@ -31,6 +32,7 @@ import { useSidepanel } from '@/app/context/SidepanelContext'
 import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 
 import { useDidMountEffect } from "@/app/utils/hooks"
+
 
 import MapboxMap from '@/app/components/Solar-Drought-Visualizer/MapboxMap'
 import Heatmap from '@/app/components/Heatmap/Heatmap'
@@ -206,7 +208,7 @@ export default function SolarDroughtViz() {
     };
 
     return (
-        <Box className="solar-drought-tool" aria-label="Solar Drought Visualizer" role="region">
+        <Box className="solar-drought-tool tool-container tool-container--padded" aria-label="Solar Drought Visualizer" role="region">
 
             {/* Intro section */}
             <Box className="solar-drought-tool__intro" style={{ 'maxWidth': '860px' }}>

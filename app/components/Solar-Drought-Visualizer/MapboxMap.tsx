@@ -6,8 +6,12 @@ import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } f
 import { Marker, Map, MapMouseEvent, NavigationControl, ScaleControl, MapRef, ViewStateChangeEvent } from 'react-map-gl'
 import GeocoderControl from './geocoder-control'
 import * as turf from '@turf/turf'
-import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 
+import Fade from '@mui/material/Fade'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+
+import HtmlTooltip from '../Global/HtmlTooltip'
+import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 import '@/app/styles/dashboard/mapbox-map.scss'
 
 type Location = [number, number]
@@ -44,13 +48,13 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
 
         const handleMapClick = (e: MapMouseEvent) => {
             const clickedPoint: [number, number] = [e.lngLat.lng, e.lngLat.lat];
-    
+
             if (mapRef.current) {
                 const point = mapRef.current.project(clickedPoint);
                 const features = mapRef.current.queryRenderedFeatures(point, {
                     layers: ['grid']
                 });
-    
+
                 if (features && features.length > 0) {
                     const selectedFeature = features[0];
                     const centroid = turf.centroid(selectedFeature).geometry.coordinates;
@@ -72,7 +76,7 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                 if (features && features.length > 0) {
                     const selectedFeature = features[0]
                     const centroid = turf.centroid(selectedFeature).geometry.coordinates
-                    
+
                     setMapMarker([centroid[0], centroid[1]])
                     setLocationSelected(centroid as [number, number])
                 }
@@ -84,7 +88,7 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
         useEffect(() => {
             if (mapRef.current && mapLoaded) {
                 const maskAttribute = photoConfigSelected === 'Utility Configuration' ? 'srdumask' : 'srddmask'
-                
+
                 if (mapRef.current) {
                     mapRef.current.setPaintProperty('grid', 'fill-color', [
                         'case',
@@ -95,7 +99,7 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                 }
             }
         }, [photoConfigSelected, mapLoaded])
-        
+
         return (
             <div className="map-container">
                 <div id="map">
@@ -112,8 +116,8 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                         minZoom={3.5}
                     >
                         {mapMarker && (
-                            <Marker 
-                                longitude={mapMarker[0]} 
+                            <Marker
+                                longitude={mapMarker[0]}
                                 latitude={mapMarker[1]}
                                 draggable={true}
                                 onDragEnd={handleMarkerDragEnd}
@@ -127,7 +131,20 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                 {/* Legend */}
                 <div className="map-container__legend">
                     <div className="map-container__legend-color-box"></div>
-                    <span>No data</span>
+
+                    <p>Location with land restrictions</p>  
+
+                    <HtmlTooltip
+                        textFragment={
+                            <React.Fragment>
+                                <p>This location has land use or land cover restrictions. No data will be returned if selected.</p>
+                            </React.Fragment>
+                        }
+                        iconFragment={<InfoOutlinedIcon />}
+                        TransitionComponent={Fade}
+                        TransitionProps={{ timeout: 600 }}
+                        placement="right-end"
+                    />
                 </div>
             </div>
         )

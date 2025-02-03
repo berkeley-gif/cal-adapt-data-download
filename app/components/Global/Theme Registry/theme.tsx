@@ -94,15 +94,19 @@ let theme = createTheme({
   },
   components: {
     MuiAlert: {
+      variants: [
+        {
+          props: { variant: 'grey' },
+          style: {
+            backgroundColor: '#E5ECF6', // Customize the background color
+          },
+        }
+      ],
       styleOverrides: {
         root: {
           borderRadius: 8,
           color: 'inherit',
           padding: '25px'
-        },
-        filledInfo: {
-          backgroundColor: '#E3F5FF',
-          color: 'inherit',
         },
       },
     },
@@ -165,6 +169,8 @@ theme = createTheme(theme, {
     primaryBlue: theme.palette.augmentColor({
       color: {
         main: '#57AEF3',
+        light: '#78BEF5',
+        dark: '#3C79AA'
       },
       name: 'primaryBlue',
     }),
@@ -222,7 +228,19 @@ theme = createTheme(theme, {
           },
         }
       }
-    }
+    },
+    MuiAlert: {
+      styleOverrides: {
+        standardInfo: {
+          backgroundColor: theme.palette.primary.main
+        },
+        icon: {
+          "&.MuiAlert-icon": {
+            color: theme.palette.primaryBlue.main
+          }
+        }
+      },
+    },
   }
 })
 
