@@ -31,11 +31,10 @@ const BASE_URL = 'https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com' as con
 const RASTER_TILE_LAYER_OPACITY = 0.8 as const
 
 type MapProps = {
+    isColorRev: boolean
     metricSelected: number
     gwlSelected: number
     customColorRamp: string
-    setMetricSelected: (metric: number) => void
-    setGwlSelected: (gwl: number) => void
     globalWarmingLevels: { id: number; value: string }[]
     metrics: { id: number; title: string; variable: string; description: string; path: string; rescale: string; colormap: string }[]
 }
@@ -85,7 +84,7 @@ const throttledFetchPoint = throttle(async (
 })
 
 const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
-    ({ metricSelected, gwlSelected, customColorRamp, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }, ref) => {
+    ({ isColorRev, metricSelected, gwlSelected, customColorRamp, globalWarmingLevels, metrics }, ref) => {
         // Refs
         const mapRef = useRef<MapRef | null>(null)
         const mapContainerRef = useRef<HTMLDivElement | null>(null) // Reference to the map container
@@ -122,11 +121,9 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         // Fetch tiles function
         const fetchTileJson = async () => {
-            // TEMP: For color wheel options
-            let colormap = currentColorMap.toLowerCase()
 
-            if (colormap == 'CubehelixDefault')
-                colormap = 'cubehelix'
+            // TEMP: For color wheel options
+            let colormap = isColorRev ? currentColorMap.toLowerCase() + '_r' : currentColorMap.toLowerCase()
 
             const params = {
                 url: currentVariableData.path,
@@ -168,7 +165,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         // TEMP: For custom color ramp selector
         useEffect(() => {
-            if (customColorRamp !== currentVariableData.colormap) {
+            if (customColorRamp.length > 0 && customColorRamp !== currentVariableData.colormap) {
                 setCurrentColorMap(customColorRamp)
             }
 
@@ -176,12 +173,16 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
 
         useEffect(() => {
             if (initialLoadRef.current) {
-                initialLoadRef.current = false;
-                return; // Skip the first execution
+                initialLoadRef.current = false
+                return // Skip the first execution
             }
 
             fetchTileJson()
-        }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl, currentColorMap])
+        }, [metricSelected, gwlSelected, currentVariable, currentVariableData, currentGwl, currentColorMap, isColorRev])
+
+        useEffect(() => {
+            setCurrentColorMap(currentVariableData.colormap)
+        }, [metricSelected])
 
         useEffect(() => {
             if (mapRef.current) {
@@ -240,6 +241,11 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                 }
             )
         }
+
+        // Cleanup throttledFetchPoint
+        useEffect(() => {
+            console.log('currentColorMap changed to: ', currentColorMap)
+        }, [currentColorMap])
 
         // Cleanup throttledFetchPoint
         useEffect(() => {
@@ -383,6 +389,7 @@ const MapboxMap = forwardRef<MapRef | undefined, MapProps>(
                                 max={parseFloat(currentVariableData.rescale.split(',')[1])}
                                 title={currentVariableData.description}
                                 aria-label="Map legend"
+                                isColorRev={isColorRev}
                             />
                         </div>
                     </div>

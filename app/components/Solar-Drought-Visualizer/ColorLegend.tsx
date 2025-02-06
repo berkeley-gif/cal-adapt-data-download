@@ -26,14 +26,11 @@ export const ColorLegend = ({
     const boundsWidth = width - COLOR_LEGEND_MARGIN.right - COLOR_LEGEND_MARGIN.left
     const boundsHeight = height - COLOR_LEGEND_MARGIN.top - COLOR_LEGEND_MARGIN.bottom
 
-
     // Provide default values if min or max is null
     const safeMin = min ?? 0; // default to 0 if min is null
     const safeMax = max ?? 1; // default to 1 if max is null to avoid division by zero
 
     const xScale = d3.scaleLinear().range([0, boundsWidth]).domain([safeMin, safeMax]);
-/*     
-    const xScale = d3.scaleLinear().range([0, boundsWidth]).domain([min, max]) */
 
     const allTicks = xScale.ticks(4).map((tick, idx) => {
         return (
@@ -72,10 +69,6 @@ export const ColorLegend = ({
             context.fillRect(i, 0, 1, boundsHeight);
         }
 
-/*         for (let i = 0; i < boundsWidth; i++) {
-            context.fillStyle = colorScale((max * i) / boundsWidth)
-            context.fillRect(i, 0, 1, boundsHeight)
-        } */
     }, [width, height, colorScale])
 
     return (
@@ -85,7 +78,7 @@ export const ColorLegend = ({
                     position: 'relative',
                     transform: `translate(${COLOR_LEGEND_MARGIN.left}px),
                         ${COLOR_LEGEND_MARGIN.top}px`,
-                        marginBottom: '25px'
+                    marginBottom: '25px'
                 }}
             >
                 <canvas ref={canvasRef} width={boundsWidth} height={boundsHeight} />
@@ -97,7 +90,7 @@ export const ColorLegend = ({
                     {allTicks}
                 </svg>
             </div>
-            <Typography style={{marginLeft: '12px'}} variant="subtitle1">Average number of solar resource drought days</Typography>
+            <Typography style={{ marginLeft: '12px' }} variant="subtitle1">Average number of solar resource drought days</Typography>
         </div>
     )
 }

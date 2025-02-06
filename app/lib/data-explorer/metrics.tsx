@@ -1,7 +1,7 @@
 export const metricsList = [
     {
         "id": 0, 
-        "title": 'Extreme Heat Days',
+        "title": 'Extreme Heat',
         "variable": 'TX99p',
         "description": 'Mean annual change in extreme heat days',
         "path": 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/TX99p/d02/TX99p.zarr',
@@ -10,7 +10,7 @@ export const metricsList = [
     },
     {
         "id": 1, 
-        "title": 'Precipitation',
+        "title": 'Extreme Precipitation',
         "variable": 'R99p',
         "description": 'Absolute change in 99th percentile 1-day accumulated precipitation',
         "path": 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/R99p/d02/R99p.zarr',
@@ -19,7 +19,7 @@ export const metricsList = [
     },
     {
         "id": 2, 
-        "title": 'Wildfire',
+        "title": 'Fire Weather',
         "variable": 'ffwige50',
         "description": 'Change in median annual number of days with (FFWI) value greater than 50',
         "path": 's3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/yr/ffwige50/d02/ffwige50.zarr',

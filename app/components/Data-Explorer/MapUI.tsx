@@ -14,7 +14,8 @@ import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import Fade from '@mui/material/Fade'
 import Fab from '@mui/material/Fab'
-import QuestionMarkOutlinedIcon from '@mui/icons-material/QuestionMarkOutlined';
+import QuestionMarkOutlinedIcon from '@mui/icons-material/QuestionMarkOutlined'
+import Switch from '@mui/material/Switch'
 
 import { useLeftDrawer } from '../../context/LeftDrawerContext'
 
@@ -22,6 +23,8 @@ const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
 type MapUIProps = {
+    isColorRev: boolean;
+    setIsColorRev: (isColorRev: boolean) => void;
     metricSelected: number;
     gwlSelected: number;
     customColorRamp: string;
@@ -52,7 +55,7 @@ const MenuProps: any = {
 }
 
 
-export default function MapUI({ metricSelected, gwlSelected, customColorRamp, customColorRampList, setCustomColorRamp, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics }: MapUIProps) {
+export default function MapUI({ metricSelected, gwlSelected, customColorRamp, customColorRampList, setCustomColorRamp, setMetricSelected, setGwlSelected, globalWarmingLevels, metrics, isColorRev, setIsColorRev }: MapUIProps) {
     const { open, drawerWidth } = useLeftDrawer()
 
     const [helpAnchorEl, setHelpAnchorEl] = React.useState<HTMLButtonElement | null>(null)
@@ -62,11 +65,12 @@ export default function MapUI({ metricSelected, gwlSelected, customColorRamp, cu
     }
 
     const handleClose = () => {
-        setHelpAnchorEl(null);
+        setHelpAnchorEl(null)
     }
 
     const helpOpen = Boolean(helpAnchorEl);
-    const id = helpOpen ? 'simple-popover' : undefined;
+    const id = helpOpen ? 'simple-popover' : undefined
+
 
     return (
         <div className="map-ui" style={{
@@ -184,6 +188,14 @@ export default function MapUI({ metricSelected, gwlSelected, customColorRamp, cu
                                                 ))}
                                             </Select>
                                         </FormControl>
+                                    </div>
+                                </div>
+                                <div className="container container--transparent">
+                                    <div className="option-group ">
+                                        <div className="option-group__title">
+                                            <Typography variant="body2">Reverse Color Ramp</Typography>
+                                        </div>
+                                        <Switch checked={isColorRev} onChange={() => setIsColorRev(!isColorRev)} />
                                     </div>
                                 </div>
                             </div>

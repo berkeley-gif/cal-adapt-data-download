@@ -16,6 +16,10 @@ import Alert from '@mui/material/Alert'
 import FormGroup from '@mui/material/FormGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
+import { FormControl } from '@mui/material'
+import ListItemText from '@mui/material/ListItemText'
+import MenuItem from '@mui/material/MenuItem'
 
 declare module '@mui/material/Alert' {
     interface AlertPropsVariantOverrides {
@@ -51,12 +55,43 @@ type apiParams = {
     configQueryStr: string,
 }
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+
+const MenuProps: any = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+    anchorOrigin: {
+        vertical: "bottom",
+        horizontal: "center"
+    },
+    transformOrigin: {
+        vertical: "top",
+        horizontal: "center"
+    },
+    variant: "menu"
+}
+
 export default function SolarDroughtViz() {
     const { open, toggleOpen } = useSidepanel()
     const { photoConfigSelected, setPhotoConfigSelected, photoConfigList } = usePhotoConfig()
 
     const heatmapContainerRef = useRef<HTMLBoxElement>(null)
     const [heatmapWidth, setHeatmapWidth] = useState(0)
+
+    // TEMP: for color ramp options
+    const [currentColorMap, setCurrentColorMap] = useState<string>('Oranges')
+
+    const customColorMapList: string[] = [
+        'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn',
+        'BuPu', 'GnBu', 'OrRd', 'PuBuGn', 'PuBu', 'PuRd', 'RdPu', 'YlGnBu', 'YlGn', 'YlOrBr', 'YlOrRd'
+    ]
+
+    const [isColorRev, setIsColorRev] = useState<boolean>(false)
 
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
     const globalWarmingList = ['2']
@@ -186,7 +221,7 @@ export default function SolarDroughtViz() {
         }
 
     }
-    
+
     // RESPONSIVE HEATMAP WIDTH (D3 requires a width specification)
     useEffect(() => {
         if (!heatmapContainerRef.current) return
@@ -224,34 +259,34 @@ export default function SolarDroughtViz() {
                 {/* Heatmap parameters section */}
                 <Grid xs={isLocationSet ? 12 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                     {queriedData && !isLoading && isPointValid &&
-                    (<Box>
-                        <Box className="flex-params">
-                            <Box className="flex-params__item">
-                                <Typography className="option-group__title" variant="body2" aria-label="Global Warming Level">Global Warming Level</Typography>
-                                <Typography variant="body1" aria-label={`Selected Global Warming Level: ${globalWarmingSelected}`}>{globalWarmingSelected}°</Typography>
-                            </Box>
-                            <Box className="flex-params__item">
-                                <Typography className="option-group__title" variant="body2" aria-label="Photovoltaic Configuration">Photovoltaic Configuration</Typography>
-                                <Typography variant="body1" aria-label={`Selected Photovoltaic Configuration: ${photoConfigSelected}`}>{photoConfigSelected}</Typography>
-                            </Box>
-                            <Box className="flex-params__item">
-                                <Typography className='inline' variant="subtitle1" aria-label="Edit parameters">Edit parameters</Typography>
-                                <IconButton className='inline' onClick={toggleOpen} aria-label="Open settings">
-                                    <SettingsOutlinedIcon />
-                                </IconButton>
-                            </Box>
-                        </Box>
-
-                        {/* Global warming level information */}
-                        <Box className="alerts" sx={{ maxWidth: '100%' }}>
-                            <Alert variant="filled" severity="info" color="info" aria-label="Global models estimate information">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
-                                <Box className="cta">
-                                    <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels" aria-label="Learn more about GWL">Learn more about GWL</Button>
+                        (<Box>
+                            <Box className="flex-params">
+                                <Box className="flex-params__item">
+                                    <Typography className="option-group__title" variant="body2" aria-label="Global Warming Level">Global Warming Level</Typography>
+                                    <Typography variant="body1" aria-label={`Selected Global Warming Level: ${globalWarmingSelected}`}>{globalWarmingSelected}°</Typography>
                                 </Box>
+                                <Box className="flex-params__item">
+                                    <Typography className="option-group__title" variant="body2" aria-label="Photovoltaic Configuration">Photovoltaic Configuration</Typography>
+                                    <Typography variant="body1" aria-label={`Selected Photovoltaic Configuration: ${photoConfigSelected}`}>{photoConfigSelected}</Typography>
+                                </Box>
+                                <Box className="flex-params__item">
+                                    <Typography className='inline' variant="subtitle1" aria-label="Edit parameters">Edit parameters</Typography>
+                                    <IconButton className='inline' onClick={toggleOpen} aria-label="Open settings">
+                                        <SettingsOutlinedIcon />
+                                    </IconButton>
+                                </Box>
+                            </Box>
+
+                            {/* Global warming level information */}
+                            <Box className="alerts" sx={{ maxWidth: '100%' }}>
+                                <Alert variant="filled" severity="info" color="info" aria-label="Global models estimate information">Global models estimate that 2° global warming levels (GWL) will be reached between <strong>2037</strong> and <strong>2061</strong>
+                                    <Box className="cta">
+                                        <Button variant="contained" target="_blank" href="https://cal-adapt.org/blog/understanding-warming-levels" aria-label="Learn more about GWL">Learn more about GWL</Button>
+                                    </Box>
                                 </Alert>
                             </Box>
                         </Box>
-                    )}
+                        )}
                 </Grid>
             </Grid>
             <Accordion
@@ -289,16 +324,47 @@ export default function SolarDroughtViz() {
                     <Grid xs={isLocationSet ? 8.5 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                         {isPointValid && (
                             <div className="color-scale-toggle">
-                                <FormGroup>
-                                    <FormControlLabel 
-                                        control={<Switch onChange={handleColorChange} color="secondary" />} 
-                                        label="Alternative color palette" 
-                                    />
-                                </FormGroup>
+                                <div className="option-group option-group--vertical">
+                                    <div className="option-group__title">
+                                        <Typography variant="body2">Custom Color Ramp</Typography>
+                                    </div>
+
+                                    <FormControl>
+                                        <Select
+                                            value={currentColorMap}
+                                            onChange={(event: any) => {
+                                                setCurrentColorMap(event.target.value as string)
+                                            }}
+                                            MenuProps={MenuProps}
+                                            sx={{ mt: '15px', width: '220px' }}
+                                        >
+                                            {customColorMapList.map((colorRamp) => (
+                                                <MenuItem key={colorRamp} value={colorRamp}>
+                                                    <ListItemText primary={colorRamp} />
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </div>
+                                <div >
+                                    {/*                                     <FormGroup>
+                                        <FormControlLabel
+                                            control={<Switch onChange={handleColorChange} color="secondary" />}
+                                            label="Alternative color palette"
+                                        />
+                                    </FormGroup> */}
+                                    <FormGroup>
+                                        <FormControlLabel
+                                            control={<Switch onChange={() => setIsColorRev(!isColorRev)} color="secondary" />}
+                                            label="Reverse color palette"
+                                        />
+                                    </FormGroup>
+                                </div>
                             </div>
+
                         )}
                     </Grid>
-                    
+
                     {/* Locator map instruction section */}
                     <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                         <AccordionSummary
@@ -313,24 +379,24 @@ export default function SolarDroughtViz() {
                             }}
                         >
                             <EditLocationOutlinedIcon aria-label="Edit location" />
-                            <Typography 
-                                className="inline" 
-                                variant="h5" 
-                                style={{ 
+                            <Typography
+                                className="inline"
+                                variant="h5"
+                                style={{
                                     'marginLeft': '10px',
                                     'textDecoration': !accordionExpanded ? 'underline' : 'none',
                                 }}
                                 aria-label={isLocationSet ? "Change your location" : "Select your location"}
                             >
-                                { isLocationSet ? "Change your location" : "Select your location" }
+                                {isLocationSet ? "Change your location" : "Select your location"}
                             </Typography>
                         </AccordionSummary>
                     </Grid>
 
                     {/* Heatmap section */}
                     <Grid xs={accordionExpanded ? 8.5 : 12}
-                        sx={{ 
-                            maxWidth: '100%', 
+                        sx={{
+                            maxWidth: '100%',
                             pr: 4,
                             marginLeft: 'auto',
                             paddingRight: 0,
@@ -339,15 +405,15 @@ export default function SolarDroughtViz() {
                         {!isLoading && !isPointValid && isLocationSet &&
                             (
                                 <Box>
-                                    <Alert variant="grey" severity="info" aria-label="Location with restrictions alert">You have selected a location with land use or land cover restrictions. No data will be returned.&nbsp; 
-                                        <span 
-                                            className={accordionExpanded ? '' : 'underline'} 
+                                    <Alert variant="grey" severity="info" aria-label="Location with restrictions alert">You have selected a location with land use or land cover restrictions. No data will be returned.&nbsp;
+                                        <span
+                                            className={accordionExpanded ? '' : 'underline'}
                                             onClick={accordionExpanded ? undefined : expandMap}
                                             aria-label="Select another location"
                                         >
                                             <strong>Select another location </strong>
-                                        </span> 
-                                         to try again
+                                        </span>
+                                        to try again
                                     </Alert>
                                 </Box>
                             )
@@ -358,12 +424,14 @@ export default function SolarDroughtViz() {
                         >
                             {!isLoading && isPointValid &&
                                 (
-                                    <Heatmap 
+                                    <Heatmap
                                         width={heatmapWidth}
-                                        height={HEATMAP_HEIGHT} 
-                                        data={queriedData && queriedData} 
+                                        height={HEATMAP_HEIGHT}
+                                        data={queriedData && queriedData}
                                         useAltColor={useAltColor}
                                         aria-label="Heatmap visualization"
+                                        currentColorMap={currentColorMap}
+                                        isColorRev={isColorRev}
                                     />
                                 )
                             }
@@ -378,18 +446,18 @@ export default function SolarDroughtViz() {
                     </Grid>
 
                     {/* Locator map section */}
-                    <Grid xs={3.5} > 
+                    <Grid xs={3.5} >
                         <AccordionDetails
                             sx={{
                                 paddingTop: '0px',
                             }}
                         >
                             <Box className="solar-drought-tool__map" style={{ width: '100%' }}>
-                                <MapboxMap 
-                                    mapMarker={mapMarker} 
-                                    setMapMarker={setMapMarker} 
-                                    ref={mapRef} 
-                                    locationSelected={apiParams.point} 
+                                <MapboxMap
+                                    mapMarker={mapMarker}
+                                    setMapMarker={setMapMarker}
+                                    ref={mapRef}
+                                    locationSelected={apiParams.point}
                                     setLocationSelected={setLocationSelected}
                                     height={MAP_HEIGHT}
                                     aria-label="Map for selecting location of heatmap data"

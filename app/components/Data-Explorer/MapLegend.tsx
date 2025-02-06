@@ -13,6 +13,7 @@ type MapLegendProps = {
     width?: number
     height?: number
     title?: string
+    isColorRev: boolean
 }
 
 const LEGEND_MARGIN = { top: 20, right: 0, bottom: 20, left: 0 }
@@ -24,7 +25,8 @@ export const MapLegend = ({
     max,
     width = 520, // adjust this value to make more space for the legend label
     height = 124,
-    title
+    title,
+    isColorRev
 }: MapLegendProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -39,7 +41,7 @@ export const MapLegend = ({
     const interpolator = (d3[interpolatorKey] as (t: number) => string) || d3.interpolateInferno
     const colorScale = d3.scaleSequential<string>()
         .domain([min, max])
-        .interpolator(interpolator)
+        .interpolator(isColorRev ? (t) => interpolator(1-t): interpolator)
 
     const ticks = [min, ...xScale.ticks(4), max]
     const allTicks = ticks.map((tick, idx) => {

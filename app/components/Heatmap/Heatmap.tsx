@@ -19,6 +19,8 @@ type HeatmapProps = {
     height: number;
     data: any;
     useAltColor: boolean;
+    currentColorMap: string;
+    isColorRev: boolean;
 }
 
 export type InteractionData = {
@@ -29,7 +31,7 @@ export type InteractionData = {
     value: number;
 }
 
-export default function Heatmap({ width, height, data, useAltColor }: HeatmapProps) {
+export default function Heatmap({ width, height, data, useAltColor, currentColorMap, isColorRev }: HeatmapProps) {
     // cell that is being hovered, for tooltips
     const [hoveredCell, setHoveredCell] = useState<InteractionData | null>(null)
 
@@ -38,25 +40,36 @@ export default function Heatmap({ width, height, data, useAltColor }: HeatmapPro
     const min = d3.min(flatData) as number | null ?? 0
     const max = d3.max(flatData) as number | null ?? 1
 
-    const defColorScale = useMemo(() => {
-        return d3
-            .scaleSequential<string>()
-            .interpolator(d3.interpolateRgbBasis(['#FD6A55', '#FEAB7D', '#EEE8DA']))
-            .domain([min ?? 0, max ?? 1]);
-    }, [min, max])
+    /*     const defColorScale = useMemo(() => {
+            return d3
+                .scaleSequential<string>()
+                .interpolator(d3.interpolateRgbBasis(['#FD6A55', '#FEAB7D', '#EEE8DA']))
+                .domain([min ?? 0, max ?? 1]);
+        }, [min, max])
+    
+        const altColorScale = useMemo(() => {
+            return d3
+                .scaleSequential<string>()
+                .interpolator(d3.interpolateRgbBasis(['#e6550d', '#fdae6b', '#fee6ce']))
+                .domain([min ?? 0, max ?? 1]);
+        }, [min, max])
+    
+        // Dynamically select color scale
+        const colorScale = useMemo(() => (useAltColor ? altColorScale : defColorScale), [useAltColor, defColorScale, altColorScale]);
+     */
 
-    const altColorScale = useMemo(() => {
-        return d3
-            .scaleSequential<string>()
-            .interpolator(d3.interpolateRgbBasis(['#e6550d', '#fdae6b', '#fee6ce']))
-            .domain([min ?? 0, max ?? 1]);
-    }, [min, max])
+    // Temp: for color scale selection
 
-    // Dynamically select color scale
-    const colorScale = useMemo(() => (useAltColor ? altColorScale : defColorScale), [useAltColor, defColorScale, altColorScale]);
+    // TEMP: To try out different color maps
 
-    // **Fallback to prevent colorScale errors**
-    // **Fallback to prevent rendering errors**
+    const interpolatorKey = `interpolate${currentColorMap.charAt(0).toUpperCase() + currentColorMap.slice(1)}` as keyof typeof d3
+    const interpolator = (d3[interpolatorKey] as (t: number) => string) || d3.interpolateOranges
+
+    const colorScale = d3.scaleSequential<string>()
+        .domain([min, max])
+        .interpolator(isColorRev ? (t) => interpolator(1-t): interpolator)
+
+    // Fallback to prevent colorScale errors**
     if (!data) {
         return <div>Loading...</div>;
     }

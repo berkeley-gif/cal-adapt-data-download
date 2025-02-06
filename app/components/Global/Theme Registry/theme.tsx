@@ -186,22 +186,6 @@ theme = createTheme(theme, {
 // Override components after creating custom palettes
 theme = createTheme(theme, {
   components: {
-    MuiAlert: {
-      variants: [
-        {
-          props: { variant: 'purple' },
-          style: {
-            backgroundColor: theme.palette.info.main
-          }
-        },
-        {
-          props: { variant: 'grey' },
-          style: {
-            backgroundColor: '#E5ECF6', // Customize the background color
-          },
-        }
-      ]
-    },
     MuiRadio: {
       styleOverrides: {
         root: {
