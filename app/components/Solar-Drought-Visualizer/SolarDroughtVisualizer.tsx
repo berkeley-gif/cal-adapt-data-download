@@ -37,7 +37,6 @@ import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 
 import { useDidMountEffect } from "@/app/utils/hooks"
 
-
 import MapboxMap from '@/app/components/Solar-Drought-Visualizer/MapboxMap'
 import Heatmap from '@/app/components/Heatmap/Heatmap'
 import VizPrmsForm from './VisualizationParamsForm'
@@ -51,14 +50,14 @@ const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
 
 type Location = [number, number]
-
-interface QueriedData {
-    data: number[][]
-}
-
 type apiParams = {
     point: Location | null,
     configQueryStr: string,
+}
+type LocationStatus = 'none' | 'data' | 'no-data'
+
+interface QueriedData {
+    data: number[][]
 }
 
 const MenuProps: any = {
@@ -100,7 +99,7 @@ export default function SolarDroughtViz() {
     const globalWarmingList = ['2']
     const [configStr, setConfigStr] = useState<string>('')
     const [queriedData, setQueriedData] = useState<QueriedData | null>(null)
-    const [isLocationSet, setIsLocationSet] = useState<boolean>(false)
+    const [isLocationSet, setIsLocationSet] = useState<LocationStatus>('none')
     const [accordionExpanded, setAccordionExpanded] = useState(true)
 
     // MAP
@@ -111,8 +110,11 @@ export default function SolarDroughtViz() {
     const [useAltColor, setUseAltColor] = useState(false)
 
     // ACCORDION
-    const expandMap = () => {
-        setAccordionExpanded((prevExpanded: boolean) => !prevExpanded)
+    const handleAccordionChange = () => {
+        // Only allow accordion state changes if a point has been chosen
+        if (apiParams.point !== null) {
+            setAccordionExpanded(!accordionExpanded)
+        }
     }
 
     // API PARAMS
@@ -178,27 +180,42 @@ export default function SolarDroughtViz() {
     }, [apiParams, onFormDataSubmit])
 
     function setLocationSelected(point: Location | null) {
-        updateApiParams({
-            point: point
-        })
-        setIsLocationSet(true)
+        if (!point) {
+            setIsLocationSet('none')
+            updateApiParams({ point: null })
+            return
+        }
+
+        // Get the grid value at this point
+        if (mapRef.current) {
+            const mapboxPoint = mapRef.current.project(point)
+            const features = mapRef.current.queryRenderedFeatures(mapboxPoint, {
+                layers: ['grid']
+            })
+
+            if (features && features.length > 0) {
+                const selectedFeature = features[0]
+                const maskAttribute = photoConfigSelected === 'Utility Configuration' ? 'srdumask' : 'srddmask'
+                const gridValue = selectedFeature.properties?.[maskAttribute]
+                
+                // Set status based on grid value
+                setIsLocationSet(gridValue === 1 ? 'data' : 'no-data')
+                updateApiParams({ point })
+                
+                // Collapse accordion immediately if we have valid data
+                if (gridValue === 1) {
+                    setAccordionExpanded(false)
+                }
+            }
+        }
     }
 
     // QUERIED DATA
     useEffect(() => {
         if (queriedData) {
             setIsLoading(false)
-
-            if (queriedData.data[0][0]) {
-                // Point is valid
-                setIsPointValid(true)
-                setAccordionExpanded(false)
-            } else {
-                // Point is Invalid
-                setIsPointValid(false)
-            }
+            setIsPointValid(true)
         }
-
     }, [queriedData])
 
     // IS LOADING
@@ -243,6 +260,13 @@ export default function SolarDroughtViz() {
         setUseAltColor((prev) => !prev)
     }
 
+    const handleSummaryClick = (event: React.MouseEvent) => {
+        if (apiParams.point === null) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+    }
+
     return (
         <Box className="solar-drought-tool tool-container tool-container--padded" aria-label="Solar Drought Visualizer" role="region">
 
@@ -258,7 +282,7 @@ export default function SolarDroughtViz() {
             {/* Main viz content */}
             <Grid container xs={12}>
                 {/* Heatmap parameters section */}
-                <Grid xs={isLocationSet ? 12 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                <Grid xs={isLocationSet !== 'none' ? 12 : 0} sx={{ display: isLocationSet !== 'none' ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                     {queriedData && !isLoading && isPointValid &&
                         (<Box>
                             <Box className="flex-params">
@@ -292,7 +316,7 @@ export default function SolarDroughtViz() {
             </Grid>
             <Accordion
                 expanded={accordionExpanded}
-                onChange={() => setAccordionExpanded(!accordionExpanded)}
+                onChange={handleAccordionChange}
                 slots={{ transition: Fade as AccordionSlots['transition'] }}
                 slotProps={{ transition: { timeout: 400 } }}
                 sx={[
@@ -321,7 +345,7 @@ export default function SolarDroughtViz() {
 
                 <Grid container xs={12} justifyContent="flex-end">
                     {/* Colormap toggle for heatmap */}
-                    <Grid xs={isLocationSet ? (accordionExpanded ? 12 : 8.5) : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                    <Grid xs={isLocationSet !== 'none' ? (accordionExpanded ? 12 : 8.5) : 0} sx={{ display: isLocationSet !== 'none' ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                         {isPointValid && (
                             <div className="color-scale-toggle">
                                 <div className="option-group option-group--vertical">
@@ -368,7 +392,8 @@ export default function SolarDroughtViz() {
                     <Grid xs={12} sx={{ display: 'flex', justifyContent: accordionExpanded ? 'flex-start' : 'flex-end' }}>
                         <Box sx={{ width: accordionExpanded ? '100%' : 'auto' }}>
                             <AccordionSummary
-                                expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} aria-label="Expand or collapse the section" />}
+                                onClick={handleSummaryClick}
+                                expandIcon={apiParams.point !== null ? <ExpandMoreIcon /> : null}
                                 aria-controls="panel1-content"
                                 id="panel1-header"
                                 sx={{
@@ -386,11 +411,10 @@ export default function SolarDroughtViz() {
                                     variant="h5"
                                     style={{
                                         'marginLeft': '10px',
-                                        'textDecoration': !accordionExpanded ? 'underline' : 'none',
                                     }}
-                                    aria-label={isLocationSet ? "Change your location" : "Select your location"}
+                                    aria-label={isLocationSet !== 'none' ? "Change your location" : "Select your location"}
                                 >
-                                    {isLocationSet ? "Change your location" : "Select your location"}
+                                    {isLocationSet !== 'none' ? "Change your location" : "Select your location"}
                                 </Typography>
                             </AccordionSummary>
                         </Box>
@@ -405,22 +429,20 @@ export default function SolarDroughtViz() {
                             paddingRight: 0,
                         }}
                     >
-                        {!isLoading && !isPointValid && isLocationSet &&
-                            (
-                                <Box>
-                                    <Alert variant="grey" severity="info" aria-label="Location with restrictions alert">You have selected a location with land use or land cover restrictions. No data will be returned.&nbsp;
-                                        <span
-                                            className={accordionExpanded ? '' : 'underline'}
-                                            onClick={accordionExpanded ? undefined : expandMap}
-                                            aria-label="Select another location"
-                                        >
-                                            <strong>Select another location </strong>
-                                        </span>
-                                        to try again
-                                    </Alert>
-                                </Box>
-                            )
-                        }
+                        {!isLoading && isLocationSet === 'no-data' && (
+                            <Box sx={{ marginBottom: '30px' }}>
+                                <Alert variant="grey" severity="info">
+                                    You have selected a location with land use or land cover restrictions. No data will be returned.&nbsp;
+                                    <span
+                                        onClick={accordionExpanded ? undefined : handleAccordionChange}
+                                        aria-label="Select another location"
+                                    >
+                                        <strong>Select another location </strong>
+                                    </span>
+                                    to try again
+                                </Alert>
+                            </Box>
+                        )}
                         <Box
                             ref={heatmapContainerRef}
                             className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '') + (!isLoading && !isPointValid ? ' invalid-point-screen' : '')}
