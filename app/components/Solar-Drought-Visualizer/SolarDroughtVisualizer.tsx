@@ -210,10 +210,8 @@ export default function SolarDroughtViz() {
 
     // Ensure the Mapbox map resizes when the accordion is expanded
     useEffect(() => {
-        if (accordionExpanded && mapRef.current) {
-            setTimeout(() => {
-                mapRef.current?.resize() // Force map resize after expansion
-            }, 300) // Delay to allow the accordion transition to complete
+        if (mapRef.current) {
+            mapRef.current.resize(); // Manually trigger the map resize
         }
     }, [accordionExpanded])
 

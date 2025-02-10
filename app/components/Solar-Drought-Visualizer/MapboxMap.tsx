@@ -46,7 +46,25 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
             setMapLoaded(true)
         }
 
-        // New helper function to handle location updates
+        const handleMapResize = () => {
+            if (mapRef.current) {
+                const currentCenter = mapRef.current.getCenter()
+                mapRef.current.setCenter(currentCenter)
+            }
+        }
+
+        useEffect(() => {
+            if (mapRef.current) {
+                mapRef.current.on('resize', handleMapResize)
+            }
+
+            return () => {
+                if (mapRef.current) {
+                    mapRef.current.off('resize', handleMapResize)
+                }
+            }
+        }, [])
+
         const handleLocationUpdate = (coordinates: [number, number]) => {
             if (mapRef.current) {
                 const point = mapRef.current.project(coordinates)
