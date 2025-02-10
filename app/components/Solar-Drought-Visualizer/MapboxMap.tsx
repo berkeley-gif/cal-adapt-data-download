@@ -3,7 +3,7 @@
 import 'mapbox-gl/dist/mapbox-gl.css'
 import 'react-map-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
-import { Marker, Map, MapMouseEvent, NavigationControl, ScaleControl, MapRef, ViewStateChangeEvent } from 'react-map-gl'
+import { Marker, Map, MapMouseEvent, NavigationControl, ScaleControl, MapRef } from 'react-map-gl'
 import GeocoderControl from './geocoder-control'
 import * as turf from '@turf/turf'
 
@@ -26,7 +26,7 @@ type MapboxMapProps = {
 }
 const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
     ({ locationSelected, setLocationSelected, mapMarker, setMapMarker, height }, ref) => {
-        const { photoConfigSelected } = usePhotoConfig();
+        const { photoConfigSelected } = usePhotoConfig()
 
         const mapRef = useRef<MapRef | null>(null)
         const [mapLoaded, setMapLoaded] = useState(false)
@@ -38,30 +38,30 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
         }
 
         // Forward the internal ref to the parent using useImperativeHandle
-        useImperativeHandle(ref, () => mapRef.current as MapRef);
+        useImperativeHandle(ref, () => mapRef.current as MapRef)
 
         const handleMapLoad = (e: any) => {
-            const map = e.target;
-            mapRef.current = map;
-            setMapLoaded(true);
-        };
+            const map = e.target
+            mapRef.current = map
+            setMapLoaded(true)
+        }
 
         const handleMapClick = (e: MapMouseEvent) => {
-            const clickedPoint: [number, number] = [e.lngLat.lng, e.lngLat.lat];
+            const clickedPoint: [number, number] = [e.lngLat.lng, e.lngLat.lat]
 
             if (mapRef.current) {
-                const point = mapRef.current.project(clickedPoint);
+                const point = mapRef.current.project(clickedPoint)
                 const features = mapRef.current.queryRenderedFeatures(point, {
                     layers: ['grid']
-                });
+                })
 
                 if (features && features.length > 0) {
-                    const selectedFeature = features[0];
-                    const centroid = turf.centroid(selectedFeature).geometry.coordinates;
-                    setMapMarker([centroid[0], centroid[1]]);
-                    setLocationSelected(centroid as [number, number]);
+                    const selectedFeature = features[0]
+                    const centroid = turf.centroid(selectedFeature).geometry.coordinates
+                    setMapMarker([centroid[0], centroid[1]])
+                    setLocationSelected(centroid as [number, number])
                 } else {
-                    console.log('No features found at the clicked location.');
+                    console.log('No features found at the clicked location.')
                 }
             }
         }
@@ -87,15 +87,16 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
         // Update grid layer nodata cells based on photoConfigSelected
         useEffect(() => {
             if (mapRef.current && mapLoaded) {
+                const map = mapRef.current as unknown as mapboxgl.Map; // Type assertion to Mapbox GL JS Map
                 const maskAttribute = photoConfigSelected === 'Utility Configuration' ? 'srdumask' : 'srddmask'
 
-                if (mapRef.current) {
-                    mapRef.current.setPaintProperty('grid', 'fill-color', [
+                if (map) {
+                    map.setPaintProperty('grid', 'fill-color', [
                         'case',
                         ['==', ['get', maskAttribute], 0],
                         'rgba(128, 128, 128, 0.3)',
                         'rgba(0, 0, 0, 0)'
-                    ]);
+                    ])
                 }
             }
         }, [photoConfigSelected, mapLoaded])
