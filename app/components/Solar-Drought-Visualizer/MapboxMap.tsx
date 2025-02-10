@@ -46,11 +46,10 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
             setMapLoaded(true)
         }
 
-        const handleMapClick = (e: MapMouseEvent) => {
-            const clickedPoint: [number, number] = [e.lngLat.lng, e.lngLat.lat]
-
+        // New helper function to handle location updates
+        const handleLocationUpdate = (coordinates: [number, number]) => {
             if (mapRef.current) {
-                const point = mapRef.current.project(clickedPoint)
+                const point = mapRef.current.project(coordinates)
                 const features = mapRef.current.queryRenderedFeatures(point, {
                     layers: ['grid']
                 })
@@ -66,23 +65,13 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
             }
         }
 
-        const handleMarkerDragEnd = (e: { lngLat: { lng: number; lat: number } }) => {
-            if (mapRef.current) {
-                const point = mapRef.current.project([e.lngLat.lng, e.lngLat.lat])
-                const features = mapRef.current.queryRenderedFeatures(point, {
-                    layers: ['grid']
-                })
-
-                if (features && features.length > 0) {
-                    const selectedFeature = features[0]
-                    const centroid = turf.centroid(selectedFeature).geometry.coordinates
-
-                    setMapMarker([centroid[0], centroid[1]])
-                    setLocationSelected(centroid as [number, number])
-                }
-            }
+        const handleMapClick = (e: MapMouseEvent) => {
+            handleLocationUpdate([e.lngLat.lng, e.lngLat.lat])
         }
 
+        const handleMarkerDragEnd = (e: { lngLat: { lng: number; lat: number } }) => {
+            handleLocationUpdate([e.lngLat.lng, e.lngLat.lat])
+        }
 
         // Update grid layer nodata cells based on photoConfigSelected
         useEffect(() => {
