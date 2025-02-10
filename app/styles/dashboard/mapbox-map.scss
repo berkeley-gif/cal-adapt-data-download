@@ -12,20 +12,27 @@
     &__legend {
       display: flex;
       align-items: center;
+      height: 36px;
 
       &-color-box {
         width: 16px;
         height: 16px;
-        background-color: rgba(187, 184, 190, 0.8);
+        background-color: rgba(153, 77, 178, 0.6);
         margin-right: 10px;
       }
     }
   }
 }
 
+.inline-tooltip {
+  margin-left: 6px;
+  margin-top: 4px;
+}
+
 .mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
-    // so geocoder component has same styling as navigation component
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 2px;
+    // so geocoder component has same styling as no-data legend
+    width: 275px !important;
+    box-shadow: none !important;
 }
 
 .mapboxgl-popup.map-popup {
@@ -33,7 +40,7 @@
         background-color: white;
         border: 0;
         border-radius: 4px;
-        padding: 8px 16px;
+        padding: 10px 16px;
         box-shadow: none;
     }
 

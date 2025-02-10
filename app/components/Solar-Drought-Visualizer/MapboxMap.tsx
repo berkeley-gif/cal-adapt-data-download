@@ -101,7 +101,7 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                     map.setPaintProperty('grid', 'fill-color', [
                         'case',
                         ['==', ['get', maskAttribute], 0],
-                        'rgba(153, 77, 178, 0.3)',
+                        'rgba(153, 77, 178, 0.6)',
                         'rgba(0, 0, 0, 0)'
                     ])
                 }
@@ -109,7 +109,7 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
         }, [photoConfigSelected, mapLoaded])
 
         return (
-            <div className="map-container">
+            <div className="map-container" style={{ position: 'relative', width: '100%', height: '100%' }}>
                 <div id="map">
                     <Map
                         onLoad={handleMapLoad}
@@ -136,12 +136,10 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                         <GeocoderControl zoom={13} mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN || ''} position="top-left" />
                     </Map>
                 </div>
-                {/* Legend */}
+                {/* Legend Overlay */}
                 <div className="map-container__legend">
                     <div className="map-container__legend-color-box"></div>
-
-                    <p>Location with land restrictions</p>  
-
+                    <p>Location with land restrictions</p>
                     <HtmlTooltip
                         textFragment={
                             <React.Fragment>
