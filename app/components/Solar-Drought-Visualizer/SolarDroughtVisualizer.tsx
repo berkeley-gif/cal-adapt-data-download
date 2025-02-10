@@ -323,7 +323,7 @@ export default function SolarDroughtViz() {
                 <Grid container xs={12}>
 
                     {/* Colormap toggle for heatmap */}
-                    <Grid xs={isLocationSet ? 8.5 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                    <Grid xs={isLocationSet ? (accordionExpanded ? 12 : 8.5) : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                         {isPointValid && (
                             <div className="color-scale-toggle">
                                 <div className="option-group option-group--vertical">
@@ -363,12 +363,11 @@ export default function SolarDroughtViz() {
                                     </FormGroup>
                                 </div>
                             </div>
-
                         )}
                     </Grid>
 
                     {/* Locator map instruction section */}
-                    <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                    <Grid xs={accordionExpanded ? 12 : 3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                         <AccordionSummary
                             expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} aria-label="Expand or collapse the section" />}
                             aria-controls="panel1-content"
@@ -396,7 +395,7 @@ export default function SolarDroughtViz() {
                     </Grid>
 
                     {/* Heatmap section */}
-                    <Grid xs={accordionExpanded ? 8.5 : 12}
+                    <Grid xs={accordionExpanded ? 12 : 8.5}
                         sx={{
                             maxWidth: '100%',
                             pr: 4,
@@ -448,7 +447,7 @@ export default function SolarDroughtViz() {
                     </Grid>
 
                     {/* Locator map section */}
-                    <Grid xs={3.5} >
+                    <Grid xs={accordionExpanded ? 12 : 3.5}>
                         <AccordionDetails
                             sx={{
                                 paddingTop: '0px',
