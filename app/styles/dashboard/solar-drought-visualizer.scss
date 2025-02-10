@@ -38,3 +38,7 @@
   margin: 0 0 35px 0;
   justify-content: flex-end;
 }
+
+.custom-accordion-details {
+  display: block !important; /* Override MUI's default behavior */
+}

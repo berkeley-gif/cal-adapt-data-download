@@ -449,6 +449,7 @@ export default function SolarDroughtViz() {
                     {/* Locator map section */}
                     <Grid xs={accordionExpanded ? 12 : 3.5}>
                         <AccordionDetails
+                            className="custom-accordion-details"
                             sx={{
                                 paddingTop: '0px',
                             }}
