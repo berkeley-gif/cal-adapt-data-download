@@ -101,7 +101,7 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                     map.setPaintProperty('grid', 'fill-color', [
                         'case',
                         ['==', ['get', maskAttribute], 0],
-                        'rgba(128, 128, 128, 0.3)',
+                        'rgba(153, 77, 178, 0.3)',
                         'rgba(0, 0, 0, 0)'
                     ])
                 }
