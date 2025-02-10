@@ -318,8 +318,7 @@ export default function SolarDroughtViz() {
                 ]}
             >
 
-                <Grid container xs={12}>
-
+                <Grid container xs={12} justifyContent="flex-end">
                     {/* Colormap toggle for heatmap */}
                     <Grid xs={isLocationSet ? (accordionExpanded ? 12 : 8.5) : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                         {isPointValid && (
@@ -365,31 +364,35 @@ export default function SolarDroughtViz() {
                     </Grid>
 
                     {/* Locator map instruction section */}
-                    <Grid xs={accordionExpanded ? 12 : 3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                        <AccordionSummary
-                            expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} aria-label="Expand or collapse the section" />}
-                            aria-controls="panel1-content"
-                            id="panel1-header"
-                            sx={{
-                                '& .MuiAccordionSummary-content': {
-                                    marginTop: '20px', // Override the default margin to keep the Accordion Summary from vertically shifting when expanding
-                                    marginBottom: '20px',
-                                },
-                            }}
-                        >
-                            <EditLocationOutlinedIcon aria-label="Edit location" />
-                            <Typography
-                                className="inline"
-                                variant="h5"
-                                style={{
-                                    'marginLeft': '10px',
-                                    'textDecoration': !accordionExpanded ? 'underline' : 'none',
+                    <Grid xs={12} sx={{ display: 'flex', justifyContent: accordionExpanded ? 'flex-start' : 'flex-end' }}>
+                        <Box sx={{ width: accordionExpanded ? '100%' : 'auto' }}>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} aria-label="Expand or collapse the section" />}
+                                aria-controls="panel1-content"
+                                id="panel1-header"
+                                sx={{
+                                    '& .MuiAccordionSummary-content': {
+                                        marginTop: '20px',
+                                        marginBottom: '20px',
+                                        justifyContent: accordionExpanded ? 'flex-start' : 'flex-end',
+                                    },
+                                    width: '100%',
                                 }}
-                                aria-label={isLocationSet ? "Change your location" : "Select your location"}
                             >
-                                {isLocationSet ? "Change your location" : "Select your location"}
-                            </Typography>
-                        </AccordionSummary>
+                                <EditLocationOutlinedIcon aria-label="Edit location" />
+                                <Typography
+                                    className="inline"
+                                    variant="h5"
+                                    style={{
+                                        'marginLeft': '10px',
+                                        'textDecoration': !accordionExpanded ? 'underline' : 'none',
+                                    }}
+                                    aria-label={isLocationSet ? "Change your location" : "Select your location"}
+                                >
+                                    {isLocationSet ? "Change your location" : "Select your location"}
+                                </Typography>
+                            </AccordionSummary>
+                        </Box>
                     </Grid>
 
                     {/* Heatmap section */}
@@ -445,7 +448,7 @@ export default function SolarDroughtViz() {
                     </Grid>
 
                     {/* Locator map section */}
-                    <Grid xs={accordionExpanded ? 12 : 3.5}>
+                    <Grid xs={accordionExpanded ? 12 : 3.5} sx={{ alignItems: 'flex-end' }}>
                         <AccordionDetails
                             className="custom-accordion-details"
                             sx={{
