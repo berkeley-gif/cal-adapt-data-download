@@ -30,6 +30,31 @@
     margin-left: 103px;
     margin-right: 14px;
   }
+
+  .map-tooltip {
+    position: absolute;
+    background-color: white;
+    border-radius: 16px;
+    color: black;
+    padding: 5px;
+    margin-left: 15px;
+    transform: translateY(-50%);
+    z-index: 1000;
+
+    &:after {
+      content: "";
+      position: absolute;
+      border-width: 5px;
+      left: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-color: transparent black transparent transparent;
+    }
+  }
+
+  .custom-accordion-details {
+    z-index: 1;
+  }
 }
 
 .flex-params {
