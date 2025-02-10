@@ -192,6 +192,7 @@ export default function SolarDroughtViz() {
             if (queriedData.data[0][0]) {
                 // Point is valid
                 setIsPointValid(true)
+                setAccordionExpanded(false)
             } else {
                 // Point is Invalid
                 setIsPointValid(false)
