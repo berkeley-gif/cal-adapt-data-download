@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
@@ -31,7 +31,7 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import SidePanel from '@/app/components/Dashboard/RightSidepanel'
+import SidePanel from '@/app/components/Dashboard/RightSidePanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
 import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 
@@ -47,16 +47,19 @@ import LoadingSpinner from '../Global/LoadingSpinner'
 
 const MAP_HEIGHT = 615
 const HEATMAP_HEIGHT = 500
+const ITEM_HEIGHT = 48
+const ITEM_PADDING_TOP = 8
 
 type Location = [number, number]
+
+interface QueriedData {
+    data: number[][]
+}
 
 type apiParams = {
     point: Location | null,
     configQueryStr: string,
 }
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
 
 const MenuProps: any = {
     PaperProps: {
@@ -80,7 +83,7 @@ export default function SolarDroughtViz() {
     const { open, toggleOpen } = useSidepanel()
     const { photoConfigSelected, setPhotoConfigSelected, photoConfigList } = usePhotoConfig()
 
-    const heatmapContainerRef = useRef<HTMLBoxElement>(null)
+    const heatmapContainerRef = useRef<HTMLDivElement>(null)
     const [heatmapWidth, setHeatmapWidth] = useState(0)
 
     // TEMP: for color ramp options
@@ -91,14 +94,16 @@ export default function SolarDroughtViz() {
         'BuPu', 'GnBu', 'OrRd', 'PuBuGn', 'PuBu', 'PuRd', 'RdPu', 'YlGnBu', 'YlGn', 'YlOrBr', 'YlOrRd'
     ]
 
+    // STATE
     const [isColorRev, setIsColorRev] = useState<boolean>(false)
-
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
     const globalWarmingList = ['2']
     const [configStr, setConfigStr] = useState<string>('')
-    const [queriedData, setQueriedData] = useState(null)
+    const [queriedData, setQueriedData] = useState<QueriedData | null>(null)
     const [isLocationSet, setIsLocationSet] = useState<boolean>(false)
     const [accordionExpanded, setAccordionExpanded] = useState(true)
+
+    // MAP
     const mapRef = useRef<any>(null) // Ref for the Mapbox component
     const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -134,6 +139,34 @@ export default function SolarDroughtViz() {
     // Ref to store previous state
     const prevApiParams = useRef<apiParams>(apiParams)
 
+    const onFormDataSubmit = useCallback(async () => {
+        if (!apiParams.point) {
+            return
+        }
+
+        setIsLoading(true)
+
+        const [long, lat] = apiParams.point
+        const apiUrl = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/${long},${lat}`
+
+        const queryParams = new URLSearchParams({
+            url: `s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/${configStr}/d03`,
+            variable: apiParams.configQueryStr
+        })
+        const fullUrl = `${apiUrl}?${queryParams.toString()}`
+
+        try {
+            const res = await fetch(fullUrl)
+            const newData = await res.json()
+
+            if (newData) {
+                setQueriedData(newData)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }, [apiParams, configStr])
+
     useEffect(() => {
         // Compare previous and current state
         if (JSON.stringify(prevApiParams.current) !== JSON.stringify(apiParams)) {
@@ -142,7 +175,7 @@ export default function SolarDroughtViz() {
 
         // Update the ref to the current apiParams
         prevApiParams.current = apiParams
-    }, [apiParams])
+    }, [apiParams, onFormDataSubmit])
 
     function setLocationSelected(point: Location | null) {
         updateApiParams({
@@ -173,7 +206,7 @@ export default function SolarDroughtViz() {
             console.log('map point invalid')
         }
 
-    }, [isLoading])
+    }, [isLoading, isPointValid])
 
     // Ensure the Mapbox map resizes when the accordion is expanded
     useEffect(() => {
@@ -189,37 +222,6 @@ export default function SolarDroughtViz() {
             ...prevParams,
             ...newParams
         }))
-    }
-
-    const onFormDataSubmit = async () => {
-        if (!apiParams.point) {
-            return
-        }
-
-        setIsLoading(true)
-
-        const [long, lat] = apiParams.point
-        const apiUrl = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/${long},${lat}`
-
-        const queryParams = new URLSearchParams({
-            url: `s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/${configStr}/d03`,
-            variable: apiParams.configQueryStr
-        })
-        const fullUrl = `${apiUrl}?${queryParams.toString()}`
-
-        try {
-            const res = await fetch(fullUrl)
-            const newData = await res.json()
-
-            if (newData) {
-                setQueriedData(newData)
-
-
-            }
-        } catch (err) {
-            console.log(err)
-        }
-
     }
 
     // RESPONSIVE HEATMAP WIDTH (D3 requires a width specification)
@@ -239,8 +241,8 @@ export default function SolarDroughtViz() {
     }, [])
 
     const handleColorChange = () => {
-        setUseAltColor((prev) => !prev);
-    };
+        setUseAltColor((prev) => !prev)
+    }
 
     return (
         <Box className="solar-drought-tool tool-container tool-container--padded" aria-label="Solar Drought Visualizer" role="region">
