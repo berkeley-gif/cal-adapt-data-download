@@ -130,7 +130,7 @@ export default function SolarDroughtViz() {
     const prevApiParams = useRef<apiParams>(apiParams)
 
     const onFormDataSubmit = useCallback(async () => {
-        if (!apiParams.point) {
+        if (!apiParams.point || locationStatus !== 'data') {
             return
         }
 
@@ -151,11 +151,17 @@ export default function SolarDroughtViz() {
 
             if (newData) {
                 setQueriedData(newData)
+                setIsPointValid(true)
+            } else {
+                setIsPointValid(false)
             }
         } catch (err) {
             console.log(err)
+            setIsPointValid(false)
+        } finally {
+            setIsLoading(false)
         }
-    }, [apiParams, configStr])
+    }, [apiParams, configStr, locationStatus])
 
     useEffect(() => {
         if (JSON.stringify(prevApiParams.current) !== JSON.stringify(apiParams)) {
@@ -185,17 +191,20 @@ export default function SolarDroughtViz() {
 
     useEffect(() => {
         if (!heatmapContainerRef.current) return
+
         const resizeObserver = new ResizeObserver(entries => {
             for (const entry of entries) {
-                setHeatmapWidth(entry.contentRect.width)
+                const newWidth = entry.contentRect.width
+                setHeatmapWidth(newWidth)
             }
         })
+
         resizeObserver.observe(heatmapContainerRef.current)
 
         return () => {
             resizeObserver.disconnect()
         }
-    }, [heatmapContainerRef])
+    }, [heatmapContainerRef.current])
 
     function setLocationSelected(point: Location | null) {
         if (!point) {
@@ -220,10 +229,8 @@ export default function SolarDroughtViz() {
                 setLocationStatus(gridValue === 1 ? 'data' : 'no-data')
                 updateApiParams({ point })
                 
-                // Collapse accordion if we have valid data
-                if (gridValue === 1) {
-                    setAccordionExpanded(false)
-                }
+                // Collapse accordion on selection
+                setAccordionExpanded(false)
             }
         }
     }
@@ -245,6 +252,8 @@ export default function SolarDroughtViz() {
             event.stopPropagation()
         }
     }
+
+    console.log('Component is rendering') // Log to check if the component is rendering
 
     return (
         <Box className="solar-drought-tool tool-container tool-container--padded" aria-label="Solar Drought Visualizer" role="region">
@@ -422,32 +431,30 @@ export default function SolarDroughtViz() {
                                 </Alert>
                             </Box>
                         )}
-                        <Box
-                            ref={heatmapContainerRef}
-                            className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '') + (!isLoading && !isPointValid ? ' invalid-point-screen' : '')}
-                            style={{ display: accordionExpanded ? 'none' : 'block' }}
-                        >
-                            {!isLoading && isPointValid &&
-                                (
+                        {locationStatus === 'data' && (
+                            <Box
+                                ref={heatmapContainerRef}
+                                className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '')}
+                                style={{ display: accordionExpanded ? 'none' : 'block' }}
+                            >
+                                {isLoading && (
+                                    <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                        <LoadingSpinner aria-label="Loading heatmap data" />
+                                    </Box>
+                                )}
+                                {!isLoading && isPointValid && (
                                     <Heatmap
                                         width={heatmapWidth}
                                         height={HEATMAP_HEIGHT}
-                                        data={queriedData && queriedData}
+                                        data={queriedData}
                                         useAltColor={useAltColor}
                                         aria-label="Heatmap visualization"
                                         currentColorMap={currentColorMap}
                                         isColorRev={isColorRev}
                                     />
-                                )
-                            }
-                            {isLoading &&
-                                (
-                                    <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                        <LoadingSpinner aria-label="Loading heatmap data" />
-                                    </Box>
-                                )
-                            }
-                        </Box>
+                                )}
+                            </Box>
+                        )}
                     </Grid>
 
                     {/* Locator map section */}
