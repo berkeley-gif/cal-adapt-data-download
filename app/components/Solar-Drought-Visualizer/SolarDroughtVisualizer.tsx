@@ -209,12 +209,12 @@ export default function SolarDroughtViz() {
 
     // Effect to handle configuration changes
     useEffect(() => {
-        console.log('PhotoConfig changed:', photoConfigSelected)
         if (apiParams.point) {
+            console.log('PhotoConfig changed:', photoConfigSelected)
             console.log('Checking location status for point due to config change:', apiParams.point)
             checkLocationStatus(apiParams.point, photoConfigSelected)
         }
-    }, [photoConfigSelected])
+    }, [photoConfigSelected, apiParams.point])
 
     // Function to check location status based on the current point and configuration
     function checkLocationStatus(point: Location | null, config: string) {
@@ -240,9 +240,20 @@ export default function SolarDroughtViz() {
                 const newStatus = gridValue === 1 ? 'data' : 'no-data'
                 console.log('Grid value:', gridValue, 'Setting location status to:', newStatus)
                 setLocationStatus(newStatus)
+
+                if (newStatus === 'data') {
+                    console.log('Fetching new data for point:', point)
+                    onFormDataSubmit()
+                } else {
+                    console.log('No data available for the selected point.')
+                    setQueriedData(null)
+                    setIsPointValid(false)
+                }
             } else {
                 console.log('No features found, setting location status to no-data')
                 setLocationStatus('no-data')
+                setQueriedData(null)
+                setIsPointValid(false)
             }
         }
     }
@@ -296,8 +307,6 @@ export default function SolarDroughtViz() {
             event.stopPropagation()
         }
     }
-
-    console.log('Component is rendering') // Log to check if the component is rendering
 
     return (
         <Box className="solar-drought-tool tool-container tool-container--padded" aria-label="Solar Drought Visualizer" role="region">
@@ -407,8 +416,7 @@ export default function SolarDroughtViz() {
                                         <FormControlLabel
                                             control={<Switch onChange={handleColorChange} color="secondary" />}
                                             label="Alternative color palette"
-                                        />
-                                    </FormGroup> */}
+                                        /> */}
                                     <FormGroup>
                                         <FormControlLabel
                                             control={<Switch onChange={() => setIsColorRev(!isColorRev)} color="secondary" />}
