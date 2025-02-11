@@ -24,6 +24,15 @@ type MapboxMapProps = {
     width?: number;
     height: number;
 }
+
+const INITIAL_VIEW_STATE = {
+    longitude: -120.4542,
+    latitude: 37.4,
+    zoom: 6
+}
+
+const GRID_FILL_COLOR = 'rgba(118, 150, 190, 0.8)'
+
 const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
     ({ locationSelected, setLocationSelected, mapMarker, setMapMarker, height }, ref) => {
         const { photoConfigSelected } = usePhotoConfig()
@@ -31,11 +40,7 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
         const mapRef = useRef<MapRef | null>(null)
         const [mapLoaded, setMapLoaded] = useState(false)
 
-        const initialViewState = {
-            longitude: -120.4542,
-            latitude: 37.0701,
-            zoom: 6
-        }
+        const initialViewState = INITIAL_VIEW_STATE
 
         // Forward the internal ref to the parent using useImperativeHandle
         useImperativeHandle(ref, () => mapRef.current as MapRef)
@@ -101,7 +106,7 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                     map.setPaintProperty('grid', 'fill-color', [
                         'case',
                         ['==', ['get', maskAttribute], 0],
-                        'rgba(128, 128, 160, 0.6)',
+                        GRID_FILL_COLOR,
                         'rgba(0, 0, 0, 0)'
                     ])
                 }
@@ -121,7 +126,7 @@ const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
                         onClick={handleMapClick}
                         scrollZoom={false}
                         attributionControl={false}
-                        minZoom={3.5}
+                        minZoom={5}
                     >
                         {mapMarker && (
                             <Marker

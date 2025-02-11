@@ -44,7 +44,7 @@ import { ApiResponse } from './DataType'
 import '@/app/styles/dashboard/solar-drought-visualizer.scss'
 import LoadingSpinner from '../Global/LoadingSpinner'
 
-const MAP_HEIGHT = 615
+const MAP_HEIGHT = 550
 const HEATMAP_HEIGHT = 500
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
@@ -83,6 +83,16 @@ export default function SolarDroughtViz() {
     const { open, toggleOpen } = useSidepanel()
     const { photoConfigSelected, photoConfigList } = usePhotoConfig()
 
+    // Parameters state
+    const [isColorRev, setIsColorRev] = useState<boolean>(false)
+    const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
+    const globalWarmingList = ['2']
+
+    // Derived state
+    const configStr = useMemo(() => {
+        return photoConfigSelected === 'Utility Configuration' ? 'srdu' : 'srdd'
+    }, [photoConfigSelected])
+
     // Map & location state
     const mapRef = useRef<any>(null)
     const [apiParams, setApiParams] = useState<apiParams>({ point: null, configQueryStr: 'srdu' })
@@ -101,11 +111,6 @@ export default function SolarDroughtViz() {
     // UI state
     const [accordionExpanded, setAccordionExpanded] = useState(true)
 
-    // Derived state
-    const configStr = useMemo(() => {
-        return photoConfigSelected === 'Utility Configuration' ? 'srdu' : 'srdd'
-    }, [photoConfigSelected])
-
     // TEMP: for color ramp options
     const [currentColorMap, setCurrentColorMap] = useState<string>('Oranges')
 
@@ -114,12 +119,44 @@ export default function SolarDroughtViz() {
         'BuPu', 'GnBu', 'OrRd', 'PuBuGn', 'PuBu', 'PuRd', 'RdPu', 'YlGnBu', 'YlGn', 'YlOrBr', 'YlOrRd'
     ]
 
-    // Parameters state
-    const [isColorRev, setIsColorRev] = useState<boolean>(false)
-    const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
-    const globalWarmingList = ['2']
+    // Handlers
+    const handleAccordionChange = () => {
+        if (apiParams.point !== null) {
+            setAccordionExpanded(!accordionExpanded)
+        }
+    }
 
-    // Effect Hooks
+    // API PARAMS
+    const prevApiParams = useRef<apiParams>(apiParams)
+
+    const onFormDataSubmit = useCallback(async () => {
+        if (!apiParams.point) {
+            return
+        }
+
+        setIsLoading(true)
+
+        const [long, lat] = apiParams.point
+        const apiUrl = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/${long},${lat}`
+
+        const queryParams = new URLSearchParams({
+            url: `s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/${configStr}/d03`,
+            variable: apiParams.configQueryStr
+        })
+        const fullUrl = `${apiUrl}?${queryParams.toString()}`
+
+        try {
+            const res = await fetch(fullUrl)
+            const newData = await res.json()
+
+            if (newData) {
+                setQueriedData(newData)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }, [apiParams, configStr])
+
     useEffect(() => {
         if (JSON.stringify(prevApiParams.current) !== JSON.stringify(apiParams)) {
             onFormDataSubmit()
@@ -159,44 +196,6 @@ export default function SolarDroughtViz() {
             resizeObserver.disconnect()
         }
     }, [heatmapContainerRef])
-
-    // Handlers
-    const handleAccordionChange = () => {
-        if (apiParams.point !== null) {
-            setAccordionExpanded(!accordionExpanded)
-        }
-    }
-
-    // API PARAMS
-    const prevApiParams = useRef<apiParams>(apiParams)
-
-    const onFormDataSubmit = useCallback(async () => {
-        if (!apiParams.point) {
-            return
-        }
-
-        setIsLoading(true)
-
-        const [long, lat] = apiParams.point
-        const apiUrl = `https://2fxwkf3nc6.execute-api.us-west-2.amazonaws.com/point/${long},${lat}`
-
-        const queryParams = new URLSearchParams({
-            url: `s3://cadcat/tmp/era/wrf/cae/mm4mean/ssp370/mon/${configStr}/d03`,
-            variable: apiParams.configQueryStr
-        })
-        const fullUrl = `${apiUrl}?${queryParams.toString()}`
-
-        try {
-            const res = await fetch(fullUrl)
-            const newData = await res.json()
-
-            if (newData) {
-                setQueriedData(newData)
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }, [apiParams, configStr])
 
     function setLocationSelected(point: Location | null) {
         if (!point) {
