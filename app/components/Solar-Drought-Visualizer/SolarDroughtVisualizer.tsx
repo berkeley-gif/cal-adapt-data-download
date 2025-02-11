@@ -80,47 +80,45 @@ const MenuProps: any = {
 
 export default function SolarDroughtViz() {
     // Context
-    const { open, toggleOpen } = useSidepanel();
-    const { photoConfigSelected, photoConfigList } = usePhotoConfig();
+    const { open, toggleOpen } = useSidepanel()
+    const { photoConfigSelected, photoConfigList } = usePhotoConfig()
 
-    // Map & Location State
-    const mapRef = useRef<any>(null);
-    const [apiParams, setApiParams] = useState<apiParams>({ point: null, configQueryStr: 'srdu' });
-    const [locationStatus, setLocationStatus] = useState<LocationStatus>('none');
+    // Map & location State
+    const mapRef = useRef<any>(null)
+    const [apiParams, setApiParams] = useState<apiParams>({ point: null, configQueryStr: 'srdu' })
+    const [locationStatus, setLocationStatus] = useState<LocationStatus>('none')
+    const [isPointValid, setIsPointValid] = useState<boolean>(false)
+    const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
 
-    // Heatmap State
-    const heatmapContainerRef = useRef<HTMLDivElement>(null);
-    const [heatmapWidth, setHeatmapWidth] = useState(0);
-    const [queriedData, setQueriedData] = useState<QueriedData | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [reverseColorMap, setReverseColorMap] = useState(false);
-    const [useAltColor, setUseAltColor] = useState(false);
+    // Heatmap state
+    const heatmapContainerRef = useRef<HTMLDivElement>(null)
+    const [heatmapWidth, setHeatmapWidth] = useState(0)
+    const [queriedData, setQueriedData] = useState<QueriedData | null>(null)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [reverseColorMap, setReverseColorMap] = useState(false)
+    const [useAltColor, setUseAltColor] = useState(false)
 
     // UI/UX State
-    const [accordionExpanded, setAccordionExpanded] = useState(true);
+    const [accordionExpanded, setAccordionExpanded] = useState(true)
 
-    // Derived State
+    // Derived state
     const configStr = useMemo(() => {
-        return photoConfigSelected === 'Utility Configuration' ? 'srdu' : 'srdd';
-    }, [photoConfigSelected]);
+        return photoConfigSelected === 'Utility Configuration' ? 'srdu' : 'srdd'
+    }, [photoConfigSelected])
 
     // TEMP: for color ramp options
-    const [currentColorMap, setCurrentColorMap] = useState<string>('Oranges');
+    const [currentColorMap, setCurrentColorMap] = useState<string>('Oranges')
 
     const customColorMapList: string[] = [
         'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn',
         'BuPu', 'GnBu', 'OrRd', 'PuBuGn', 'PuBu', 'PuRd', 'RdPu', 'YlGnBu', 'YlGn', 'YlOrBr', 'YlOrRd'
-    ];
+    ]
 
-    // STATE
+    // Parameters state
     const [isColorRev, setIsColorRev] = useState<boolean>(false)
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
     const globalWarmingList = ['2']
-    const [isPointValid, setIsPointValid] = useState<boolean>(false)
     const [useAlternateColorMap, setUseAlternateColorMap] = useState(false)
-
-    // MAP
-    const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
 
     // ACCORDION
     const handleAccordionChange = () => {
@@ -221,7 +219,7 @@ export default function SolarDroughtViz() {
     // Ensure the Mapbox map resizes when the accordion is expanded
     useEffect(() => {
         if (mapRef.current) {
-            mapRef.current.resize(); // Manually trigger the map resize
+            mapRef.current.resize() // Manually trigger the map resize
         }
     }, [accordionExpanded])
 
@@ -234,18 +232,18 @@ export default function SolarDroughtViz() {
 
     // Use the custom hook to update heatmapWidth
     useEffect(() => {
-        if (!heatmapContainerRef.current) return;
+        if (!heatmapContainerRef.current) return
         const resizeObserver = new ResizeObserver(entries => {
             for (const entry of entries) {
-                setHeatmapWidth(entry.contentRect.width);
+                setHeatmapWidth(entry.contentRect.width)
             }
-        });
-        resizeObserver.observe(heatmapContainerRef.current);
+        })
+        resizeObserver.observe(heatmapContainerRef.current)
 
         return () => {
-            resizeObserver.disconnect();
-        };
-    }, [heatmapContainerRef]);
+            resizeObserver.disconnect()
+        }
+    }, [heatmapContainerRef])
 
     const handleColorChange = () => {
         setUseAltColor((prev) => !prev)
