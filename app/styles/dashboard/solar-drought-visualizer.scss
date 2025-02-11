@@ -55,24 +55,6 @@
   .custom-accordion-details {
     z-index: 1;
   }
-
-  .map-container__legend {
-    position: absolute;
-    top: 60px;
-    left: 10px;
-    background-color: white;
-    padding: 6px 10px 4px 10px;
-    border-radius: 4px;
-    box-shadow: none;
-    font-size: 0.875rem;
-
-    &-color-box {
-      width: 16px;
-      height: 16px;
-      background-color: rgba(153, 77, 178, 0.6);
-      margin-right: 10px;
-    }
-  }
 }
 
 .flex-params {

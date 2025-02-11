@@ -14,6 +14,14 @@ import HtmlTooltip from '../Global/HtmlTooltip'
 import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 import '@/app/styles/dashboard/mapbox-map.scss'
 
+const INITIAL_VIEW_STATE = {
+    longitude: -120.4542,
+    latitude: 37.4,
+    zoom: 6
+}
+
+const GRID_FILL_COLOR = 'rgba(118, 150, 190, 0.8)'
+
 type Location = [number, number]
 
 type MapboxMapProps = {
@@ -24,14 +32,6 @@ type MapboxMapProps = {
     width?: number;
     height: number;
 }
-
-const INITIAL_VIEW_STATE = {
-    longitude: -120.4542,
-    latitude: 37.4,
-    zoom: 6
-}
-
-const GRID_FILL_COLOR = 'rgba(118, 150, 190, 0.8)'
 
 const MapboxMap = forwardRef<MapRef | null, MapboxMapProps>(
     ({ locationSelected, setLocationSelected, mapMarker, setMapMarker, height }, ref) => {
