@@ -230,7 +230,7 @@ export default function SolarDroughtViz() {
         }))
     }
 
-    // Use the custom hook to update heatmapWidth
+    // Update heatmapWidth (bc d3 needs hard values)
     useEffect(() => {
         if (!heatmapContainerRef.current) return
         const resizeObserver = new ResizeObserver(entries => {
@@ -410,7 +410,7 @@ export default function SolarDroughtViz() {
                     </Grid>
 
                     {/* Heatmap section */}
-                    <Grid xs={accordionExpanded ? 12 : 8.5}
+                    <Grid xs={accordionExpanded ? 0 : 8.5}
                         sx={{
                             maxWidth: '100%',
                             pr: 4,
@@ -435,6 +435,7 @@ export default function SolarDroughtViz() {
                         <Box
                             ref={heatmapContainerRef}
                             className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '') + (!isLoading && !isPointValid ? ' invalid-point-screen' : '')}
+                            style={{ display: accordionExpanded ? 'none' : 'block' }}
                         >
                             {!isLoading && isPointValid &&
                                 (
