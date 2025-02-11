@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
@@ -79,35 +79,48 @@ const MenuProps: any = {
 }
 
 export default function SolarDroughtViz() {
-    const { open, toggleOpen } = useSidepanel()
-    const { photoConfigSelected, setPhotoConfigSelected, photoConfigList } = usePhotoConfig()
+    // Context
+    const { open, toggleOpen } = useSidepanel();
+    const { photoConfigSelected, photoConfigList } = usePhotoConfig();
 
-    const heatmapContainerRef = useRef<HTMLDivElement>(null)
-    const [heatmapWidth, setHeatmapWidth] = useState(0)
+    // Map & Location State
+    const mapRef = useRef<any>(null);
+    const [apiParams, setApiParams] = useState<apiParams>({ point: null, configQueryStr: 'srdu' });
+    const [locationStatus, setLocationStatus] = useState<LocationStatus>('none');
+
+    // Heatmap State
+    const heatmapContainerRef = useRef<HTMLDivElement>(null);
+    const [heatmapWidth, setHeatmapWidth] = useState(0);
+    const [queriedData, setQueriedData] = useState<QueriedData | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [reverseColorMap, setReverseColorMap] = useState(false);
+    const [useAltColor, setUseAltColor] = useState(false);
+
+    // UI/UX State
+    const [accordionExpanded, setAccordionExpanded] = useState(true);
+
+    // Derived State
+    const configStr = useMemo(() => {
+        return photoConfigSelected === 'Utility Configuration' ? 'srdu' : 'srdd';
+    }, [photoConfigSelected]);
 
     // TEMP: for color ramp options
-    const [currentColorMap, setCurrentColorMap] = useState<string>('Oranges')
+    const [currentColorMap, setCurrentColorMap] = useState<string>('Oranges');
 
     const customColorMapList: string[] = [
         'Oranges', 'Purples', 'Reds', 'Turbo', 'Viridis', 'Inferno', 'Magma', 'Cividis', 'Warm', 'Cool', 'CubehelixDefault', 'BuGn',
         'BuPu', 'GnBu', 'OrRd', 'PuBuGn', 'PuBu', 'PuRd', 'RdPu', 'YlGnBu', 'YlGn', 'YlOrBr', 'YlOrRd'
-    ]
+    ];
 
     // STATE
     const [isColorRev, setIsColorRev] = useState<boolean>(false)
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
     const globalWarmingList = ['2']
-    const [configStr, setConfigStr] = useState<string>('')
-    const [queriedData, setQueriedData] = useState<QueriedData | null>(null)
-    const [isLocationSet, setIsLocationSet] = useState<LocationStatus>('none')
-    const [accordionExpanded, setAccordionExpanded] = useState(true)
+    const [isPointValid, setIsPointValid] = useState<boolean>(false)
+    const [useAlternateColorMap, setUseAlternateColorMap] = useState(false)
 
     // MAP
-    const mapRef = useRef<any>(null) // Ref for the Mapbox component
     const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [isPointValid, setIsPointValid] = useState<boolean>(false)
-    const [useAltColor, setUseAltColor] = useState(false)
 
     // ACCORDION
     const handleAccordionChange = () => {
@@ -118,27 +131,6 @@ export default function SolarDroughtViz() {
     }
 
     // API PARAMS
-    const [apiParams, setApiParams] = useState<apiParams>({
-        point: null,
-        configQueryStr: 'srdu',
-    })
-
-    useEffect(() => {
-        if (photoConfigSelected == "Utility Configuration") {
-            setConfigStr('srdu')
-        } else if (photoConfigSelected == "Distributed Configuration") {
-            setConfigStr('srdd')
-        }
-    }, [photoConfigSelected])
-
-    useEffect(() => {
-        updateApiParams({
-            configQueryStr: configStr
-        })
-
-    }, [configStr])
-
-    // Ref to store previous state
     const prevApiParams = useRef<apiParams>(apiParams)
 
     const onFormDataSubmit = useCallback(async () => {
@@ -181,7 +173,7 @@ export default function SolarDroughtViz() {
 
     function setLocationSelected(point: Location | null) {
         if (!point) {
-            setIsLocationSet('none')
+            setLocationStatus('none')
             updateApiParams({ point: null })
             return
         }
@@ -199,7 +191,7 @@ export default function SolarDroughtViz() {
                 const gridValue = selectedFeature.properties?.[maskAttribute]
                 
                 // Set status based on grid value
-                setIsLocationSet(gridValue === 1 ? 'data' : 'no-data')
+                setLocationStatus(gridValue === 1 ? 'data' : 'no-data')
                 updateApiParams({ point })
                 
                 // Collapse accordion immediately if we have valid data
@@ -240,21 +232,20 @@ export default function SolarDroughtViz() {
         }))
     }
 
-    // RESPONSIVE HEATMAP WIDTH (D3 requires a width specification)
+    // Use the custom hook to update heatmapWidth
     useEffect(() => {
-        if (!heatmapContainerRef.current) return
+        if (!heatmapContainerRef.current) return;
         const resizeObserver = new ResizeObserver(entries => {
             for (const entry of entries) {
-                setHeatmapWidth(entry.contentRect.width)
+                setHeatmapWidth(entry.contentRect.width);
             }
-        })
-
-        resizeObserver.observe(heatmapContainerRef.current)
+        });
+        resizeObserver.observe(heatmapContainerRef.current);
 
         return () => {
-            resizeObserver.disconnect()
-        }
-    }, [])
+            resizeObserver.disconnect();
+        };
+    }, [heatmapContainerRef]);
 
     const handleColorChange = () => {
         setUseAltColor((prev) => !prev)
@@ -282,7 +273,7 @@ export default function SolarDroughtViz() {
             {/* Main viz content */}
             <Grid container xs={12}>
                 {/* Heatmap parameters section */}
-                <Grid xs={isLocationSet !== 'none' ? 12 : 0} sx={{ display: isLocationSet !== 'none' ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                <Grid xs={locationStatus !== 'none' ? 12 : 0} sx={{ display: locationStatus !== 'none' ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                     {queriedData && !isLoading && isPointValid &&
                         (<Box>
                             <Box className="flex-params">
@@ -345,7 +336,7 @@ export default function SolarDroughtViz() {
 
                 <Grid container xs={12} justifyContent="flex-end">
                     {/* Colormap toggle for heatmap */}
-                    <Grid xs={isLocationSet !== 'none' ? (accordionExpanded ? 12 : 8.5) : 0} sx={{ display: isLocationSet !== 'none' ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                    <Grid xs={locationStatus !== 'none' ? (accordionExpanded ? 12 : 8.5) : 0} sx={{ display: locationStatus !== 'none' ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                         {isPointValid && (
                             <div className="color-scale-toggle">
                                 <div className="option-group option-group--vertical">
@@ -412,9 +403,9 @@ export default function SolarDroughtViz() {
                                     style={{
                                         'marginLeft': '10px',
                                     }}
-                                    aria-label={isLocationSet !== 'none' ? "Change your location" : "Select your location"}
+                                    aria-label={locationStatus !== 'none' ? "Change your location" : "Select your location"}
                                 >
-                                    {isLocationSet !== 'none' ? "Change your location" : "Select your location"}
+                                    {locationStatus !== 'none' ? "Change your location" : "Select your location"}
                                 </Typography>
                             </AccordionSummary>
                         </Box>
@@ -429,7 +420,7 @@ export default function SolarDroughtViz() {
                             paddingRight: 0,
                         }}
                     >
-                        {!isLoading && isLocationSet === 'no-data' && (
+                        {!isLoading && locationStatus === 'no-data' && (
                             <Box sx={{ marginBottom: '30px' }}>
                                 <Alert variant="grey" severity="info">
                                     You have selected a location with land use or land cover restrictions. No data will be returned.&nbsp;
