@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
@@ -31,12 +31,11 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import SidePanel from '@/app/components/Dashboard/RightSidepanel'
+import SidePanel from '@/app/components/Dashboard/RightSidePanel'
 import { useSidepanel } from '@/app/context/SidepanelContext'
 import { usePhotoConfig } from '@/app/context/PhotoConfigContext'
 
 import { useDidMountEffect } from "@/app/utils/hooks"
-
 
 import MapboxMap from '@/app/components/Solar-Drought-Visualizer/MapboxMap'
 import Heatmap from '@/app/components/Heatmap/Heatmap'
@@ -45,18 +44,21 @@ import { ApiResponse } from './DataType'
 import '@/app/styles/dashboard/solar-drought-visualizer.scss'
 import LoadingSpinner from '../Global/LoadingSpinner'
 
-const MAP_HEIGHT = 615
+const MAP_HEIGHT = 550
 const HEATMAP_HEIGHT = 500
+const ITEM_HEIGHT = 48
+const ITEM_PADDING_TOP = 8
 
 type Location = [number, number]
-
 type apiParams = {
     point: Location | null,
     configQueryStr: string,
 }
+type LocationStatus = 'none' | 'data' | 'no-data'
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
+interface QueriedData {
+    data: number[][]
+}
 
 const MenuProps: any = {
     PaperProps: {
@@ -77,11 +79,37 @@ const MenuProps: any = {
 }
 
 export default function SolarDroughtViz() {
+    // Context
     const { open, toggleOpen } = useSidepanel()
-    const { photoConfigSelected, setPhotoConfigSelected, photoConfigList } = usePhotoConfig()
+    const { photoConfigSelected, photoConfigList } = usePhotoConfig()
 
-    const heatmapContainerRef = useRef<HTMLBoxElement>(null)
+    // Parameters state
+    const [isColorRev, setIsColorRev] = useState<boolean>(false)
+    const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
+    const globalWarmingList = ['2']
+
+    // Derived state
+    const configStr = useMemo(() => {
+        return photoConfigSelected === 'Utility Configuration' ? 'srdu' : 'srdd'
+    }, [photoConfigSelected])
+
+    // Map & location state
+    const mapRef = useRef<any>(null)
+    const [apiParams, setApiParams] = useState<apiParams>({ point: null, configQueryStr: 'srdu' })
+    const [locationStatus, setLocationStatus] = useState<LocationStatus>('none')
+    const [isPointValid, setIsPointValid] = useState<boolean>(false)
+    const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
+
+    // Heatmap state
+    const heatmapContainerRef = useRef<HTMLDivElement>(null)
     const [heatmapWidth, setHeatmapWidth] = useState(0)
+    const [queriedData, setQueriedData] = useState<QueriedData | null>(null)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [reverseColorMap, setReverseColorMap] = useState(false)
+    const [useAltColor, setUseAltColor] = useState(false)
+
+    // UI state
+    const [accordionExpanded, setAccordionExpanded] = useState(true)
 
     // TEMP: for color ramp options
     const [currentColorMap, setCurrentColorMap] = useState<string>('Oranges')
@@ -91,108 +119,18 @@ export default function SolarDroughtViz() {
         'BuPu', 'GnBu', 'OrRd', 'PuBuGn', 'PuBu', 'PuRd', 'RdPu', 'YlGnBu', 'YlGn', 'YlOrBr', 'YlOrRd'
     ]
 
-    const [isColorRev, setIsColorRev] = useState<boolean>(false)
-
-    const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
-    const globalWarmingList = ['2']
-    const [configStr, setConfigStr] = useState<string>('')
-    const [queriedData, setQueriedData] = useState(null)
-    const [isLocationSet, setIsLocationSet] = useState<boolean>(false)
-    const [accordionExpanded, setAccordionExpanded] = useState(true)
-    const mapRef = useRef<any>(null) // Ref for the Mapbox component
-    const [mapMarker, setMapMarker] = useState<[number, number] | null>(null)
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [isPointValid, setIsPointValid] = useState<boolean>(false)
-    const [useAltColor, setUseAltColor] = useState(false)
-
-    // ACCORDION
-    const expandMap = () => {
-        setAccordionExpanded((prevExpanded: boolean) => !prevExpanded)
+    // Handlers
+    const handleAccordionChange = () => {
+        if (apiParams.point !== null) {
+            setAccordionExpanded(!accordionExpanded)
+        }
     }
 
     // API PARAMS
-    const [apiParams, setApiParams] = useState<apiParams>({
-        point: null,
-        configQueryStr: 'srdu',
-    })
-
-    useEffect(() => {
-        if (photoConfigSelected == "Utility Configuration") {
-            setConfigStr('srdu')
-        } else if (photoConfigSelected == "Distributed Configuration") {
-            setConfigStr('srdd')
-        }
-    }, [photoConfigSelected])
-
-    useEffect(() => {
-        updateApiParams({
-            configQueryStr: configStr
-        })
-
-    }, [configStr])
-
-    // Ref to store previous state
     const prevApiParams = useRef<apiParams>(apiParams)
 
-    useEffect(() => {
-        // Compare previous and current state
-        if (JSON.stringify(prevApiParams.current) !== JSON.stringify(apiParams)) {
-            onFormDataSubmit()
-        }
-
-        // Update the ref to the current apiParams
-        prevApiParams.current = apiParams
-    }, [apiParams])
-
-    function setLocationSelected(point: Location | null) {
-        updateApiParams({
-            point: point
-        })
-        setIsLocationSet(true)
-    }
-
-    // QUERIED DATA
-    useEffect(() => {
-        if (queriedData) {
-            setIsLoading(false)
-
-            if (queriedData.data[0][0]) {
-                // Point is valid
-                setIsPointValid(true)
-            } else {
-                // Point is Invalid
-                setIsPointValid(false)
-            }
-        }
-
-    }, [queriedData])
-
-    // IS LOADING
-    useEffect(() => {
-        if (!isLoading && !isPointValid) {
-            console.log('map point invalid')
-        }
-
-    }, [isLoading])
-
-    // Ensure the Mapbox map resizes when the accordion is expanded
-    useEffect(() => {
-        if (accordionExpanded && mapRef.current) {
-            setTimeout(() => {
-                mapRef.current?.resize() // Force map resize after expansion
-            }, 300) // Delay to allow the accordion transition to complete
-        }
-    }, [accordionExpanded])
-
-    function updateApiParams(newParams: Partial<apiParams>) {
-        setApiParams(prevParams => ({
-            ...prevParams,
-            ...newParams
-        }))
-    }
-
-    const onFormDataSubmit = async () => {
-        if (!apiParams.point) {
+    const onFormDataSubmit = useCallback(async () => {
+        if (!apiParams.point || locationStatus !== 'data') {
             return
         }
 
@@ -213,34 +151,162 @@ export default function SolarDroughtViz() {
 
             if (newData) {
                 setQueriedData(newData)
-
-
+                setIsPointValid(true)
+            } else {
+                setIsPointValid(false)
             }
         } catch (err) {
             console.log(err)
+            setIsPointValid(false)
+        } finally {
+            setIsLoading(false)
         }
+    }, [apiParams, configStr, locationStatus])
 
-    }
-
-    // RESPONSIVE HEATMAP WIDTH (D3 requires a width specification)
     useEffect(() => {
-        if (!heatmapContainerRef.current) return
+        if (JSON.stringify(prevApiParams.current) !== JSON.stringify(apiParams)) {
+            onFormDataSubmit()
+        }
+        prevApiParams.current = apiParams
+    }, [apiParams, onFormDataSubmit])
+
+    useEffect(() => {
+        if (queriedData) {
+            setIsLoading(false)
+            setIsPointValid(true)
+        }
+    }, [queriedData])
+
+    useEffect(() => {
+        if (!isLoading && !isPointValid) {
+            console.log('map point invalid')
+        }
+    }, [isLoading, isPointValid])
+
+    useEffect(() => {
+        if (mapRef.current) {
+            mapRef.current.resize()
+        }
+    }, [accordionExpanded])
+
+    useEffect(() => {
+        const currentRef = heatmapContainerRef.current;
+        if (!currentRef) return;
+
         const resizeObserver = new ResizeObserver(entries => {
             for (const entry of entries) {
-                setHeatmapWidth(entry.contentRect.width)
+                const newWidth = entry.contentRect.width;
+                setHeatmapWidth(newWidth);
             }
-        })
+        });
 
-        resizeObserver.observe(heatmapContainerRef.current)
+        resizeObserver.observe(currentRef);
 
         return () => {
-            resizeObserver.disconnect()
+            resizeObserver.disconnect();
+        };
+    }, [heatmapContainerRef.current]);
+
+    // Effect to handle configuration changes
+    useEffect(() => {
+        if (apiParams.point) {
+            console.log('PhotoConfig changed:', photoConfigSelected)
+            console.log('Checking location status for point due to config change:', apiParams.point)
+            checkLocationStatus(apiParams.point, photoConfigSelected)
         }
-    }, [])
+    }, [photoConfigSelected, apiParams.point])
+
+    // Function to check location status based on the current point and configuration
+    function checkLocationStatus(point: Location | null, config: string) {
+        if (!point) {
+            console.log('No point selected, setting location status to none')
+            setLocationStatus('none')
+            return
+        }
+
+        // Get the grid value at this point
+        if (mapRef.current) {
+            const mapboxPoint = mapRef.current.project(point)
+            const features = mapRef.current.queryRenderedFeatures(mapboxPoint, {
+                layers: ['grid']
+            })
+
+            if (features && features.length > 0) {
+                const selectedFeature = features[0]
+                const maskAttribute = config === 'Utility Configuration' ? 'srdumask' : 'srddmask'
+                const gridValue = selectedFeature.properties?.[maskAttribute]
+                
+                // Set status based on grid value
+                const newStatus = gridValue === 1 ? 'data' : 'no-data'
+                console.log('Grid value:', gridValue, 'Setting location status to:', newStatus)
+                setLocationStatus(newStatus)
+
+                if (newStatus === 'data') {
+                    console.log('Fetching new data for point:', point)
+                    onFormDataSubmit()
+                } else {
+                    console.log('No data available for the selected point.')
+                    setQueriedData(null)
+                    setIsPointValid(false)
+                }
+            } else {
+                console.log('No features found, setting location status to no-data')
+                setLocationStatus('no-data')
+                setQueriedData(null)
+                setIsPointValid(false)
+            }
+        }
+    }
+
+    function setLocationSelected(point: Location | null) {
+        if (!point) {
+            setLocationStatus('none')
+            updateApiParams({ point: null })
+            return
+        }
+
+        // Get the grid value at this point
+        if (mapRef.current) {
+            const mapboxPoint = mapRef.current.project(point)
+            const features = mapRef.current.queryRenderedFeatures(mapboxPoint, {
+                layers: ['grid']
+            })
+
+            if (features && features.length > 0) {
+                const selectedFeature = features[0]
+                const maskAttribute = photoConfigSelected === 'Utility Configuration' ? 'srdumask' : 'srddmask'
+                const gridValue = selectedFeature.properties?.[maskAttribute]
+                
+                // Set status based on grid value
+                setLocationStatus(gridValue === 1 ? 'data' : 'no-data')
+                updateApiParams({ point })
+                
+                // Collapse accordion on selection
+                setAccordionExpanded(false)
+
+                // Debug
+                console.log('Location selected:', point, 'Grid value:', gridValue)
+            }
+        }
+    }
+
+    function updateApiParams(newParams: Partial<apiParams>) {
+        setApiParams(prevParams => ({
+            ...prevParams,
+            ...newParams
+        }))
+    }
 
     const handleColorChange = () => {
-        setUseAltColor((prev) => !prev);
-    };
+        setUseAltColor((prev) => !prev)
+    }
+
+    const handleSummaryClick = (event: React.MouseEvent) => {
+        if (apiParams.point === null) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+    }
 
     return (
         <Box className="solar-drought-tool tool-container tool-container--padded" aria-label="Solar Drought Visualizer" role="region">
@@ -257,7 +323,7 @@ export default function SolarDroughtViz() {
             {/* Main viz content */}
             <Grid container xs={12}>
                 {/* Heatmap parameters section */}
-                <Grid xs={isLocationSet ? 12 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                <Grid xs={locationStatus !== 'none' ? 12 : 0} sx={{ display: locationStatus !== 'none' ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                     {queriedData && !isLoading && isPointValid &&
                         (<Box>
                             <Box className="flex-params">
@@ -291,7 +357,7 @@ export default function SolarDroughtViz() {
             </Grid>
             <Accordion
                 expanded={accordionExpanded}
-                onChange={() => setAccordionExpanded(!accordionExpanded)}
+                onChange={handleAccordionChange}
                 slots={{ transition: Fade as AccordionSlots['transition'] }}
                 slotProps={{ transition: { timeout: 400 } }}
                 sx={[
@@ -318,10 +384,9 @@ export default function SolarDroughtViz() {
                 ]}
             >
 
-                <Grid container xs={12}>
-
+                <Grid container xs={12} justifyContent="flex-end">
                     {/* Colormap toggle for heatmap */}
-                    <Grid xs={isLocationSet ? 8.5 : 0} sx={{ display: isLocationSet ? 'block' : 'none', transition: 'all 0.3s ease' }}>
+                    <Grid xs={locationStatus !== 'none' ? (accordionExpanded ? 12 : 8.5) : 0} sx={{ display: locationStatus !== 'none' ? 'block' : 'none', transition: 'all 0.3s ease' }}>
                         {isPointValid && (
                             <div className="color-scale-toggle">
                                 <div className="option-group option-group--vertical">
@@ -351,8 +416,7 @@ export default function SolarDroughtViz() {
                                         <FormControlLabel
                                             control={<Switch onChange={handleColorChange} color="secondary" />}
                                             label="Alternative color palette"
-                                        />
-                                    </FormGroup> */}
+                                        /> */}
                                     <FormGroup>
                                         <FormControlLabel
                                             control={<Switch onChange={() => setIsColorRev(!isColorRev)} color="secondary" />}
@@ -361,40 +425,43 @@ export default function SolarDroughtViz() {
                                     </FormGroup>
                                 </div>
                             </div>
-
                         )}
                     </Grid>
 
                     {/* Locator map instruction section */}
-                    <Grid xs={3.5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                        <AccordionSummary
-                            expandIcon={<ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} aria-label="Expand or collapse the section" />}
-                            aria-controls="panel1-content"
-                            id="panel1-header"
-                            sx={{
-                                '& .MuiAccordionSummary-content': {
-                                    marginTop: '20px', // Override the default margin to keep the Accordion Summary from vertically shifting when expanding
-                                    marginBottom: '20px',
-                                },
-                            }}
-                        >
-                            <EditLocationOutlinedIcon aria-label="Edit location" />
-                            <Typography
-                                className="inline"
-                                variant="h5"
-                                style={{
-                                    'marginLeft': '10px',
-                                    'textDecoration': !accordionExpanded ? 'underline' : 'none',
+                    <Grid xs={12} sx={{ display: 'flex', justifyContent: accordionExpanded ? 'flex-start' : 'flex-end' }}>
+                        <Box sx={{ width: accordionExpanded ? '100%' : 'auto' }}>
+                            <AccordionSummary
+                                onClick={handleSummaryClick}
+                                expandIcon={apiParams.point !== null ? <ExpandMoreIcon /> : null}
+                                aria-controls="panel1-content"
+                                id="panel1-header"
+                                sx={{
+                                    '& .MuiAccordionSummary-content': {
+                                        marginTop: '20px',
+                                        marginBottom: '20px',
+                                        justifyContent: accordionExpanded ? 'flex-start' : 'flex-end',
+                                    },
+                                    width: '100%',
                                 }}
-                                aria-label={isLocationSet ? "Change your location" : "Select your location"}
                             >
-                                {isLocationSet ? "Change your location" : "Select your location"}
-                            </Typography>
-                        </AccordionSummary>
+                                <EditLocationOutlinedIcon aria-label="Edit location" />
+                                <Typography
+                                    className="inline"
+                                    variant="h5"
+                                    style={{
+                                        'marginLeft': '10px',
+                                    }}
+                                    aria-label={locationStatus !== 'none' ? "Change your location" : "Select your location"}
+                                >
+                                    {locationStatus !== 'none' ? "Change your location" : "Select your location"}
+                                </Typography>
+                            </AccordionSummary>
+                        </Box>
                     </Grid>
 
                     {/* Heatmap section */}
-                    <Grid xs={accordionExpanded ? 8.5 : 12}
+                    <Grid xs={accordionExpanded ? 0 : 8.5}
                         sx={{
                             maxWidth: '100%',
                             pr: 4,
@@ -402,52 +469,50 @@ export default function SolarDroughtViz() {
                             paddingRight: 0,
                         }}
                     >
-                        {!isLoading && !isPointValid && isLocationSet &&
-                            (
-                                <Box>
-                                    <Alert variant="grey" severity="info" aria-label="Location with restrictions alert">You have selected a location with land use or land cover restrictions. No data will be returned.&nbsp;
-                                        <span
-                                            className={accordionExpanded ? '' : 'underline'}
-                                            onClick={accordionExpanded ? undefined : expandMap}
-                                            aria-label="Select another location"
-                                        >
-                                            <strong>Select another location </strong>
-                                        </span>
-                                        to try again
-                                    </Alert>
-                                </Box>
-                            )
-                        }
-                        <Box
-                            ref={heatmapContainerRef}
-                            className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '') + (!isLoading && !isPointValid ? ' invalid-point-screen' : '')}
-                        >
-                            {!isLoading && isPointValid &&
-                                (
+                        {!isLoading && locationStatus === 'no-data' && (
+                            <Box sx={{ marginBottom: '30px' }}>
+                                <Alert variant="grey" severity="info">
+                                    You have selected a location with land use or land cover restrictions. No data will be returned.&nbsp;
+                                    <span
+                                        onClick={accordionExpanded ? undefined : handleAccordionChange}
+                                        aria-label="Select another location"
+                                    >
+                                        <strong>Select another location </strong>
+                                    </span>
+                                    to try again
+                                </Alert>
+                            </Box>
+                        )}
+                        {locationStatus === 'data' && (
+                            <Box
+                                ref={heatmapContainerRef}
+                                className={'solar-drought-tool__heatmap' + (isLoading ? ' loading-screen' : '')}
+                                style={{ display: accordionExpanded ? 'none' : 'block' }}
+                            >
+                                {isLoading && (
+                                    <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                        <LoadingSpinner aria-label="Loading heatmap data" />
+                                    </Box>
+                                )}
+                                {!isLoading && isPointValid && (
                                     <Heatmap
                                         width={heatmapWidth}
                                         height={HEATMAP_HEIGHT}
-                                        data={queriedData && queriedData}
+                                        data={queriedData}
                                         useAltColor={useAltColor}
                                         aria-label="Heatmap visualization"
                                         currentColorMap={currentColorMap}
                                         isColorRev={isColorRev}
                                     />
-                                )
-                            }
-                            {isLoading &&
-                                (
-                                    <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                        <LoadingSpinner aria-label="Loading heatmap data" />
-                                    </Box>
-                                )
-                            }
-                        </Box>
+                                )}
+                            </Box>
+                        )}
                     </Grid>
 
                     {/* Locator map section */}
-                    <Grid xs={3.5} >
+                    <Grid xs={accordionExpanded ? 12 : 3.5} sx={{ alignItems: 'flex-end' }}>
                         <AccordionDetails
+                            className="custom-accordion-details"
                             sx={{
                                 paddingTop: '0px',
                             }}

@@ -1,6 +1,6 @@
 .solar-drought-tool {
   &__intro {
-    margin: 30px 16px;
+    margin: 0 16px 16px 16px;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -23,12 +23,37 @@
   }
 
   .invalid-point-screen {
-    margin-top: 30px;
+    margin-top: 0;
   }
 
   .alerts {
     margin-left: 103px;
     margin-right: 14px;
+  }
+
+  .map-tooltip {
+    position: absolute;
+    background-color: white;
+    border-radius: 16px;
+    color: black;
+    padding: 5px;
+    margin-left: 15px;
+    transform: translateY(-50%);
+    z-index: 1000;
+
+    &:after {
+      content: "";
+      position: absolute;
+      border-width: 5px;
+      left: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-color: transparent black transparent transparent;
+    }
+  }
+
+  .custom-accordion-details {
+    z-index: 1;
   }
 }
 
@@ -37,4 +62,8 @@
   gap: 40px;
   margin: 0 0 35px 0;
   justify-content: flex-end;
+}
+
+.custom-accordion-details {
+  display: block !important; /* Override MUI's default behavior */
 }

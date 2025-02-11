@@ -10,22 +10,37 @@
     }
 
     &__legend {
+      position: absolute;
+      top: 60px;
+      left: 10px;
       display: flex;
       align-items: center;
+      height: 36px;
+      background-color: white;
+      padding: 6px 10px 4px 10px;
+      border-radius: 4px;
+      box-shadow: none;
+      font-size: 0.875rem;
 
       &-color-box {
         width: 16px;
         height: 16px;
-        background-color: rgba(128, 128, 128, 0.3);
+        background-color: rgba(118, 150, 190, 0.8);
         margin-right: 10px;
       }
     }
   }
 }
 
+.inline-tooltip {
+  margin-left: 6px;
+  margin-top: 4px;
+}
+
 .mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
-    // so geocoder component has same styling as navigation component
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 2px;
+    // so geocoder component has same styling as no-data legend
+    width: 275px !important;
+    box-shadow: none !important;
 }
 
 .mapboxgl-popup.map-popup {
@@ -33,7 +48,7 @@
         background-color: white;
         border: 0;
         border-radius: 4px;
-        padding: 8px 16px;
+        padding: 10px 16px;
         box-shadow: none;
     }
 
