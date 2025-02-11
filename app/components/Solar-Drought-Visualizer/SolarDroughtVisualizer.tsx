@@ -190,21 +190,62 @@ export default function SolarDroughtViz() {
     }, [accordionExpanded])
 
     useEffect(() => {
-        if (!heatmapContainerRef.current) return
+        const currentRef = heatmapContainerRef.current;
+        if (!currentRef) return;
 
         const resizeObserver = new ResizeObserver(entries => {
             for (const entry of entries) {
-                const newWidth = entry.contentRect.width
-                setHeatmapWidth(newWidth)
+                const newWidth = entry.contentRect.width;
+                setHeatmapWidth(newWidth);
             }
-        })
+        });
 
-        resizeObserver.observe(heatmapContainerRef.current)
+        resizeObserver.observe(currentRef);
 
         return () => {
-            resizeObserver.disconnect()
+            resizeObserver.disconnect();
+        };
+    }, [heatmapContainerRef.current]);
+
+    // Effect to handle configuration changes
+    useEffect(() => {
+        console.log('PhotoConfig changed:', photoConfigSelected)
+        if (apiParams.point) {
+            console.log('Checking location status for point due to config change:', apiParams.point)
+            checkLocationStatus(apiParams.point, photoConfigSelected)
         }
-    }, [heatmapContainerRef.current])
+    }, [photoConfigSelected])
+
+    // Function to check location status based on the current point and configuration
+    function checkLocationStatus(point: Location | null, config: string) {
+        if (!point) {
+            console.log('No point selected, setting location status to none')
+            setLocationStatus('none')
+            return
+        }
+
+        // Get the grid value at this point
+        if (mapRef.current) {
+            const mapboxPoint = mapRef.current.project(point)
+            const features = mapRef.current.queryRenderedFeatures(mapboxPoint, {
+                layers: ['grid']
+            })
+
+            if (features && features.length > 0) {
+                const selectedFeature = features[0]
+                const maskAttribute = config === 'Utility Configuration' ? 'srdumask' : 'srddmask'
+                const gridValue = selectedFeature.properties?.[maskAttribute]
+                
+                // Set status based on grid value
+                const newStatus = gridValue === 1 ? 'data' : 'no-data'
+                console.log('Grid value:', gridValue, 'Setting location status to:', newStatus)
+                setLocationStatus(newStatus)
+            } else {
+                console.log('No features found, setting location status to no-data')
+                setLocationStatus('no-data')
+            }
+        }
+    }
 
     function setLocationSelected(point: Location | null) {
         if (!point) {
@@ -231,6 +272,9 @@ export default function SolarDroughtViz() {
                 
                 // Collapse accordion on selection
                 setAccordionExpanded(false)
+
+                // Debug
+                console.log('Location selected:', point, 'Grid value:', gridValue)
             }
         }
     }
