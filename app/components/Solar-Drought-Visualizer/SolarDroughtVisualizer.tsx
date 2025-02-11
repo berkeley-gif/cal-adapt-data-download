@@ -83,7 +83,7 @@ export default function SolarDroughtViz() {
     const { open, toggleOpen } = useSidepanel()
     const { photoConfigSelected, photoConfigList } = usePhotoConfig()
 
-    // Map & location State
+    // Map & location state
     const mapRef = useRef<any>(null)
     const [apiParams, setApiParams] = useState<apiParams>({ point: null, configQueryStr: 'srdu' })
     const [locationStatus, setLocationStatus] = useState<LocationStatus>('none')
@@ -98,7 +98,7 @@ export default function SolarDroughtViz() {
     const [reverseColorMap, setReverseColorMap] = useState(false)
     const [useAltColor, setUseAltColor] = useState(false)
 
-    // UI/UX State
+    // UI state
     const [accordionExpanded, setAccordionExpanded] = useState(true)
 
     // Derived state
@@ -118,11 +118,50 @@ export default function SolarDroughtViz() {
     const [isColorRev, setIsColorRev] = useState<boolean>(false)
     const [globalWarmingSelected, setGlobalWarmingSelected] = useState('2')
     const globalWarmingList = ['2']
-    const [useAlternateColorMap, setUseAlternateColorMap] = useState(false)
 
-    // ACCORDION
+    // Effect Hooks
+    useEffect(() => {
+        if (JSON.stringify(prevApiParams.current) !== JSON.stringify(apiParams)) {
+            onFormDataSubmit()
+        }
+        prevApiParams.current = apiParams
+    }, [apiParams, onFormDataSubmit])
+
+    useEffect(() => {
+        if (queriedData) {
+            setIsLoading(false)
+            setIsPointValid(true)
+        }
+    }, [queriedData])
+
+    useEffect(() => {
+        if (!isLoading && !isPointValid) {
+            console.log('map point invalid')
+        }
+    }, [isLoading, isPointValid])
+
+    useEffect(() => {
+        if (mapRef.current) {
+            mapRef.current.resize()
+        }
+    }, [accordionExpanded])
+
+    useEffect(() => {
+        if (!heatmapContainerRef.current) return
+        const resizeObserver = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                setHeatmapWidth(entry.contentRect.width)
+            }
+        })
+        resizeObserver.observe(heatmapContainerRef.current)
+
+        return () => {
+            resizeObserver.disconnect()
+        }
+    }, [heatmapContainerRef])
+
+    // Handlers
     const handleAccordionChange = () => {
-        // Only allow accordion state changes if a point has been chosen
         if (apiParams.point !== null) {
             setAccordionExpanded(!accordionExpanded)
         }
@@ -159,16 +198,6 @@ export default function SolarDroughtViz() {
         }
     }, [apiParams, configStr])
 
-    useEffect(() => {
-        // Compare previous and current state
-        if (JSON.stringify(prevApiParams.current) !== JSON.stringify(apiParams)) {
-            onFormDataSubmit()
-        }
-
-        // Update the ref to the current apiParams
-        prevApiParams.current = apiParams
-    }, [apiParams, onFormDataSubmit])
-
     function setLocationSelected(point: Location | null) {
         if (!point) {
             setLocationStatus('none')
@@ -192,7 +221,7 @@ export default function SolarDroughtViz() {
                 setLocationStatus(gridValue === 1 ? 'data' : 'no-data')
                 updateApiParams({ point })
                 
-                // Collapse accordion immediately if we have valid data
+                // Collapse accordion if we have valid data
                 if (gridValue === 1) {
                     setAccordionExpanded(false)
                 }
@@ -200,50 +229,12 @@ export default function SolarDroughtViz() {
         }
     }
 
-    // QUERIED DATA
-    useEffect(() => {
-        if (queriedData) {
-            setIsLoading(false)
-            setIsPointValid(true)
-        }
-    }, [queriedData])
-
-    // IS LOADING
-    useEffect(() => {
-        if (!isLoading && !isPointValid) {
-            console.log('map point invalid')
-        }
-
-    }, [isLoading, isPointValid])
-
-    // Ensure the Mapbox map resizes when the accordion is expanded
-    useEffect(() => {
-        if (mapRef.current) {
-            mapRef.current.resize() // Manually trigger the map resize
-        }
-    }, [accordionExpanded])
-
     function updateApiParams(newParams: Partial<apiParams>) {
         setApiParams(prevParams => ({
             ...prevParams,
             ...newParams
         }))
     }
-
-    // Update heatmapWidth (bc d3 needs hard values)
-    useEffect(() => {
-        if (!heatmapContainerRef.current) return
-        const resizeObserver = new ResizeObserver(entries => {
-            for (const entry of entries) {
-                setHeatmapWidth(entry.contentRect.width)
-            }
-        })
-        resizeObserver.observe(heatmapContainerRef.current)
-
-        return () => {
-            resizeObserver.disconnect()
-        }
-    }, [heatmapContainerRef])
 
     const handleColorChange = () => {
         setUseAltColor((prev) => !prev)
